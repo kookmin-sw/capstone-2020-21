@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+# Applications provided by Django.
 DJANGO_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,9 +40,15 @@ DJANGO_APPS = (
     'django.contrib.staticfiles',
 )
 
-THIRD_PARTY_APPS = ()
+# Applications installed via pip.
+THIRD_PARTY_APPS = (
+    'rest_framework',
+)
 
-LOCAL_APPS = ()
+# Applications implemented.
+LOCAL_APPS = (
+    'apps.api',
+)
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -82,7 +89,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': Path(BASE_DIR, 'db.sqlite3'),
+        'NAME': str(Path(BASE_DIR, 'db.sqlite3')),
     }
 }
 
@@ -119,6 +126,11 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Settings for Django REST Framework.
+
+REST_FRAMEWORK = {
+    
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
