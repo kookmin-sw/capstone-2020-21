@@ -1,76 +1,84 @@
-# Welcome to GitHub
+# 옷때?(OTTE?)
 
-캡스톤 팀 생성을 축하합니다.
+## 1. 프로젝트 소개
 
-## 팀소개 및 페이지를 꾸며주세요.
+<center><img src="index.assets/image-20200314162533015.png" alt="image-20200314162533015" style="zoom:50%;" /></center>
 
-- 프로젝트 소개
-  - 프로젝트 설치방법 및 데모, 사용방법, 프리뷰등을 readme.md에 작성.
-  - Api나 사용방법등 내용이 많을경우 wiki에 꾸미고 링크 추가.
+​	많은 사람들은 날씨에 맞는 옷을 입기 위해서 기온 별 옷차림을 검색한다. 하지만 이렇게 신중하게 옷을 골라 입어도 막상 밖에 나가보면 너무 덥거나 추웠던 경우가 잇을 것이다. 사람마다 더위, 추위를 타는 정도와 각자 소유하고 있는 옷 등이 다르므로 우리는 사용자 개인 맞춤에 중점을 두어 "오늘 뭐 입지?"라는 고민을 같이 덜어주고자 한다.
 
-- 팀페이지 꾸미기
-  - 프로젝트 소개 및 팀원 소개
-  - index.md 예시보고 수정.
+​	'옷때?(OTTE?)'는 **O**utfit **T**oday wea**T**h**E**r의 의미를 가지며, 사용자가 날씨에 맞는 코디를 할 수 있게 도와주는 웹 서비스다. 주요 기능은 다음과 같다.
 
-- GitHub Pages 리파지토리 Settings > Options > GitHub Pages 
-  - Source를 marster branch
-  - Theme Chooser에서 태마선택
-  - 수정후 팀페이지 확인하여 점검.
+1. 사용자의 **옷** 정보 저장
+   - 옷 사진 업로드에 따른 분류 작업 수행
+     - 대분류 : 아우터, 상의, 바지, 치마, 원피스
+     - 소분류 : 대분류의 세부 카테고리
+2. 사용자의 **코디** 정보(어떤 옷들을 조합하여 입었는지) 저장
+3. 사용자의 **코디 리뷰** 정보(언제, 어디서 입었는지, 춥거나 덥지는 않았는지 여부) 저장
+4. 오늘의 날씨에 맞는 **코디 추천**
+   - 과거 유사한 날씨에 본인이 작성한 코디 리뷰 조회
+   - 과거 유사한 날씨에 다른 사용자들이 작성한 긍정적인 리뷰들 중, 
+     각 대분류 별 가장 높은 비율을 차지한 소분류 카테고리에 따라 해당 카테고리와 일치하는 사용자의 옷 추천
 
-**팀페이지 주소** -> https://kookmin-sw.github.io/ '{{자신의 리파지토리 아이디}}'
+### Abstract
 
-**예시)** 2020년 0조  https://kookmin-sw.github.io/capstone-2020-0/
+​	Many people search for what to wear before going out in order to find appropriate clothes set for the weather. But even if they go through this process of searching, there are cases where they feel colder or hotter than what they have thought after getting out. Because every people feels different on how hot or cold about the same weather and also has different clothes to choose from, we are trying to help them resolve the problem "What to wear today" by focusing on individual information.
 
+​	'**OTTE?**' stands for **O**utfit **T**oday wea**T**h**E**r, and it is a web service that helps the user to find appropriate clothes set for the weather they are about to face. The main features are as follows.
 
-## 내용에 아래와 같은 내용들을 추가하세요.
+1. Save the user's **Clothes** information.
+   - Classify the uploaded clothes picture.
+     - Big categories : Outer, Top, Pants, Skirts, Dress.
+     - Small categories : detailed multiple categories inside inside big categories
+2. Save the user's **Clothes Set**(what combination of clothes the user wore) information.
+3. Save the user's **Clothes Set "Review"**(when & where they wore, whether it was too cold or hot).
+4. **Recommend** the clothing set for weather today.
+   - Show Clothes Set Reviews written by the user that had the similar weather with today's weather.
+   - Relying on 'positive' Clothes Set Reviews written by other users that had the similar weather with today's weather, find which small category of each big categories were the most popular, and show the user's clothes on those categories.
 
-### 1. 프로잭트 소개
+## 2. 소개 영상
 
-프로젝트
+(영상 embed 예정)
 
-### 2. 소개 영상
+## 3. 팀 소개
 
-프로젝트 소개하는 영상을 추가하세요
+#### 황효빈
 
-### 3. 팀 소개
+~~~
+📧 email: hyobin0715@kookmin.ac.kr
+📌 role: 팀장, AWS 연결, 데이터베이스 구축, API 서버 개발
+~~~
 
-팀을 소개하세요.
+#### 송현화
 
-팀원정보 및 담당이나 사진 및 SNS를 이용하여 소개하세요.
+~~~
+📧 email: soonghh@kookmin.ac.kr
+📌 role: 유저 인터페이스 디자인, 프론트엔드 개발
+~~~
 
-### 4. 사용법
+#### 정예빈
 
-소스코드제출시 설치법이나 사용법을 작성하세요.
+~~~
+📧 email: gsj4243@kookmin.ac.kr
+📌 role: 유저 인터페이스 디자인, 프론트엔드 개발
+~~~
 
-### 5. 기타
+#### 권민수
 
-추가적인 내용은 자유롭게 작성하세요.
+~~~
+📧 email: mageeeeek@gmail.com
+📌 role: Project Manager, API 서버 개발, 옷 분류 모델 개발
+~~~
 
+#### 이재호
 
-## Markdown을 사용하여 내용꾸미기
+~~~
+📧 email: hiljh96@kookmin.ac.kr
+📌 role: AWS 연결, API 서버 개발
+~~~
 
-Markdown은 작문을 스타일링하기위한 가볍고 사용하기 쉬운 구문입니다. 여기에는 다음을위한 규칙이 포함됩니다.
+#### 주가구
 
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-자세한 내용은 [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Support or Contact
-
-readme 파일 생성에 추가적인 도움이 필요하면 [도움말](https://help.github.com/articles/about-readmes/) 이나 [contact support](https://github.com/contact) 을 이용하세요.
+~~~
+📧 email: zhoujiaju@kookmin.ac.kr
+📌 role: 유닛 테스팅, 문서 정리
+~~~
