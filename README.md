@@ -43,7 +43,7 @@
 
 #### 황효빈
 
-<img src="index.assets/image-20200314190325679.png" alt="image-20200314190325679" style="zoom: 25%;" />
+<img src="index.assets/image-20200314190325679.png" alt="image-20200314190325679" width="25%" height="25%" />
 
 ~~~
 📧 email: hyobin0715@kookmin.ac.kr
@@ -52,7 +52,7 @@
 
 #### 송현화
 
-<img src="index.assets/image-20200314175816474.png" alt="image-20200314175816474" style="zoom: 25%;" />
+<img src="index.assets/image-20200314175816474.png" alt="image-20200314175816474" width="25%" height="25%" />
 
 ~~~
 📧 email: soonghh@kookmin.ac.kr
@@ -61,7 +61,7 @@
 
 #### 정예빈
 
-<img src="index.assets/image-20200314175846745.png" alt="image-20200314175846745" style="zoom:50%;" />
+<img src="index.assets/image-20200314175846745.png" alt="image-20200314175846745" width="25%" height="25%" />
 
 ~~~
 📧 email: gsj4243@kookmin.ac.kr
@@ -70,7 +70,7 @@
 
 #### 권민수
 
-<img src="index.assets/image-20200314165043995.png" alt="image-20200314165043995" style="zoom: 33%;" />
+<img src="index.assets/image-20200314165043995.png" alt="image-20200314165043995" width="33%" height="33%" />
 
 ~~~
 📧 email: mageeeeek@gmail.com
@@ -79,7 +79,7 @@
 
 #### 이재호
 
-<img src="index.assets/image-20200314192457820.png" alt="image-20200314192457820" style="zoom:90%;" />
+<img src="index.assets/image-20200314192457820.png" alt="image-20200314192457820" width="25%" height="25%" />
 
 ~~~
 📧 email: hiljh96@kookmin.ac.kr
@@ -88,7 +88,7 @@
 
 #### 주가구
 
-<img src="index.assets/image-20200314164133788.png" alt="image-20200314164133788" style="zoom:25%;" />
+<img src="index.assets/image-20200314164133788.png" alt="image-20200314164133788" width="25%" height="25%" />
 
 ~~~
 📧 email: zhoujiaju@kookmin.ac.kr
