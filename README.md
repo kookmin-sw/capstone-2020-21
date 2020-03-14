@@ -43,12 +43,16 @@
 
 #### 황효빈
 
+<img src="index.assets/image-20200314190325679.png" alt="image-20200314190325679" style="zoom: 25%;" />
+
 ~~~
 📧 email: hyobin0715@kookmin.ac.kr
 📌 role: 팀장, AWS 연결, 데이터베이스 구축, API 서버 개발
 ~~~
 
 #### 송현화
+
+<img src="index.assets/image-20200314175816474.png" alt="image-20200314175816474" style="zoom: 25%;" />
 
 ~~~
 📧 email: soonghh@kookmin.ac.kr
@@ -57,12 +61,16 @@
 
 #### 정예빈
 
+<img src="index.assets/image-20200314175846745.png" alt="image-20200314175846745" style="zoom:50%;" />
+
 ~~~
 📧 email: gsj4243@kookmin.ac.kr
 📌 role: 유저 인터페이스 디자인, 프론트엔드 개발
 ~~~
 
 #### 권민수
+
+<img src="index.assets/image-20200314165043995.png" alt="image-20200314165043995" style="zoom: 33%;" />
 
 ~~~
 📧 email: mageeeeek@gmail.com
@@ -71,12 +79,16 @@
 
 #### 이재호
 
+<img src="index.assets/image-20200314192457820.png" alt="image-20200314192457820" style="zoom:90%;" />
+
 ~~~
 📧 email: hiljh96@kookmin.ac.kr
 📌 role: AWS 연결, API 서버 개발
 ~~~
 
 #### 주가구
+
+<img src="index.assets/image-20200314164133788.png" alt="image-20200314164133788" style="zoom:25%;" />
 
 ~~~
 📧 email: zhoujiaju@kookmin.ac.kr
