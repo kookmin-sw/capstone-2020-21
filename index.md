@@ -1,37 +1,87 @@
-## Welcome to GitHub Pages
+# 옷때?(OTTE?)
 
-You can use the [editor on GitHub](https://github.com/kookmin-sw/cap-template/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+## 1. 프로젝트 소개
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+<center><img src="index.assets/image-20200314162533015.png" alt="image-20200314162533015" style="zoom:50%;" /></center>
 
-### Markdown
+​	많은 사람들은 날씨에 맞는 옷을 입기 위해서 기온 별 옷차림을 검색한다. 하지만 이렇게 신중하게 옷을 골라 입어도 막상 밖에 나가보면 너무 덥거나 추웠던 경우가 잇을 것이다. 사람마다 더위, 추위를 타는 정도와 각자 소유하고 있는 옷 등이 다르므로 우리는 사용자 개인 맞춤에 중점을 두어 "오늘 뭐 입지?"라는 고민을 같이 덜어주고자 한다.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+​	'옷때?(OTTE?)'는 **O**utfit **T**oday wea**T**h**E**r의 의미를 가지며, 사용자가 날씨에 맞는 코디를 할 수 있게 도와주는 웹 서비스다. 주요 기능은 다음과 같다.
 
-```markdown
-Syntax highlighted code block
+1. 사용자의 **옷** 정보 저장
+   - 옷 사진 업로드에 따른 분류 작업 수행
+     - 대분류 : 아우터, 상의, 바지, 치마, 원피스
+     - 소분류 : 대분류의 세부 카테고리
+2. 사용자의 **코디** 정보(어떤 옷들을 조합하여 입었는지) 저장
+3. 사용자의 **코디 리뷰** 정보(언제, 어디서 입었는지, 춥거나 덥지는 않았는지 여부) 저장
+4. 오늘의 날씨에 맞는 **코디 추천**
+   - 과거 유사한 날씨에 본인이 작성한 코디 리뷰 조회
+   - 과거 유사한 날씨에 다른 사용자들이 작성한 긍정적인 리뷰들 중, 
+     각 대분류 별 가장 높은 비율을 차지한 소분류 카테고리에 따라 해당 카테고리와 일치하는 사용자의 옷 추천
 
-# Header 1
-## Header 2
-### Header 3
+### Abstract
 
-- Bulleted
-- List
+​	Many people search for what to wear before going out in order to find appropriate clothes set for the weather. But even if they go through this process of searching, there are cases where they feel colder or hotter than what they have thought after getting out. Because every people feels different on how hot or cold about the same weather and also has different clothes to choose from, we are trying to help them resolve the problem "What to wear today" by focusing on individual information.
 
-1. Numbered
-2. List
+​	'**OTTE?**' stands for **O**utfit **T**oday wea**T**h**E**r, and it is a web service that helps the user to find appropriate clothes set for the weather they are about to face. The main features are as follows.
 
-**Bold** and _Italic_ and `Code` text
+1. Save the user's **Clothes** information.
+   - Classify the uploaded clothes picture.
+     - Big categories : Outer, Top, Pants, Skirts, Dress.
+     - Small categories : detailed multiple categories inside inside big categories
+2. Save the user's **Clothes Set**(what combination of clothes the user wore) information.
+3. Save the user's **Clothes Set "Review"**(when & where they wore, whether it was too cold or hot).
+4. **Recommend** the clothing set for weather today.
+   - Show Clothes Set Reviews written by the user that had the similar weather with today's weather.
+   - Relying on 'positive' Clothes Set Reviews written by other users that had the similar weather with today's weather, find which small category of each big categories were the most popular, and show the user's clothes on those categories.
 
-[Link](url) and ![Image](src)
-```
+## 2. 소개 영상
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+(영상 embed 예정)
 
-### Jekyll Themes
+## 3. 팀 소개
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/kookmin-sw/cap-template/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+#### 황효빈
 
-### Support or Contact
+~~~
+📧 email: hyobin0715@kookmin.ac.kr
+📌 role: 팀장, AWS 연결, 데이터베이스 구축, API 서버 개발
+~~~
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+#### 송현화
+
+~~~
+📧 email: soonghh@kookmin.ac.kr
+📌 role: 유저 인터페이스 디자인, 프론트엔드 개발
+~~~
+
+#### 정예빈
+
+~~~
+📧 email: gsj4243@kookmin.ac.kr
+📌 role: 유저 인터페이스 디자인, 프론트엔드 개발
+~~~
+
+#### 권민수
+
+~~~
+📧 email: mageeeeek@gmail.com
+📌 role: Project Manager, API 서버 개발, 옷 분류 모델 개발
+~~~
+
+#### 이재호
+
+~~~
+📧 email: hiljh96@kookmin.ac.kr
+📌 role: AWS 연결, API 서버 개발
+~~~
+
+#### 주가구
+
+~~~
+📧 email: zhoujiaju@kookmin.ac.kr
+📌 role: 유닛 테스팅, 문서 정리
+~~~
+
+
+
