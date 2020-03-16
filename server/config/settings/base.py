@@ -86,10 +86,25 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+RDS_HOST = config('RDS_HOST')
+RDS_PORT = config('RDS_PORT')
+RDS_NAME = config('RDS_NAME')
+RDS_USER = config('RDS_USER')
+RDS_PASSWORD = config('RDS_PASSWORD')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(Path(BASE_DIR, 'db.sqlite3')),
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': RDS_HOST,
+        'PORT': RDS_PORT,
+        'NAME': RDS_NAME,
+        'USER': RDS_USER,
+        'PASSWORD': RDS_PASSWORD,
+        # Set MySQL Strict Mode
+        # ref:https://docs.djangoproject.com/en/3.0/ref/databases/#mysql-sql-mode
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 
