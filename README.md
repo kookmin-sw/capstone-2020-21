@@ -92,5 +92,5 @@
 
 ~~~
 📧 email: zhoujiaju@kookmin.ac.kr
-📌 role: 유닛 테스팅, 로고 
+📌 role: 유닛 테스팅, 로고 제작
 ~~~
