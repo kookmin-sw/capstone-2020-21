@@ -38,6 +38,7 @@ class Clothes(models.Model):
         (5, 'Skirt'),
     ]
 
+    # TODO : 수정필요
     LOWER_CATEGORY_CHOICES = [
         (1, 'Jeans'),
         (2, 'Knitwear'),
@@ -62,6 +63,7 @@ class ClothesSet(models.Model):
 
 class ClothesSetReview(models.Model):
 
+    # TODO : 수정필요
     LOCATION_CHOICES = [
         (1, '서울특별시'),
         (2, '천안시'),
