@@ -90,3 +90,4 @@ class ClothesSetReview(models.Model):
     wind_speed = models.FloatField()
     precipitation = models.IntegerField()
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
+    
