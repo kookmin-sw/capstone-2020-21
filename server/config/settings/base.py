@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).parent.parent.parent
 APPS_DIR = Path(BASE_DIR, 'apps')
@@ -144,10 +145,21 @@ USE_TZ = True
 # Settings for Django REST Framework.
 
 REST_FRAMEWORK = {
-    
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Authentication
+AUTH_USER_MODEL = 'api.User'
+
+# Settings for JWT Authentication
+SIMPLE_JWT = {
+    # TODO(mskwon1): change this to a reasonable time value.
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+}
