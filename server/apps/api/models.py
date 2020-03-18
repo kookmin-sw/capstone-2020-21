@@ -11,7 +11,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
-    birthday = models.DateTimeField(null=True)
+    birthday = models.DateField(null=True)
     
     GENDER_CHOICES = [
         (True, 'Man'),
