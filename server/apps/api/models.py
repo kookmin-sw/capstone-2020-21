@@ -26,3 +26,31 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def __str__(self):
         return self.username
+# Create your models here.
+
+class Clothes(models.Model):
+
+    UPPER_CATEGORY_CHOICES = [
+        (1, 'Top'),
+        (2, 'Bottom'),
+        (3, 'Outer'),
+        (4, 'Dress'),
+        (5, 'Skirt'),
+    ]
+
+    LOWER_CATEGORY_CHOICES = [
+        (1, 'Jeans'),
+        (2, 'Knitwear'),
+        (3, 'Jacket')
+    ]
+
+    upper_category = models.CharField(max_length=10, choices=UPPER_CATEGORY_CHOICES)
+    lower_category = models.CharField(max_length=20, choices=LOWER_CATEGORY_CHOICES)
+    image_url = models.URLField(unique=True)
+    alias = models.CharField(max_length=20, null=True)
+    # owner = models.ForeignKey('Users', on_delete=models.CASCADE)
+
+
+# class ClothesSet(models.Model):
+
+
