@@ -1,5 +1,5 @@
 # 옷때?(OTTE?)
-
+#### 팀페이지 주소 : https://kookmin-sw.github.io/capstone-2020-21/
 ## 1. 프로젝트 개요
 
 <center><img src="index.assets/image-20200314162533015.png" alt="image-20200314162533015" height="33%" width="33%" /></center>
