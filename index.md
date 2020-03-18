@@ -1,6 +1,6 @@
 # 옷때?(OTTE?)
 
-## 1. 프로젝트 소개
+## 1. 프로젝트 개요
 
 <center><img src="index.assets/image-20200314162533015.png" alt="image-20200314162533015" style="zoom:50%;" /></center>
 
@@ -19,27 +19,7 @@
    - 과거 유사한 날씨에 다른 사용자들이 작성한 긍정적인 리뷰들 중, 
      각 대분류 별 가장 높은 비율을 차지한 소분류 카테고리에 따라 해당 카테고리와 일치하는 사용자의 옷 추천
 
-### Abstract
-
-​	Many people search for what to wear before going out in order to find appropriate clothes set for the weather. But even if they go through this process of searching, there are cases where they feel colder or hotter than what they have thought after getting out. Because every people feels different on how hot or cold about the same weather and also has different clothes to choose from, we are trying to help them resolve the problem "What to wear today" by focusing on individual information.
-
-​	'**OTTE?**' stands for **O**utfit **T**oday wea**T**h**E**r, and it is a web service that helps the user to find appropriate clothes set for the weather they are about to face. The main features are as follows.
-
-1. Save the user's **Clothes** information.
-   - Classify the uploaded clothes picture.
-     - Big categories : Outer, Top, Pants, Skirts, Dress.
-     - Small categories : detailed multiple categories inside inside big categories
-2. Save the user's **Clothes Set**(what combination of clothes the user wore) information.
-3. Save the user's **Clothes Set "Review"**(when & where they wore, whether it was too cold or hot).
-4. **Recommend** the clothing set for weather today.
-   - Show Clothes Set Reviews written by the user that had the similar weather with today's weather.
-   - Relying on 'positive' Clothes Set Reviews written by other users that had the similar weather with today's weather, find which small category of each big categories were the most popular, and show the user's clothes on those categories.
-
-## 2. 소개 영상
-
-(영상 embed 예정)
-
-## 3. 팀 소개
+## 2. 팀 소개
 
 #### 황효빈
 
@@ -94,3 +74,23 @@
 📧 email: zhoujiaju@kookmin.ac.kr
 📌 role: 유닛 테스팅, 로고 제작
 ~~~
+
+## 3. Abstract
+
+​	Many people search for what to wear before going out in order to find appropriate clothes set for the weather. But even if they go through this process of searching, there are cases where they feel colder or hotter than what they have thought after getting out. Because every people feels different on how hot or cold about the same weather and also has different clothes to choose from, we are trying to help them resolve the problem "What to wear today" by focusing on individual information.
+
+​	'**OTTE?**' stands for **O**utfit **T**oday wea**T**h**E**r, and it is a web service that helps the user to find appropriate clothes set for the weather they are about to face. The main features are as follows.
+
+1. Save the user's **Clothes** information.
+   - Classify the uploaded clothes picture.
+     - Big categories : Outer, Top, Pants, Skirts, Dress.
+     - Small categories : detailed multiple categories inside inside big categories
+2. Save the user's **Clothes Set**(what combination of clothes the user wore) information.
+3. Save the user's **Clothes Set "Review"**(when & where they wore, whether it was too cold or hot).
+4. **Recommend** the clothing set for weather today.
+   - Show Clothes Set Reviews written by the user that had the similar weather with today's weather.
+   - Relying on 'positive' Clothes Set Reviews written by other users that had the similar weather with today's weather, find which small category of each big categories were the most popular, and show the user's clothes on those categories.
+
+## 4. 소개 영상
+
+## 5. 결과 영상
