@@ -145,9 +145,8 @@ USE_TZ = True
 # Settings for Django REST Framework.
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication', ),
+    'DEFAULT_PAGINATION_CLASS': 'apps.api.pagination.MediumLimitOffsetPagination',
 }
 
 # Static files (CSS, JavaScript, Images)
