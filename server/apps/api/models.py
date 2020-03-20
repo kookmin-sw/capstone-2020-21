@@ -59,5 +59,5 @@ class ClothesSetReview(models.Model):
     wind_speed = models.FloatField()
     precipitation = models.IntegerField()
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
-    comment = models.CharField(max_length=100)
+    comment = models.CharField(max_length=100, default='한줄평을 입력해주세요.')
     
