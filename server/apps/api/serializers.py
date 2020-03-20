@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import User, Clothes, ClothesSet, ClothesSetReview
 
+
+# test git commit
 class UserSerializer(serializers.ModelSerializer):
     gender = serializers.CharField(source='get_gender_display')
     
