@@ -28,3 +28,4 @@ class ClothesSetReviewSerializer(serializers.ModelSerializer):
                   'location', 'review', 'max_temp', 'min_temp', 
                   'max_sensible_temp', 'min_sensible_temp', 'humidity', 
                   'wind_speed', 'precipitation', 'owner')
+        
