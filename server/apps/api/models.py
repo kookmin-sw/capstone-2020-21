@@ -15,6 +15,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     username = models.CharField(max_length=30,unique=True)
+    nickname = models.CharField(max_length=30)
     
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
@@ -49,7 +50,7 @@ class ClothesSetReview(models.Model):
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
-    review = models.CharField(max_length=30, choices=REVIEW_CHOICES)
+    review = models.IntegerField(choices=REVIEW_CHOICES)
     max_temp = models.FloatField()
     min_temp = models.FloatField()
     max_sensible_temp = models.FloatField()
@@ -58,4 +59,5 @@ class ClothesSetReview(models.Model):
     wind_speed = models.FloatField()
     precipitation = models.IntegerField()
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
+    comment = models.CharField(max_length=100)
     
