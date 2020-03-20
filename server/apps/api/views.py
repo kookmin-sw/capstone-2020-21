@@ -1,10 +1,16 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import User
-from .serializers import UserSerializer
+from rest_framework_extensions.mixins import NestedViewSetMixin
+from .models import Clothes, ClothesSet, ClothesSetReview, User
+from .serializers import (
+    ClothesSerializer,
+    ClothesSetSerializer,
+    ClothesSetReviewSerializer,
+    UserSerializer
+)
 
-class UserView(viewsets.ModelViewSet):
+class UserView(NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
@@ -21,4 +27,20 @@ class UserView(viewsets.ModelViewSet):
             return Response(
                 {'error': 'please log in'},
                 status=status.HTTP_401_UNAUTHORIZED)
+    
+
+class ClothesView(NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = Clothes.objects.all()
+    serializer_class = ClothesSerializer
+    
+
+class ClothesSetView(NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = ClothesSet.objects.all()
+    serializer_class = ClothesSetSerializer
+    
+    
+class ClothesSetReviewView(NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = ClothesSetReview.objects.all()
+    serializer_class = ClothesSetReviewSerializer
+    
     
