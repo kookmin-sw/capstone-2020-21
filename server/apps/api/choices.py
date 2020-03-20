@@ -47,10 +47,11 @@ LOWER_CATEGORY_CHOICES = [
 ]
 
 REVIEW_CHOICES = [
-    ('cold', 'cold'),
-    ('cool', 'cool'),
-    ('hot', 'hot'),
-    ('warm', 'warm'),
+    (1, 'cold'),
+    (2, 'little_cold'),
+    (3, 'nice'),
+    (4, 'little_hot'),
+    (5, 'hot'),
 ]
     
 UPPER_CATEGORY_CHOICES = [
