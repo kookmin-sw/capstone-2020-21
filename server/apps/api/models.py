@@ -36,7 +36,7 @@ class Clothes(models.Model):
 
 class ClothesSet(models.Model):
 
-    chothes = models.ManyToManyField(Clothes)
+    clothes = models.ManyToManyField(Clothes)
     name = models.CharField(max_length=30)
     style = models.CharField(max_length=30)
     image_url = models.URLField(unique=True)

@@ -18,7 +18,7 @@ class ClothesSerializer(serializers.ModelSerializer):
 class ClothesSetSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClothesSet
-        fields = ('id', 'chothes', 'name', 'style', 'image_url', 'owner')
+        fields = ('id', 'clothes', 'name', 'style', 'image_url', 'owner')
         
 
 class ClothesSetReviewSerializer(serializers.ModelSerializer):
