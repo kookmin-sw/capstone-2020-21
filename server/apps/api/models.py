@@ -15,7 +15,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     username = models.CharField(max_length=30,unique=True)
-    nickname = models.CharField(max_length=30)
+    nickname = models.CharField(max_length=30, default="닉네임을 입력해주세요.")
     
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
