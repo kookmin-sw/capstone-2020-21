@@ -1,14 +1,20 @@
-from django.shortcuts import render
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from .models import User
 from .serializers import UserSerializer
 
 class UserView(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    def get_queryset(self):
-        # # This code is to test if request.user is received correctly
-        # if self.request.user.is_authenticated:
-        #     print(self.request.user)
-        return super().get_queryset()
+    
+    @action(detail=False, methods=['get'])
+    def me(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            self.kwargs.update(pk=request.user.id)
+            return self.retrieve(request, *args, **kwargs)
+        else:
+            return Response(
+                {'error': 'please log in'},
+                status=status.HTTP_401_UNAUTHORIZED)
     
