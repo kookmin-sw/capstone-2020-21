@@ -10,6 +10,10 @@ class UserView(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def me(self, request, *args, **kwargs):
+        """
+        A endpoint where current user's data is returned,
+        uses Authorization JWT token to check the user.
+        """
         if self.request.user.is_authenticated:
             self.kwargs.update(pk=request.user.id)
             return self.retrieve(request, *args, **kwargs)
