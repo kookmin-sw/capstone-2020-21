@@ -33,6 +33,7 @@ class Clothes(models.Model):
     image_url = models.URLField(unique=True)
     alias = models.CharField(max_length=30, null=True)
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class ClothesSet(models.Model):
@@ -42,6 +43,7 @@ class ClothesSet(models.Model):
     style = models.CharField(max_length=30)
     image_url = models.URLField(unique=True)
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class ClothesSetReview(models.Model):
@@ -60,4 +62,5 @@ class ClothesSetReview(models.Model):
     precipitation = models.IntegerField()
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
     comment = models.CharField(max_length=100, default='한줄평을 입력해주세요.')
+    created_at = models.DateTimeField(auto_now_add=True)
     
