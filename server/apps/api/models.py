@@ -40,7 +40,7 @@ class ClothesSet(models.Model):
 
     clothes = models.ManyToManyField(Clothes)
     name = models.CharField(max_length=30, null=True)
-    style = models.CharField(max_length=30, null=True)
+    style = models.CharField(max_length=30, null=True, choices=STYLE_CHOICES)
     image_url = models.URLField(unique=True)
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)

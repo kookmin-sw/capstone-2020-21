@@ -61,3 +61,11 @@ UPPER_CATEGORY_CHOICES = [
     ('skirt', 'skirt'),
     ('top', 'top'),
 ]
+
+STYLE_CHOICES = [
+    ('simple', 'simple'),
+    ('street', 'street'),
+    ('suit', 'suit'),
+    ('date', 'date'),
+    ('splendor', 'splendor'),
+]
