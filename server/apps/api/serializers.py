@@ -6,7 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'gender', 'birthday']
+        fields = ['id', 'username', 'nickname', 'gender', 'birthday']
 
 
 class ClothesSerializer(serializers.ModelSerializer):
@@ -27,5 +27,5 @@ class ClothesSetReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'clothes_set', 'start_datetime', 'end_datetime', 
                   'location', 'review', 'max_temp', 'min_temp', 
                   'max_sensible_temp', 'min_sensible_temp', 'humidity', 
-                  'wind_speed', 'precipitation', 'owner')
+                  'wind_speed', 'precipitation', 'comment', 'owner')
         
