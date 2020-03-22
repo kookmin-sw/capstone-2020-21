@@ -22,8 +22,18 @@ user_router.register('clothes-set-reviews',
                      basename='user-clothes_set_reviews',
                      parents_query_lookups=['owner'])
 
-router.register('clothes', views.ClothesView)
-router.register('clothes-sets', views.ClothesSetView)
+clothes_router = router.register('clothes', views.ClothesView)
+clothes_router.register('clothes-sets',
+                        views.ClothesSetView,
+                        basename='clothes-clothes_sets',
+                        parents_query_lookups=['clothes'])
+
+clothes_sets_router = router.register('clothes-sets', views.ClothesSetView)
+clothes_sets_router.register('clothes-set-reviews',
+                             views.ClothesSetReviewView,
+                             basename='clothes_sets-clothes_set_reviews',
+                             parents_query_lookups=['clothes_set'])
+
 router.register('clothes-set-reviews', views.ClothesSetReviewView)
 
 urlpatterns = [
