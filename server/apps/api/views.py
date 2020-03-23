@@ -1,7 +1,11 @@
-from rest_framework import viewsets, status
+from django.utils import timezone
+from filters.mixins import FiltersMixin
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
+import datetime
+
 from .models import Clothes, ClothesSet, ClothesSetReview, User
 from .serializers import (
     ClothesSerializer,
@@ -9,11 +13,33 @@ from .serializers import (
     ClothesSetReviewSerializer,
     UserSerializer
 )
+from .validations import user_query_schema
 
-class UserView(NestedViewSetMixin, viewsets.ModelViewSet):
+class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('id', 'date_joined', )
+    ordering = ('id', )
+    
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'gender': 'gender',
+        'min_age': 'birthday__lte',
+        'max_age': 'birthday__gte',
+    }
+    
+    # TODO(mskwon1) : change this to a more reasonable calculation.
+    filter_value_transformations = {
+        'min_age' : lambda val: timezone.now() - datetime.timedelta(days=int(val)*365),
+        'max_age' : lambda val: timezone.now() - datetime.timedelta(days=int(val)*365),
+    }
+    
+    # Use filter validation.
+    filter_validation_schema = user_query_schema
+
     @action(detail=False, methods=['get'])
     def me(self, request, *args, **kwargs):
         """
@@ -29,17 +55,31 @@ class UserView(NestedViewSetMixin, viewsets.ModelViewSet):
                 status=status.HTTP_401_UNAUTHORIZED)
     
 
-class ClothesView(NestedViewSetMixin, viewsets.ModelViewSet):
+class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = Clothes.objects.all()
-    serializer_class = ClothesSerializer
+    serializer_class = ClothesSerializer   
+    
+    # def get_queryset(self):
+    #     queryset = Clothes.objects.all()
+        
+    #     # me 파라미터가 true인 경우, 해당 유저의 옷만 반환
+    #     if self.request.query_params.get('me'):
+    #         user = self.request.user
+            
+    #         if user.is_authenticated:
+    #             queryset = queryset.filter(id=user.id)
+    #         else:
+    #             return queryset.filter(id=user.id)
+                
+    #     return queryset
     
 
-class ClothesSetView(NestedViewSetMixin, viewsets.ModelViewSet):
+class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSet.objects.all()
     serializer_class = ClothesSetSerializer
     
     
-class ClothesSetReviewView(NestedViewSetMixin, viewsets.ModelViewSet):
+class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSetReview.objects.all()
     serializer_class = ClothesSetReviewSerializer
     

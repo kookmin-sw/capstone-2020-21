@@ -44,6 +44,7 @@ DJANGO_APPS = (
 # Applications installed via pip.
 THIRD_PARTY_APPS = (
     'rest_framework',
+    'filters',
 )
 
 # Applications implemented.

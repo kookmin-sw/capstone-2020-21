@@ -8,7 +8,7 @@ from rest_framework_extensions.routers import ExtendedDefaultRouter
 router = ExtendedDefaultRouter()
 
 # Nested router for user.
-user_router = router.register('users', views.UserView)
+user_router = router.register('users', views.UserView, basename='users')
 user_router.register('clothes',
                      views.ClothesView,
                      basename='user-clothes',
@@ -22,19 +22,19 @@ user_router.register('clothes-set-reviews',
                      basename='user-clothes_set_reviews',
                      parents_query_lookups=['owner'])
 
-clothes_router = router.register('clothes', views.ClothesView)
+clothes_router = router.register('clothes', views.ClothesView, basename='clothes')
 clothes_router.register('clothes-sets',
                         views.ClothesSetView,
                         basename='clothes-clothes_sets',
                         parents_query_lookups=['clothes'])
 
-clothes_sets_router = router.register('clothes-sets', views.ClothesSetView)
+clothes_sets_router = router.register('clothes-sets', views.ClothesSetView, basename='clothes-sets')
 clothes_sets_router.register('clothes-set-reviews',
                              views.ClothesSetReviewView,
                              basename='clothes_sets-clothes_set_reviews',
                              parents_query_lookups=['clothes_set'])
 
-router.register('clothes-set-reviews', views.ClothesSetReviewView)
+router.register('clothes-set-reviews', views.ClothesSetReviewView, basename='clothes-set-reviews')
 
 urlpatterns = [
     url('', include(router.urls)),
