@@ -1,10 +1,11 @@
+from django.utils import timezone
 from filters.mixins import FiltersMixin
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
-from django.utils import timezone
 import datetime
+
 from .models import Clothes, ClothesSet, ClothesSetReview, User
 from .serializers import (
     ClothesSerializer,
@@ -12,8 +13,10 @@ from .serializers import (
     ClothesSetReviewSerializer,
     UserSerializer
 )
+from .validations import user_query_schema
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     
     # Apply ordering, uses `ordering` query parameter.
@@ -28,10 +31,14 @@ class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         'max_age': 'birthday__gte',
     }
     
+    # TODO(mskwon1) : change this to a more reasonable calculation.
     filter_value_transformations = {
         'min_age' : lambda val: timezone.now() - datetime.timedelta(days=int(val)*365),
         'max_age' : lambda val: timezone.now() - datetime.timedelta(days=int(val)*365),
     }
+    
+    # Use filter validation.
+    filter_validation_schema = user_query_schema
 
     @action(detail=False, methods=['get'])
     def me(self, request, *args, **kwargs):

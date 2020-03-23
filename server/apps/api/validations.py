@@ -9,8 +9,8 @@ from filters.validations import (
 
 user_query_schema = base_query_params_schema.extend(
     {
-        "gender": IntegerLike,
-        "min_age": IntegerLike,
-        "max_age": IntegerLike,
+        "gender": IntegerLike(),
+        "min_age": IntegerLike(),
+        "max_age": IntegerLike(),
     }
 )
