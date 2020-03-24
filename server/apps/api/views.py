@@ -112,7 +112,7 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     serializer_class = ClothesSetSerializer
 
     # def get_queryset(self):
-    #     queryset = Clothes.objects.all()
+    #     queryset = ClothesSet.objects.all()
         
     #     # me 파라미터가 true인 경우, 해당 유저의 옷만 반환
     #     if self.request.query_params.get('me'):
@@ -146,5 +146,5 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
     ordering_fields = ('created_at', 'id', )
-    ordering = ('-created_at', )    
+    ordering = ('-created_at', )
 
