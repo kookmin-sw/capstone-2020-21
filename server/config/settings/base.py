@@ -163,3 +163,7 @@ SIMPLE_JWT = {
     # TODO(mskwon1): change this to a reasonable time value.
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+# AWS
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
