@@ -2,6 +2,7 @@ Django==3.0.4
 djangorestframework==3.11.0
 djangorestframework-simplejwt==4.4.0
 drf-extensions==0.6.0
+drf-url-filters==0.5.1
 mysqlclient==1.4.6
 python-decouple==3.3
 six==1.14.0
