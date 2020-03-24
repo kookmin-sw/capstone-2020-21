@@ -14,6 +14,7 @@ from .serializers import (
     UserSerializer
 )
 from .validations import user_query_schema
+from .utils import *
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -72,6 +73,25 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     #             return queryset.filter(id=user.id)
                 
     #     return queryset
+    
+    @action(detail=False, methods=['post'])
+    def inference(self, request, *args, **kwargs):
+        """
+        An endpoint where the analysis of a clothes is returned
+        """
+        
+        image = byte_to_image(request.body)
+        image = remove_background(image)
+        image_url = save_image_s3(image)
+        
+        image_tensor = image_to_tensor(image)
+        inference_result = execute_inference(image_tensor)
+        upper, lower = get_categories_from_predictions(inference_result)
+        
+        return Response({'image_url': image_url, 
+                         'upper_category':upper, 
+                         'lower_category':lower}, status=status.HTTP_200_OK)
+        
     
 
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
