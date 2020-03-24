@@ -14,3 +14,11 @@ user_query_schema = base_query_params_schema.extend(
         "max_age": IntegerLike(),
     }
 )
+
+clothes_query_schema = base_query_params_schema.extend(
+    {
+        "upper_category": six.text_type,
+        "lower_category": six.text_type,
+    }
+)
+

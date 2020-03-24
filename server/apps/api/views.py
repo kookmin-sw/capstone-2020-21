@@ -13,7 +13,7 @@ from .serializers import (
     ClothesSetReviewSerializer,
     UserSerializer
 )
-from .validations import user_query_schema
+from .validations import user_query_schema, clothes_query_schema
 from .utils import *
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
@@ -68,9 +68,9 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     #         user = self.request.user
             
     #         if user.is_authenticated:
-    #             queryset = queryset.filter(id=user.id)
+    #             queryset = queryset.filter(owner=user.id)
     #         else:
-    #             return queryset.filter(id=user.id)
+    #             return queryset.filter(owner=user.id)
                 
     #     return queryset
 
@@ -78,6 +78,15 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     filter_backends = (filters.OrderingFilter, )
     ordering_fields = ('created_at', 'id', )
     ordering = ('-created_at', )
+
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'upper_category': 'upper_category',
+        'lower_category': 'lower_category',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_query_schema
     
     @action(detail=False, methods=['post'])
     def inference(self, request, *args, **kwargs):
@@ -105,9 +114,9 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
     ordering_fields = ('created_at', 'id', )
-    ordering = ('-created_at', )
+    ordering = ('-created_at', )    
     
-    
+
 class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSetReview.objects.all()
     serializer_class = ClothesSetReviewSerializer
@@ -115,5 +124,5 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
     ordering_fields = ('created_at', 'id', )
-    ordering = ('-created_at', )
-    
+    ordering = ('-created_at', )    
+
