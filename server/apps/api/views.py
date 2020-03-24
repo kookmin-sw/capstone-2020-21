@@ -72,15 +72,30 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     #             return queryset.filter(id=user.id)
                 
     #     return queryset
+
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
     
 
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSet.objects.all()
     serializer_class = ClothesSetSerializer
+
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
     
     
 class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSetReview.objects.all()
     serializer_class = ClothesSetReviewSerializer
+
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
     
 
