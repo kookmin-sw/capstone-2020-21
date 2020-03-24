@@ -91,7 +91,6 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return Response({'image_url': image_url, 
                          'upper_category':upper, 
                          'lower_category':lower}, status=status.HTTP_200_OK)
-        
     
 
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
@@ -103,4 +102,3 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     queryset = ClothesSetReview.objects.all()
     serializer_class = ClothesSetReviewSerializer
     
-

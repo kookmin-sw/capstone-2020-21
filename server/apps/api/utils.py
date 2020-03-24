@@ -159,3 +159,4 @@ def get_upper_category(lower_index):
         return 'outer'
     else:
         return 'dress'
+    
