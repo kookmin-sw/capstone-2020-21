@@ -13,7 +13,7 @@ from .serializers import (
     ClothesSetReviewSerializer,
     UserSerializer
 )
-from .validations import user_query_schema, clothes_query_schema
+from .validations import user_query_schema, clothes_query_schema, clothes_set_query_schema
 from .utils import *
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
@@ -111,12 +111,34 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSet.objects.all()
     serializer_class = ClothesSetSerializer
 
+    # def get_queryset(self):
+    #     queryset = Clothes.objects.all()
+        
+    #     # me 파라미터가 true인 경우, 해당 유저의 옷만 반환
+    #     if self.request.query_params.get('me'):
+    #         user = self.request.user
+            
+    #         if user.is_authenticated:
+    #             queryset = queryset.filter(owner=user.id)
+    #         else:
+    #             return queryset.filter(owner=user.id)
+                
+    #     return queryset
+
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
     ordering_fields = ('created_at', 'id', )
-    ordering = ('-created_at', )    
-    
+    ordering = ('-created_at', )
 
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'style': 'style',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_set_query_schema
+    
+    
 class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSetReview.objects.all()
     serializer_class = ClothesSetReviewSerializer

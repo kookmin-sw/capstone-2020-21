@@ -22,3 +22,8 @@ clothes_query_schema = base_query_params_schema.extend(
     }
 )
 
+clothes_set_query_schema = base_query_params_schema.extend(
+    {
+        "style": six.text_type,
+    }
+)
