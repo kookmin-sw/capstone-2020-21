@@ -16,12 +16,16 @@ class ClothesSerializer(serializers.ModelSerializer):
         
 
 class ClothesSetSerializer(serializers.ModelSerializer):
+    clothes = ClothesSerializer(many=True)
+    
     class Meta:
         model = ClothesSet
         fields = ('id', 'clothes', 'name', 'style', 'image_url', 'owner')
         
 
 class ClothesSetReviewSerializer(serializers.ModelSerializer):
+    clothes_set = ClothesSetSerializer()
+    
     class Meta:
         model = ClothesSetReview
         fields = ('id', 'clothes_set', 'start_datetime', 'end_datetime', 
