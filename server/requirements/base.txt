@@ -1,8 +1,12 @@
+boto3==1.12.27
 Django==3.0.4
 djangorestframework==3.11.0
 djangorestframework-simplejwt==4.4.0
 drf-extensions==0.6.0
 drf-url-filters==0.5.1
 mysqlclient==1.4.6
+numpy==1.18.2
+opencv-python==4.2.0.32
 python-decouple==3.3
+sagemaker==1.51.4
 six==1.14.0
