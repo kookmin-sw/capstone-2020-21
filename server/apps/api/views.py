@@ -94,6 +94,14 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     # Use filter validation.
     filter_validation_schema = clothes_query_schema
     
+    def create(self, request, *args, **kwargs):
+        # Move image from temp to saved on s3 storage.
+        request.data._mutable = True
+        image_url = request.data['image_url']
+        request.data['image_url']  = move_image_to_saved(image_url)
+        
+        return super(ClothesView, self).create(request, *args, **kwargs)        
+    
     @action(detail=False, methods=['post'])
     def inference(self, request, *args, **kwargs):
         """
