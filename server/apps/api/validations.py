@@ -27,3 +27,11 @@ clothes_set_query_schema = base_query_params_schema.extend(
         "style": six.text_type,
     }
 )
+
+clothes_set_review_query_schema = base_query_params_schema.extend(
+    {
+        'start_datetime': DatetimeWithTZ(),
+        'end_datetime': DatetimeWithTZ(),
+        'location' : six.text_type,
+    }
+)
