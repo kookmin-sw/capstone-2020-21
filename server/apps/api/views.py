@@ -13,7 +13,12 @@ from .serializers import (
     ClothesSetReviewSerializer,
     UserSerializer
 )
-from .validations import user_query_schema
+from .validations import (
+    user_query_schema, 
+    clothes_query_schema, 
+    clothes_set_query_schema, 
+    clothes_set_review_query_schema
+)
 from .utils import *
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
@@ -60,19 +65,34 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = Clothes.objects.all()
     serializer_class = ClothesSerializer   
     
-    # def get_queryset(self):
-    #     queryset = Clothes.objects.all()
+    # TODO : 부분예외처리 필요
+    def get_queryset(self):
+        queryset = Clothes.objects.all()
         
-    #     # me 파라미터가 true인 경우, 해당 유저의 옷만 반환
-    #     if self.request.query_params.get('me'):
-    #         user = self.request.user
+        # me 파라미터가 true인 경우, 해당 유저의 옷만 반환
+        if self.request.query_params.get('me'):
+            user = self.request.user
             
-    #         if user.is_authenticated:
-    #             queryset = queryset.filter(id=user.id)
-    #         else:
-    #             return queryset.filter(id=user.id)
+            if user.is_authenticated:
+                queryset = queryset.filter(owner=user.id)
+            else:
+                return queryset.filter(owner=user.id)
                 
-    #     return queryset
+        return queryset
+
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
+
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'upper_category': 'upper_category',
+        'lower_category': 'lower_category',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_query_schema
     
     @action(detail=False, methods=['post'])
     def inference(self, request, *args, **kwargs):
@@ -96,9 +116,69 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSet.objects.all()
     serializer_class = ClothesSetSerializer
+
+    # TODO : 부분예외처리 필요
+    def get_queryset(self):
+        queryset = ClothesSet.objects.all()
+        
+        # me 파라미터가 true인 경우, 해당 유저의 옷만 반환
+        if self.request.query_params.get('me'):
+            user = self.request.user
+            
+            if user.is_authenticated:
+                queryset = queryset.filter(owner=user.id)
+            else:
+                return queryset.filter(owner=user.id)
+                
+        return queryset
+
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
+
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'style': 'style',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_set_query_schema
     
     
 class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSetReview.objects.all()
     serializer_class = ClothesSetReviewSerializer
+
+    # TODO : 부분예외처리 필요
+    def get_queryset(self):
+        queryset = ClothesSetReview.objects.all()
+        
+        # me 파라미터가 true인 경우, 해당 유저의 옷만 반환
+        if self.request.query_params.get('me'):
+            user = self.request.user
+            
+            if user.is_authenticated:
+                queryset = queryset.filter(owner=user.id)
+            else:
+                return queryset.filter(owner=user.id)
+                
+        return queryset
+
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
+
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'start_datetime': 'start_datetime',
+        'end_datetime': 'end_datetime',
+        'location' : 'location',
+        'max_sensible_temp' : 'max_sensible_temp',
+        'min_sensible_temp ' : 'min_sensible_temp',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_set_review_query_schema
     
