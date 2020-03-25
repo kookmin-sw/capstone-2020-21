@@ -139,6 +139,36 @@ def save_image_s3(image):
 
     return url
 
+def move_image_to_saved(image_url):
+    parts = image_url.split('/')
+    
+    BUCKET_NAME = parts[2].split('.')[0]
+    IMAGE_NAME = parts[-1]
+    OBJECT_NAME = 'clothes/temp/' + IMAGE_NAME
+    KEY_NAME = 'clothes/saved/' + IMAGE_NAME
+    
+    COPY_SOURCE = {
+        'Bucket': BUCKET_NAME,
+        'Key': OBJECT_NAME
+    }
+    
+    s3 = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+    
+    # Copy from temp to saved.
+    s3.copy_object(Bucket=BUCKET_NAME, 
+                   CopySource= COPY_SOURCE, 
+                   Key=KEY_NAME,
+                   ACL='public-read')
+    
+    # Delete temp
+    s3.delete_object(Bucket=BUCKET_NAME,
+                     Key=OBJECT_NAME)
+    
+    moved_url = 'https://' + BUCKET_NAME + '.s3.ap-northeast-2.amazonaws.com/' + KEY_NAME
+    
+    return moved_url
+
 def get_categories_from_predictions(predictions):
     result = predictions['predictions'][0]
     lower_index = result.index(max(result))
