@@ -149,13 +149,13 @@ def get_categories_from_predictions(predictions):
     return (upper, lower)
 
 def get_upper_category(lower_index):
-    if lower_index < 9:
+    if lower_index < 11:
         return 'top'
-    elif lower_index < 14 or lower_index == 16:
+    elif lower_index < 17:
         return 'bottom'
-    elif lower_index == 14 or lower_index == 15:
+    elif lower_index < 19:
         return 'skirt'
-    elif lower_index < 30:
+    elif lower_index < 33:
         return 'outer'
     else:
         return 'dress'

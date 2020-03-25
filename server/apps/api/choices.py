@@ -23,14 +23,16 @@ LOWER_CATEGORY_CHOICES = [
     ('hoodie', 'hoodie'),
     ('sweater', 'sweater'),
     ('blouse', 'blouse'),
+    ('spaghetti_strap' ,'spaghetti_strap'),
+    ('sleeveless' ,'sleeveless'),
     ('shorts', 'shorts'),
     ('hot_pants', 'hot_pants'),
     ('slacks', 'slacks'),
     ('jeans', 'jeans'),
     ('golden_pants', 'golden_pants'),
+    ('sweatpants', 'sweatpants'),
     ('skirt', 'skirt'),
     ('long_skirt', 'long_skirt'),
-    ('sweatpants', 'sweatpants'),
     ('blazer', 'blazer'),
     ('short_padding', 'short_padding'),
     ('vest_padding', 'vest_padding'),
@@ -44,6 +46,7 @@ LOWER_CATEGORY_CHOICES = [
     ('track_top', 'track_top'),
     ('leather_jacket', 'leather_jacket'),
     ('blue_jacket', 'blue_jacket'),
+    ('cardigan', 'cardigan'),
     ('dress', 'dress')
 ]
 
