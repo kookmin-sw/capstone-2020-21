@@ -140,6 +140,9 @@ def save_image_s3(image):
     return url
 
 def move_image_to_saved(image_url):
+    """
+    moves image_url from temp to save on s3 bucket
+    """
     parts = image_url.split('/')
     
     BUCKET_NAME = parts[2].split('.')[0]
@@ -161,7 +164,7 @@ def move_image_to_saved(image_url):
                    Key=KEY_NAME,
                    ACL='public-read')
     
-    # Delete temp
+    # Delete temp.
     s3.delete_object(Bucket=BUCKET_NAME,
                      Key=OBJECT_NAME)
     
@@ -170,6 +173,10 @@ def move_image_to_saved(image_url):
     return moved_url
 
 def get_categories_from_predictions(predictions):
+    """
+    converts prediction result to
+    corresponding upper and lower categories
+    """
     result = predictions['predictions'][0]
     lower_index = result.index(max(result))
     
@@ -179,6 +186,10 @@ def get_categories_from_predictions(predictions):
     return (upper, lower)
 
 def get_upper_category(lower_index):
+    """
+    get upper category of the corresponding
+    lower category index
+    """
     if lower_index < 11:
         return 'top'
     elif lower_index < 17:
