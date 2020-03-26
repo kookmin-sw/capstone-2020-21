@@ -1,10 +1,14 @@
+import datetime
 from django.utils import timezone
 from filters.mixins import FiltersMixin
+import json
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
-import datetime
+
+from .pagination import MediumLimitOffsetPagination
+
 
 from .models import Clothes, ClothesSet, ClothesSetReview, User
 from .serializers import (
@@ -189,4 +193,51 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
 
     # Use filter validation.
     filter_validation_schema = clothes_set_review_query_schema
+    
+    @action(detail=False, methods=['get'])
+    def location_search(self, request, *args, **kwargs):
+        """
+        An endpoint that returns search result for
+        location based on query parameter
+        """
+        
+        # Get query parameters.
+        search = request.query_params.get('search')
+        search = '' if search == None else search
+        limit = request.query_params.get('limit')
+        offset = request.query_params.get('offset')
+        
+        # Open JSON file for location results.
+        with open('apps/api/locations/data.json') as json_file:
+            data = json.load(json_file)
+            
+        # Get results total count & initial list containing search keyword.    
+        results = []
+        count = 0
+        for index in data:
+            if search in data[index]['full_address']:
+                count += 1
+                results.append({
+                    'id' : index,
+                    'location' : data[index]['full_address']
+                })
+        
+        # Filter list according to limit & offset.
+        final_results = []
+        offset = 0 if offset == None else int(offset)
+        limit = count if limit == None else int(limit)
+        limit_count = 0
+        
+        for result in results[offset:]:
+            limit_count += 1
+            final_results.append(result)
+            if limit_count == limit:
+                break
+        
+        # Return response.
+        return Response({
+                'count': count,
+                'next': offset + limit_count,
+                'results': final_results,
+            }, status=status.HTTP_200_OK)
     
