@@ -12,7 +12,7 @@ class ClothesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Clothes
         fields = ('id', 'upper_category', 'lower_category', 'image_url', 'alias', 'owner')
-        
+        read_only_fields = ('owner', )
 
 class ClothesSetSerializer(serializers.ModelSerializer):
     clothes = ClothesSerializer(many=True)

@@ -6,9 +6,7 @@ from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
-
-from .pagination import MediumLimitOffsetPagination
-
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import Clothes, ClothesSet, ClothesSetReview, User
 from .serializers import (
@@ -49,6 +47,9 @@ class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     
     # Use filter validation.
     filter_validation_schema = user_query_schema
+    
+    # Permissions.
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     @action(detail=False, methods=['get'])
     def me(self, request, *args, **kwargs):
@@ -98,13 +99,19 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     # Use filter validation.
     filter_validation_schema = clothes_query_schema
     
+    # Permissions.
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
     def create(self, request, *args, **kwargs):
         # Move image from temp to saved on s3 storage.
         request.data._mutable = True
         image_url = request.data['image_url']
         request.data['image_url']  = move_image_to_saved(image_url)
         
-        return super(ClothesView, self).create(request, *args, **kwargs)        
+        return super(ClothesView, self).create(request, *args, **kwargs)  
+    
+    def perform_create(self, serializer):
+        serializer.save(owner_id = self.request.user.id)      
     
     @action(detail=False, methods=['post'])
     def inference(self, request, *args, **kwargs):
