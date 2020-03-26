@@ -7,7 +7,7 @@ GENDER_CHOICES = [
     (False, 'woman'),
 ]
 
-with open('locations/data.json') as json_file:
+with open('apps/api/locations/data.json') as json_file:
     data = json.load(json_file)
     
 LOCATION_CHOICES = []
