@@ -51,7 +51,7 @@ class ClothesSetReview(models.Model):
     clothes_set = models.ForeignKey('ClothesSet', on_delete=models.CASCADE)
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
-    location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
+    location = models.IntegerField(choices=LOCATION_CHOICES)
     review = models.IntegerField(choices=REVIEW_CHOICES)
     max_temp = models.FloatField()
     min_temp = models.FloatField()
