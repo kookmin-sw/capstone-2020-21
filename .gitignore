@@ -182,3 +182,4 @@ yarn-error.log*
 
 # sqlite db
 db.sqlite3
+.vs
