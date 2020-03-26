@@ -93,6 +93,6 @@
 
 ## 4. 소개 영상
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/9LO2N7AenVQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+영상링크 : https://youtu.be/9LO2N7AenVQ
 
 ## 5. 결과 영상
