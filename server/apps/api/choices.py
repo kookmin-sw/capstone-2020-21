@@ -1,17 +1,18 @@
 # This file saves constant list for choice fields options.
 # 알파벳 순으로 정렬.
+import json
 
 GENDER_CHOICES = [
     (True, 'man'),
     (False, 'woman'),
 ]
 
-# TODO : 수정필요
-LOCATION_CHOICES = [
-    ('cheonan', 'cheonan'),
-    ('busan', 'busan'),
-    ('seoul', 'seoul'),
-]
+with open('locations/data.json') as json_file:
+    data = json.load(json_file)
+    
+LOCATION_CHOICES = []
+for row in data:
+    LOCATION_CHOICES.append((int(row), data[row]['full_address']))
 
 LOWER_CATEGORY_CHOICES = [
     ('short_sleeve', 'short_sleeve'),
