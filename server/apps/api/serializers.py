@@ -1,12 +1,11 @@
 from rest_framework import serializers
 from .models import User, Clothes, ClothesSet, ClothesSetReview
 
-class UserSerializer(serializers.ModelSerializer):
-    gender = serializers.CharField(source='get_gender_display')
-    
+class UserSerializer(serializers.ModelSerializer):    
     class Meta:
         model = User
-        fields = ['id', 'username', 'nickname', 'gender', 'birthday']
+        fields = ['id', 'username', 'password', 'nickname', 'gender', 'birthday']
+        extra_kwargs = {'password': {'write_only': True}}
 
 
 class ClothesSerializer(serializers.ModelSerializer):
