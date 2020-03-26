@@ -7,3 +7,5 @@ DATABASES = {
         'NAME': str(Path(BASE_DIR, 'db.sqlite3')),
     }
 }
+
+AUTH_PASSWORD_VALIDATORS = []
