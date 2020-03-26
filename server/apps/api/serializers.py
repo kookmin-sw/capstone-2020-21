@@ -14,16 +14,29 @@ class ClothesSerializer(serializers.ModelSerializer):
         fields = ('id', 'upper_category', 'lower_category', 'image_url', 'alias', 'owner')
         read_only_fields = ('owner', )
 
+
 class ClothesSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClothesSet
+        fields = ('id', 'clothes', 'name', 'style', 'image_url', 'owner')
+        read_only_fields = ('owner', )
+        
+class ClothesSetReadSerializer(serializers.ModelSerializer):
     clothes = ClothesSerializer(many=True)
     
     class Meta:
         model = ClothesSet
         fields = ('id', 'clothes', 'name', 'style', 'image_url', 'owner')
+        read_only_fields = ('owner', )
         
-
 class ClothesSetReviewSerializer(serializers.ModelSerializer):
-    clothes_set = ClothesSetSerializer()
+    class Meta:
+        model = ClothesSetReview
+        fields = ('id', 'clothes_set', 'start_datetime', 'end_datetime', 
+                  'location', 'review', 'comment',)
+
+class ClothesSetReviewReadSerializer(serializers.ModelSerializer):
+    clothes_set = ClothesSetReadSerializer()
     
     class Meta:
         model = ClothesSetReview

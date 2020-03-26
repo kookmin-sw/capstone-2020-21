@@ -12,7 +12,9 @@ from .models import Clothes, ClothesSet, ClothesSetReview, User
 from .serializers import (
     ClothesSerializer,
     ClothesSetSerializer,
+    ClothesSetReadSerializer,
     ClothesSetReviewSerializer,
+    ClothesSetReviewReadSerializer,
     UserSerializer
 )
 from .validations import (
@@ -68,7 +70,7 @@ class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
 class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = Clothes.objects.all()
-    serializer_class = ClothesSerializer   
+    serializer_class = ClothesSerializer
     
     # TODO : 부분예외처리 필요
     def get_queryset(self):
@@ -133,9 +135,6 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     
 
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
-    queryset = ClothesSet.objects.all()
-    serializer_class = ClothesSetSerializer
-
     # TODO : 부분예외처리 필요
     def get_queryset(self):
         queryset = ClothesSet.objects.all()
@@ -150,6 +149,11 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
                 return queryset.filter(owner=user.id)
                 
         return queryset
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ClothesSetSerializer
+        return ClothesSetReadSerializer 
 
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
@@ -164,9 +168,18 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     # Use filter validation.
     filter_validation_schema = clothes_set_query_schema
     
+    # Permissions.
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    # TODO(mskwon1): 입력된 옷들이 모두 해당 유저의 것인지 확인.
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+    
+    def perform_create(self, serializer):
+        serializer.save(owner_id = self.request.user.id)    
+    
     
 class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
-    queryset = ClothesSetReview.objects.all()
     serializer_class = ClothesSetReviewSerializer
 
     # TODO : 부분예외처리 필요
@@ -183,6 +196,11 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 return queryset.filter(owner=user.id)
                 
         return queryset
+
+    def  get_serializer_class(self):
+        if self.action == 'create':
+            return ClothesSetReviewSerializer
+        return ClothesSetReviewReadSerializer
 
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
@@ -201,6 +219,17 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     # Use filter validation.
     filter_validation_schema = clothes_set_review_query_schema
     
+    # Permissions.
+    permission_classes = [IsAuthenticatedOrReadOnly]    
+    
+    # TODO(mskwon1): 입력된 코디가 해당 유저의 것인지 확인.
+    # TODO(mskwon1): 날씨정보 받아오기
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+    
+    def perform_create(self, serializer):
+        serializer.save(owner_id = self.request.user.id)
+        
     @action(detail=False, methods=['get'])
     def location_search(self, request, *args, **kwargs):
         """
@@ -247,4 +276,4 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'next': offset + limit_count,
                 'results': final_results,
             }, status=status.HTTP_200_OK)
-    
+        
