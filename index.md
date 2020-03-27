@@ -30,8 +30,6 @@
 📌 role: 프로젝트 지도교수, 멘토
 ~~~
 
-#### 
-
 #### 황효빈
 
 <img src="index.assets/image-20200314190325679.png" alt="image-20200314190325679" style="zoom: 25%;" />
