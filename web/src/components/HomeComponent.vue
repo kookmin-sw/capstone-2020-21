@@ -27,11 +27,11 @@
           <p class="lead mb-5">Many people search for what to wear before going out in order to find appropriate clothes set for the weather. <br/>But even
           if they go through this process of searching, there are cases where they feel colder or hotter than what they have
           thought after getting out. Because every people feels different on how hot or cold about the same weather and also has
-          different clothes to choose from, we are trying to help them resolve the problem
-          <p class="font-weight-bold"><mark>"What to wear today"</mark></p></p>
+          different clothes to choose from, we are trying to help them resolve the problem<br/><br/>
+          <span class="font-weight-bold"><mark>"What to wear today"</mark></span></p>
           <p class="lead mb-5">focusing on
-          individual information.<br/><p class="lead mb-5">'OTTE?' stands for Outfit Today weaThEr, and it is a web service that helps the user to find appropriate clothes set for
-          the weather they are about to face.</p></p>
+          individual information.<br/><span class="lead mb-5">'OTTE?' stands for Outfit Today weaThEr, and it is a web service that helps the user to find appropriate clothes set for
+          the weather they are about to face.</span></p>
           <br/>
         <br/>
           <a class="btn btn-dark btn-xl" @click="goDevelopers()">Developers</a>
