@@ -21,6 +21,15 @@
 
 ## 2. 팀 소개
 
+#### 이경용 교수님
+
+<img src="index.assets/image-20200327133112841.png" alt="image-20200327133112841" width= 25% height=25% />
+
+~~~
+📧 email: leeky@kookmin.ac.kr
+📌 role: 프로젝트 지도교수, 멘토
+~~~
+
 #### 황효빈
 
 <img src="index.assets/image-20200314190325679.png" alt="image-20200314190325679" width="25%" height="25%" />
