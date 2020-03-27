@@ -31,6 +31,5 @@ export default new Router({
       name: 'Closet',
       component: Closet
     }
-
   ]
 })
