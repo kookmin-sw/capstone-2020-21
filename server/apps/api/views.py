@@ -24,6 +24,7 @@ from .validations import (
     clothes_set_review_query_schema
 )
 from .utils import *
+from statistics import mode
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -136,7 +137,50 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return Response({'image_url': image_url, 
                          'upper_category':upper, 
                          'lower_category':lower}, status=status.HTTP_200_OK)
-    
+
+    @action(detail=False, methods=['get'])
+    def today_category(self, request, *args, **kwargs):
+        """
+        An endpoint where the today_category is returned
+        """
+
+        min_sensible = float(request.query_params.get('min_sensible_temp'))
+        max_sensible = float(request.query_params.get('max_sensible_temp'))
+        
+        cody_review_set = ClothesSetReview.objects.all()
+        filtered_cody_review_set = cody_review_set.filter(review=3, 
+                                                        min_sensible_temp__gte=min_sensible-2,
+                                                        min_sensible_temp__lte=min_sensible+2, 
+                                                        max_sensible_temp__gte=max_sensible-2,
+                                                        max_sensible_temp__lte=max_sensible+2
+                                                        )
+        
+        # TODO : 효빈이 serializer 공부용 -효빈-
+        # serializer = ClothesSetReviewReadSerializer(filtered_cody_review_set, many=True)
+        # return Response(serializer.data)    
+
+        filtered_clothes_set_id = []
+        for filtered_cody_review in filtered_cody_review_set:
+            filtered_clothes_set_id.append(filtered_cody_review.clothes_set.id)
+        
+        filtered_clothes_set = ClothesSet.objects.filter(pk__in=filtered_clothes_set_id)
+
+        analysis_upper_category_dict = {
+            'bottom' : [],
+            'dress' : [],
+            'outer' : [],
+            'skirt' : [],
+            'top' : []        
+        }
+
+        for clothes_set in filtered_clothes_set:
+            for clothes in clothes_set.clothes.all():
+                analysis_upper_category_dict[clothes.upper_category].append(clothes.lower_category)
+
+        for key in analysis_upper_category_dict.keys():
+            analysis_upper_category_dict[key] = mode(analysis_upper_category_dict[key])
+
+        return Response(analysis_upper_category_dict)       
 
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     def get_queryset(self):
