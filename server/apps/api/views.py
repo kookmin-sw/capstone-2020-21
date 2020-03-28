@@ -72,18 +72,13 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = Clothes.objects.all()
     serializer_class = ClothesSerializer
     
-    # TODO : 부분예외처리 필요
     def get_queryset(self):
         queryset = Clothes.objects.all()
         
-        # me 파라미터가 true인 경우, 해당 유저의 옷만 반환
+        # me 파라미터가 true인 경우, 해당 유저의 옷만 반환.
         if self.request.query_params.get('me'):
             user = self.request.user
-            
-            if user.is_authenticated:
-                queryset = queryset.filter(owner=user.id)
-            else:
-                return queryset.filter(owner=user.id)
+            queryset = queryset.filter(owner=user.id)
                 
         return queryset
 
@@ -103,6 +98,15 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     
     # Permissions.
     permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    def list(self, request, *args, **kwargs):
+        # If me parameter is set, check authentication.
+        if request.query_params.get('me') and not request.user.is_authenticated:
+            return Response({
+                'error' : 'token authorization failed ... please log in'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().list(request, *args, **kwargs)
     
     def create(self, request, *args, **kwargs):
         # Move image from temp to saved on s3 storage.
@@ -135,18 +139,13 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     
 
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
-    # TODO : 부분예외처리 필요
     def get_queryset(self):
         queryset = ClothesSet.objects.all()
         
-        # me 파라미터가 true인 경우, 해당 유저의 옷만 반환
+        # me 파라미터가 true인 경우, 해당 유저의 코디만 반환
         if self.request.query_params.get('me'):
             user = self.request.user
-            
-            if user.is_authenticated:
-                queryset = queryset.filter(owner=user.id)
-            else:
-                return queryset.filter(owner=user.id)
+            queryset = queryset.filter(owner=user.id)
                 
         return queryset
     
@@ -171,29 +170,45 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     # Permissions.
     permission_classes = [IsAuthenticatedOrReadOnly]
     
-    # TODO(mskwon1): 입력된 옷들이 모두 해당 유저의 것인지 확인.
+    def list(self, request, *args, **kwargs):
+        # If me parameter is set, check authentication.
+        if request.query_params.get('me') and not request.user.is_authenticated:
+            return Response({
+                'error' : 'token authorization failed ... please log in'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().list(request, *args, **kwargs)
+    
     def create(self, request, *args, **kwargs):
+        user = request.user
+        
+        all_clothes = Clothes.objects.all()
+        filtered_clothes = all_clothes.filter(owner_id=user.id)
+        filtered_clothes_id = []
+        for clothes in filtered_clothes:
+            filtered_clothes_id.append(int(clothes.id))
+            
+        # 입력된 옷들이 모두 해당 유저의 것인지 확인.
+        for clothes_id in request.data.getlist('clothes'):
+            if int(clothes_id) not in filtered_clothes_id:
+                return Response({
+                    "error" : "this is not your clothes : " + clothes_id
+                }, status=status.HTTP_200_OK)
+        
         return super().create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
         serializer.save(owner_id = self.request.user.id)    
     
     
-class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
-    serializer_class = ClothesSetReviewSerializer
-
-    # TODO : 부분예외처리 필요
+class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):    
     def get_queryset(self):
         queryset = ClothesSetReview.objects.all()
         
-        # me 파라미터가 true인 경우, 해당 유저의 옷만 반환
+        # me 파라미터가 true인 경우, 해당 유저의 Review만 반환
         if self.request.query_params.get('me'):
             user = self.request.user
-            
-            if user.is_authenticated:
-                queryset = queryset.filter(owner=user.id)
-            else:
-                return queryset.filter(owner=user.id)
+            queryset = queryset.filter(owner=user.id)
                 
         return queryset
 
@@ -222,9 +237,31 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     # Permissions.
     permission_classes = [IsAuthenticatedOrReadOnly]    
     
-    # TODO(mskwon1): 입력된 코디가 해당 유저의 것인지 확인.
+    def list(self, request, *args, **kwargs):
+        # If me parameter is set, check authentication.
+        if request.query_params.get('me') and not request.user.is_authenticated:
+            return Response({
+                'error' : 'token authorization failed ... please log in'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().list(request, *args, **kwargs)
+    
     # TODO(mskwon1): 날씨정보 받아오기
     def create(self, request, *args, **kwargs):
+        user = request.user
+        
+        all_clothes_set = ClothesSet.objects.all()
+        filtered_clothes_set = all_clothes_set.filter(owner_id=user.id)
+        filtered_clothes_set_id = []
+        for clothes_set in filtered_clothes_set:
+            filtered_clothes_set_id.append(int(clothes_set.id))
+            
+        # 입력된 코디가 해당 유저의 것인지 확인.
+        if int(request.data['clothes_set']) not in filtered_clothes_set_id:
+            return Response({
+                "error" : "this is not your clothes set : " + request.data['clothes_set']
+            }, status=status.HTTP_200_OK)
+        
         return super().create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
