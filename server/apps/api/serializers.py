@@ -16,6 +16,8 @@ class ClothesSerializer(serializers.ModelSerializer):
 
 
 class ClothesSetSerializer(serializers.ModelSerializer):
+    clothes = serializers.PrimaryKeyRelatedField(many=True, queryset=Clothes.objects.all())
+    
     class Meta:
         model = ClothesSet
         fields = ('id', 'clothes', 'name', 'style', 'image_url', 'owner')
