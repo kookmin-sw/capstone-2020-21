@@ -14,7 +14,6 @@
         <div class="txt">
           <p>상의 / 후드</p>
         </div>
-
       </a>
     </div>
     <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
