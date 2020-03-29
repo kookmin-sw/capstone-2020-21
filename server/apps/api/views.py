@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from statistics import mode
 
 from .models import Clothes, ClothesSet, ClothesSetReview, User
 from .serializers import (
@@ -24,7 +25,6 @@ from .validations import (
     clothes_set_review_query_schema
 )
 from .utils import *
-from statistics import mode
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
