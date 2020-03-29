@@ -54,6 +54,24 @@ class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     # Permissions.
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        if user.id != int(kwargs.pop('pk')):
+            return Response({
+                'error' : 'you are not allowed to access this object'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        user = request.user
+        if user.id != int(kwargs.pop('pk')):
+            return Response({
+                'error' : 'you are not allowed to access this object'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().destroy(request, *args, **kwargs)
+
     @action(detail=False, methods=['get'])
     def me(self, request, *args, **kwargs):
         """
@@ -119,6 +137,30 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(owner_id = self.request.user.id)      
+    
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        key = int(kwargs.pop('pk'))
+        target_clothes = Clothes.objects.filter(id=key)
+        
+        if user.id != int(target_clothes[0].owner.id):
+            return Response({
+                'error' : 'you are not allowed to access this object'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        user = request.user
+        key = int(kwargs.pop('pk'))
+        target_clothes = Clothes.objects.filter(id=key)
+        
+        if user.id != int(target_clothes[0].owner.id):
+            return Response({
+                'error' : 'you are not allowed to access this object'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().destroy(request, *args, **kwargs)
     
     @action(detail=False, methods=['post'])
     def inference(self, request, *args, **kwargs):
@@ -242,7 +284,31 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return super().create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
-        serializer.save(owner_id = self.request.user.id)    
+        serializer.save(owner_id = self.request.user.id)
+        
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        key = int(kwargs.pop('pk'))
+        target_clothes_set = ClothesSet.objects.filter(id=key)
+        
+        if user.id != int(target_clothes_set[0].owner.id):
+            return Response({
+                'error' : 'you are not allowed to access this object'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        user = request.user
+        key = int(kwargs.pop('pk'))
+        target_clothes_set = ClothesSet.objects.filter(id=key)
+        
+        if user.id != int(target_clothes_set[0].owner.id):
+            return Response({
+                'error' : 'you are not allowed to access this object'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().destroy(request, *args, **kwargs)
     
     
 class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):    
@@ -310,7 +376,31 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     
     def perform_create(self, serializer):
         serializer.save(owner_id = self.request.user.id)
+    
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        key = int(kwargs.pop('pk'))
+        target_clothes_review_set = ClothesSetReview.objects.filter(id=key)
         
+        if user.id != int(target_clothes_review_set[0].owner.id):
+            return Response({
+                'error' : 'you are not allowed to access this object'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        user = request.user
+        key = int(kwargs.pop('pk'))
+        target_clothes_review_set = ClothesSetReview.objects.filter(id=key)
+        
+        if user.id != int(target_clothes_review_set[0].owner.id):
+            return Response({
+                'error' : 'you are not allowed to access this object'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        return super().destroy(request, *args, **kwargs)    
+    
     @action(detail=False, methods=['get'])
     def location_search(self, request, *args, **kwargs):
         """
