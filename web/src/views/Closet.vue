@@ -1,5 +1,6 @@
 <template>
   <div class="closet">
+    <MainNavigation></MainNavigation>
     <div class="container_1">
       <div class="add_container">
         <b-button class="btn_add" style="margin-right:10px" @click="goAdd()">등록하기</b-button>
@@ -15,11 +16,13 @@
 <script>
 import ClosetComponent from '@/components/ClosetComponent.vue'
 import ClassificationComponent from '@/components/ClassificationComponent.vue'
+import MainNavigation from '@/components/MainNavigation.vue'
 export default {
   name: 'Closet',
   components: {
     ClosetComponent,
-    ClassificationComponent
+    ClassificationComponent,
+    MainNavigation
   }
   // methods: {
   //   goAdd: function () {
@@ -34,12 +37,13 @@ export default {
     width: 100%;
     margin-right: auto;
     margin-left: auto;
-    margin-top: 200px;
+    /* margin-top: 200px; */
 }
 .container_1{
-  margin-top: 100px;
+  /* margin-top: 100px; */
   text-align: left;
   margin-left: 50px;
+  margin-right: 50px;
 }
 .add_container{
   width:100%;
