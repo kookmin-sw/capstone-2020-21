@@ -1,6 +1,6 @@
 <template>
   <div class="del">
-    <font-awesome-icon icon="trash" size="4x" />
+    <font-awesome-icon icon="trash" size="3x" />
   </div>
 </template>
 
@@ -13,5 +13,8 @@ export default {
 <style>
 .del{
   display: inline-block;
+  margin-bottom: 30px;
+  width: 100%;
+  text-align: right;
 }
 </style>
