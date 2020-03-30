@@ -2,7 +2,7 @@
 <div class="col-md-10 my_closet">
   <div class="row" style="padding:20px">
     <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
-      <a href="#">
+      <a href="closet/detail">
         <div class="txt">
           <p>상의 / 후드</p>
         </div>
