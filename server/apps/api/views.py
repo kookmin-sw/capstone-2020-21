@@ -27,6 +27,7 @@ from .validations import (
     clothes_set_review_query_schema
 )
 from .utils import *
+from .weather import get_weather_date
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -146,7 +147,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(owner_id = self.request.user.id)      
-    
+
     def update(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
@@ -170,7 +171,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             }, status=status.HTTP_401_UNAUTHORIZED)
             
         return super().destroy(request, *args, **kwargs)
-    
+        
     @action(detail=False, methods=['post'])
     def inference(self, request, *args, **kwargs):
         """
@@ -187,7 +188,6 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return Response({'image_url': image_url, 
                          'upper_category':upper, 
                          'lower_category':lower}, status=status.HTTP_200_OK)
-
     @action(detail=False, methods=['get'])
     def today_category(self, request, *args, **kwargs):
         """
@@ -235,6 +235,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             analysis_upper_category_dict[key] = mode(analysis_upper_category_dict[key])
 
         return Response(analysis_upper_category_dict)       
+
 
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     def get_queryset(self):
@@ -299,8 +300,8 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return super().create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
-        serializer.save(owner_id = self.request.user.id)
-        
+        serializer.save(owner_id = self.request.user.id)    
+
     def update(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
@@ -324,7 +325,7 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             }, status=status.HTTP_401_UNAUTHORIZED)
             
         return super().destroy(request, *args, **kwargs)
-    
+        
     
 class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):    
     def get_queryset(self):
@@ -360,7 +361,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     filter_validation_schema = clothes_set_review_query_schema
     
     # Permissions.
-    permission_classes = [IsAuthenticatedOrReadOnly]    
+    # permission_classes = [IsAuthenticatedOrReadOnly]    
     
     def list(self, request, *args, **kwargs):
         # If me parameter is set, check authentication.
@@ -392,7 +393,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     
     def perform_create(self, serializer):
         serializer.save(owner_id = self.request.user.id)
-    
+
     def update(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
@@ -416,7 +417,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             }, status=status.HTTP_401_UNAUTHORIZED)
             
         return super().destroy(request, *args, **kwargs)    
-    
+           
     @action(detail=False, methods=['get'])
     def location_search(self, request, *args, **kwargs):
         """
@@ -463,4 +464,62 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'next': offset + limit_count,
                 'results': final_results,
             }, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def get_weather(self, request, *args, **kwargs):   
+
+        #데이터 받아오기
+
+        json_datas = request.body
+        datas = json.loads(json_datas)
+        start = datas['start_datetime']
+        end = datas['end_datetime']
+        location = datas['location']
         
+        #API 요청하기
+        start_weather = get_weather_date(start, location)
+        end_weather = get_weather_date(start, location)
+        
+
+        #온도 구하기
+
+        start_min = start_weather['TMN']
+        start_max = start_weather['TMX']
+        start_sense_max = start_weather['WCIMAX']
+        start_sense_min = start_weather['WCIMIN']
+
+        end_min = end_weather['TMN']
+        end_max = end_weather['TMX']
+
+        end_sense_max = end_weather['WCIMAX']
+        end_sense_min = end_weather['WCIMIN']
+
+        maximum_temp = max(start_max, end_max)
+        minimum_temp = min(start_min, end_min)
+        
+        maximum_sensible_temp =  max(start_sense_max, end_sense_max)
+        minimum_sensible_temp =  min(start_sense_min, end_sense_min)
+
+        #데이터 저장하기
+
+        weatherData = ClothesSetReview()
+        weatherData.max_temp = maximum_temp
+        weatherData.min_temp = minimum_temp
+        weatherData.max_sensible_temp = maximum_sensible_temp
+        weatherData.min_sensible_temp = minimum_sensible_temp
+        weatherData.humidity =  start_weather['REH']
+        weatherData.precipitation =  start_weather['R06']
+        weatherData.wind_speed = start_weather['WSD']
+        weatherData.save()
+        
+       
+
+
+        return Response({
+                'min_temp': weatherData.min_temp,
+                'max_temp': weatherData.max_temp,
+                'max_sense' : weatherData.max_sensible_temp,
+                'min_sense' : weatherData.min_sensible_temp,
+                'windspeed' : weatherData.wind_speed,
+                'location': location,
+            }, status=status.HTTP_200_OK)
