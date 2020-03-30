@@ -1,6 +1,9 @@
 <template>
-  <div clothes_detail>
-
+  <div class="clothes_detail">
+    <div class="detail_box">
+      <div class="detail_item" v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }">
+      </div>
+    </div>
   </div>
 </template>
 
@@ -13,5 +16,20 @@ export default {
 <style>
 .clothes_detail{
   display: inline-block;
+}
+.detail_box{
+  background-color: #faf5ef;
+  border-color: #d3f4ff;
+  border-style: solid;
+  width: 500px;
+  height: 500px;
+  background-image: 100% 100%;
+}
+.detail_item{
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 450px;
+  position: relative;
 }
 </style>
