@@ -1,8 +1,9 @@
 from django.contrib.auth.hashers import make_password
 from faker import Faker
 from apps.api.factories import (
-    UserFactory, ClothesFactory
+    UserFactory, ClothesFactory, ClothesSetFactory
 )
+from .models import Clothes
 
 def populate_users(number=10):
     fake = Faker('ko_KR')
@@ -38,11 +39,11 @@ def populate_clothes(number=10):
     }
 
     for i in range(number):
-        upper_category = fake.random_element(elements=('outer', 'top', 'bottom', 'skirt', 'dress'))
+        upper_category = fake.random_element(elements=category_dict.keys())
         lower_category = fake.random_element(elements=category_dict[upper_category])
         image_url = fake.image_url(width=None, height=None)
         alias = fake.word(ext_word_list=None)
-        created_at = fake.date_time_this_month(before_now=True, after_now=False, tzinfo=None)
+        created_at = fake.date_between(start_date='-90d', end_date='-60d')
         
         created = ClothesFactory.create(
             upper_category=upper_category, 
@@ -50,6 +51,35 @@ def populate_clothes(number=10):
             image_url=image_url,
             alias=alias,
             created_at=created_at
+        )
+        print(created)
+
+
+def populate_clothes_set(number=10):
+    fake = Faker('ko_KR')
+
+    for i in range(number):
+        created = ClothesSetFactory.build()
+
+        clothes = Clothes.objects.all().filter(owner_id=created.owner_id)
+
+        clothes_set = set()
+        for cloth in clothes:
+                clothes_set.add(cloth)
+
+        clothes = fake.random_elements(elements=clothes_set, length=4, unique=True)
+        name = fake.word(ext_word_list=None)
+        style = fake.random_element(elements=('simple', 'street', 'suit', 'date', 'splendor'))
+        image_url = fake.image_url(width=None, height=None)
+        created_at = fake.date_time_between(start_date='-60d', end_date='-30d')
+
+        ClothesSetFactory.create(
+            name=name, 
+            style=style,
+            image_url=image_url,
+            created_at=created_at,
+            clothes=clothes,
+            owner_id=created.owner_id
         )
         print(created)
 

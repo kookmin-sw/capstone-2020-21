@@ -24,3 +24,23 @@ class ClothesFactory(factory.DjangoModelFactory):
         django_get_or_create = ('upper_category', 'lower_category', 'image_url', 'alias', 'owner', 'created_at')
         
     owner = factory.Iterator(User.objects.all())
+
+class ClothesSetFactory(factory.DjangoModelFactory):
+    """
+    clothes, name, style, image_url, owner, created_at
+    """
+    class Meta:
+        model = ClothesSet
+        django_get_or_create = ('name', 'style', 'image_url', 'owner', 'created_at')
+        
+    owner = factory.Iterator(User.objects.all())
+
+    @factory.post_generation
+    def clothes(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for cloth in extracted:
+                self.clothes.add(cloth)
+    
