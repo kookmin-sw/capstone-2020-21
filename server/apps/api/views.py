@@ -451,19 +451,18 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     @action(detail=False, methods=['post'])
     def get_weather(self, request, *args, **kwargs):   
 
-        #데이터 받아오기
-
+        # 데이터 받아오기
         json_datas = request.body
         datas = json.loads(json_datas)
         start = datas['start_datetime']
         end = datas['end_datetime']
         location = datas['location']
         
-        #API 요청하기
+        # API 요청하기
         start_weather = get_weather_date(start, location)
         end_weather = get_weather_date(start, location)
 
-        #온도 구하기
+        # 온도 구하기
         start_min = start_weather['TMN']
         start_max = start_weather['TMX']
         start_sense_max = start_weather['WCIMAX']
@@ -481,7 +480,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         maximum_sensible_temp =  max(start_sense_max, end_sense_max)
         minimum_sensible_temp =  min(start_sense_min, end_sense_min)
 
-        #데이터 저장하기
+        # 데이터 저장하기
         weatherData = ClothesSetReview()
         weatherData.max_temp = maximum_temp
         weatherData.min_temp = minimum_temp
