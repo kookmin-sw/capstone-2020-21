@@ -20,13 +20,13 @@ from .serializers import (
     ClothesSetReviewReadSerializer,
     UserSerializer
 )
+from .utils import *
 from .validations import (
     user_query_schema, 
     clothes_query_schema, 
     clothes_set_query_schema, 
     clothes_set_review_query_schema
 )
-from .utils import *
 from .weather import get_weather_date
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
@@ -169,9 +169,9 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+   
         return super().destroy(request, *args, **kwargs)
-        
+ 
     @action(detail=False, methods=['post'])
     def inference(self, request, *args, **kwargs):
         """
@@ -326,7 +326,6 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             
         return super().destroy(request, *args, **kwargs)
         
-    
 class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):    
     def get_queryset(self):
         queryset = ClothesSetReview.objects.all()
@@ -479,10 +478,8 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         #API 요청하기
         start_weather = get_weather_date(start, location)
         end_weather = get_weather_date(start, location)
-        
 
         #온도 구하기
-
         start_min = start_weather['TMN']
         start_max = start_weather['TMX']
         start_sense_max = start_weather['WCIMAX']
@@ -501,7 +498,6 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         minimum_sensible_temp =  min(start_sense_min, end_sense_min)
 
         #데이터 저장하기
-
         weatherData = ClothesSetReview()
         weatherData.max_temp = maximum_temp
         weatherData.min_temp = minimum_temp
@@ -511,10 +507,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         weatherData.precipitation =  start_weather['R06']
         weatherData.wind_speed = start_weather['WSD']
         weatherData.save()
-        
-       
-
-
+    
         return Response({
                 'min_temp': weatherData.min_temp,
                 'max_temp': weatherData.max_temp,
