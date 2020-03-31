@@ -1,42 +1,36 @@
 <template>
-  <div class="closet_detail">
+  <div class="closet_add">
     <MainNavigation></MainNavigation>
-    <div class="btn_back">
-        <router-link to="/closet"><b-button class="back">뒤로가기</b-button></router-link>
-    </div>
     <div class="container_1">
-        <ClosetDetailComponent></ClosetDetailComponent>
+        <ClosetAddComponent></ClosetAddComponent>
         <div class="information">
-        <ClosetDeletedComponent></ClosetDeletedComponent>
-        <ClosetDetailInfoComponent title="상세정보"></ClosetDetailInfoComponent>
+        <ClosetDetailInfoComponent title="분석결과"></ClosetDetailInfoComponent>
         <ClosetModifiedComponent></ClosetModifiedComponent>
         <b-button size="lg">확인</b-button>
         </div>
     </div>
-
   </div>
 </template>
 
 <script>
-import ClosetDetailComponent from '@/components/ClosetDetailComponent.vue'
-import ClosetModifiedComponent from '@/components/ClosetModifiedComponent.vue'
-import ClosetDeletedComponent from '@/components/ClosetDeletedComponent.vue'
 import MainNavigation from '@/components/MainNavigation.vue'
+import ClosetModifiedComponent from '@/components/ClosetModifiedComponent.vue'
 import ClosetDetailInfoComponent from '@/components/ClosetDetailInfoComponent.vue'
+import ClosetAddComponent from '@/components/ClosetAddComponent.vue'
 export default {
-  name: 'ClosetDetail',
+  name: 'ClosetAdd',
   components: {
-    ClosetDetailComponent,
-    ClosetModifiedComponent,
-    ClosetDeletedComponent,
     MainNavigation,
-    ClosetDetailInfoComponent
+    ClosetModifiedComponent,
+    ClosetDetailInfoComponent,
+    ClosetAddComponent
   }
+
 }
 </script>
 
-<style scoped>
-.closet_detail{
+<style>
+.closet_add {
     width: 100%;
     margin-right: auto;
     margin-left: auto;
@@ -57,13 +51,5 @@ export default {
      margin-top: -200px;
      width: 300px;
      height: 300px;
-
-}
-.btn_back{
-    text-align: left;
-}
-.back{
-    margin-left: 150px;
-    margin-bottom: 20px;
 }
 </style>

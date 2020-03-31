@@ -3,7 +3,7 @@
     <MainNavigation></MainNavigation>
     <div class="container_1">
       <div class="add_container">
-        <b-button class="btn_add" style="margin-right:10px" @click="goAdd()">등록하기</b-button>
+        <b-button class="btn_add" style="margin-right:10px" href="/closet/add">등록하기</b-button>
       </div>
       <div class="row">
         <ClassificationComponent></ClassificationComponent>
@@ -24,12 +24,6 @@ export default {
     ClassificationComponent,
     MainNavigation
   }
-  // methods: {
-  //   goAdd: function () {
-  //     router.push({ path: '/closet/add' })
-  //   }
-  // }
-
 }
 </script>
 <style scoped>
