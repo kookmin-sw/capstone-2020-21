@@ -1,7 +1,7 @@
 <template>
 <div class="col-md-9">
     <div id="filtering" class="container-fluid">
-        <div id="nav">
+        <div id="nav filtering">
             <router-link to="/">최신등록순</router-link> |
             <router-link to="/">날씨별</router-link> |
             <router-link to="/">심플</router-link> |
@@ -65,6 +65,11 @@ export default {
 </script>
 
 <style scoped>
+#filtering {
+    padding: 0px;
+    margin-bottom: 10px;
+    font-size: small;
+}
 .my_closet{
   background-color: #faf5ef;
   border-color: #d3f4ff;
