@@ -1,7 +1,7 @@
 <template>
 <div class="info">
     <div class="text">
-        <h1>상세정보</h1>
+        <h1>{{ title }}</h1>
         <p>대분류 :</p>
         <p>소분류 :</p>
         <p>별칭 :</p>
@@ -11,6 +11,8 @@
 
 <script>
 export default {
+  name: 'ClosetDetailInfoComponent',
+  props: ['title']
 }
 </script>
 
