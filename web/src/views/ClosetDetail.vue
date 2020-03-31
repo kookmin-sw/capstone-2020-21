@@ -8,7 +8,7 @@
         <ClosetDetailComponent></ClosetDetailComponent>
         <div class="information">
         <ClosetDeletedComponent></ClosetDeletedComponent>
-        <ClosetDetailInfoComponent></ClosetDetailInfoComponent>
+        <ClosetDetailInfoComponent title="상세정보"></ClosetDetailInfoComponent>
         <ClosetModifiedComponent></ClosetModifiedComponent>
         <b-button size="lg">확인</b-button>
         </div>
