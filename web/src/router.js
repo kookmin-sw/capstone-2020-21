@@ -5,6 +5,8 @@ import Signup from './views/Signup.vue'
 import Home from './views/Home.vue'
 import Closet from './views/Closet.vue'
 import Review from './views/Review.vue'
+import ClosetDetail from './views/ClosetDetail.vue'
+import Main from './views/Main.vue'
 
 Vue.use(Router)
 
@@ -36,6 +38,16 @@ export default new Router({
       path: '/review',
       name: 'Review',
       component: Review
+    },
+    {
+      path: '/closet/detail',
+      name: 'ClosetDetail',
+      component: ClosetDetail
+    },
+    {
+      path: '/main',
+      name: 'Main',
+      component: Main
     }
   ]
 })

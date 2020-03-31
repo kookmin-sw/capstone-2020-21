@@ -1,6 +1,5 @@
 <template>
 <div>
-  <link href="/views/css/login.css" rel="stylesheet">
   <div id="mainnavigation" class="container-fluid">
     <div id="nav">
       <router-link to="/">Home</router-link> |
