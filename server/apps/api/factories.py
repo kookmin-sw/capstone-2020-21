@@ -44,3 +44,20 @@ class ClothesSetFactory(factory.DjangoModelFactory):
             for cloth in extracted:
                 self.clothes.add(cloth)
     
+
+class ClothesSetReviewFactory(factory.DjangoModelFactory):
+    """
+    start_datetime, end_datetime, location, review, max_temp, min_temp, 
+    max_sensible_temp, min_sensible_temp, humidity, wind_speed, precipitation, 
+    owner, comment, created_at
+    """
+    class Meta:
+        model = ClothesSetReview
+        django_get_or_create = ('start_datetime', 'end_datetime', 'location', 'review', 'owner', 'max_temp', 
+                                'min_temp', 'max_sensible_temp', 'min_sensible_temp', 'humidity', 'wind_speed', 
+                                'precipitation', 'comment', 'created_at'
+                                )
+        
+    clothes_set = factory.Iterator(ClothesSet.objects.all())
+    owner = factory.Iterator(User.objects.all())
+    

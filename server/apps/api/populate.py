@@ -1,9 +1,9 @@
 from django.contrib.auth.hashers import make_password
 from faker import Faker
 from apps.api.factories import (
-    UserFactory, ClothesFactory, ClothesSetFactory
+    UserFactory, ClothesFactory, ClothesSetFactory, ClothesSetReviewFactory
 )
-from .models import Clothes
+from .models import Clothes, ClothesSet
 
 def populate_users(number=10):
     fake = Faker('ko_KR')
@@ -43,7 +43,7 @@ def populate_clothes(number=10):
         lower_category = fake.random_element(elements=category_dict[upper_category])
         image_url = fake.image_url(width=None, height=None)
         alias = fake.word(ext_word_list=None)
-        created_at = fake.date_between(start_date='-90d', end_date='-60d')
+        created_at = fake.date_time_between(start_date='-90d', end_date='-60d')
         
         created = ClothesFactory.create(
             upper_category=upper_category, 
@@ -83,3 +83,49 @@ def populate_clothes_set(number=10):
         )
         print(created)
 
+
+def populate_clothes_set_review(number=10):
+    fake = Faker('ko_KR')
+
+    for i in range(number):
+        created = ClothesSetReviewFactory.build()
+
+        filtered_clothes_set = ClothesSet.objects.all().filter(owner_id=created.owner_id)
+        
+        filtered_clothes = set()
+        for clothes_set in filtered_clothes_set:
+                filtered_clothes.add(clothes_set.id)
+
+        start_datetime = fake.date_time_between(start_date='-30d', end_date='-15d')
+        end_datetime = fake.date_time_between(start_date='-15d', end_date='-3d')
+        location = fake.pyint(min_value=0, max_value=3379)
+        review = fake.random_element(elements=(1, 2, 3, 4, 5))
+        max_temp = fake.pyfloat(max_value=35.0, min_value=15.0)
+        min_temp = fake.pyfloat(max_value=15.0, min_value=-20.0)
+        max_sensible_temp = fake.pyfloat(max_value=35.0, min_value=15.0)
+        min_sensible_temp = fake.pyfloat(max_value=15.0, min_value=-20.0)
+        humidity = fake.pyint(max_value=100, min_value=0)
+        wind_speed = fake.pyint(max_value=150, min_value=0)
+        precipitation = fake.pyint(max_value=200, min_value=0)
+        comment = fake.image_url(width=None, height=None)
+        created_at = fake.date_time_between(start_date='-2d', end_date='now')
+        clothes_set_id = fake.random_elements(elements=filtered_clothes, length=1, unique=True)
+        
+        created = ClothesSetReviewFactory.create(
+            start_datetime=start_datetime, 
+            end_datetime=end_datetime, 
+            location=location,
+            review=review,
+            max_temp=max_temp,
+            min_temp=min_temp,
+            max_sensible_temp=max_sensible_temp, 
+            min_sensible_temp=min_sensible_temp, 
+            humidity=humidity,
+            wind_speed=wind_speed,
+            precipitation=precipitation,
+            comment=comment,
+            created_at=created_at,
+            clothes_set_id=clothes_set_id,
+            owner_id=created.owner_id
+        )
+        print(created)
