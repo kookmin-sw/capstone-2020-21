@@ -58,6 +58,5 @@ class ClothesSetReviewFactory(factory.DjangoModelFactory):
                                 'precipitation', 'comment', 'created_at'
                                 )
         
-    clothes_set = factory.Iterator(ClothesSet.objects.all())
     owner = factory.Iterator(User.objects.all())
     

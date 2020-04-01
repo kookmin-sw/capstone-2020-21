@@ -79,7 +79,6 @@ def populate_clothes_set(number=10):
             image_url=image_url,
             created_at=created_at,
             clothes=clothes,
-            owner_id=created.owner_id
         )
         print(created)
 
