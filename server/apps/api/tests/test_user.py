@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import User
+from apps.api.models import User
 
 class UserCreateTests(APITestCase):
     def test_create_user_success(self):
