@@ -64,9 +64,9 @@ export default {}
     margin-right: 60px;
     position: relative;
 }
-.navigation ul li:last-child{
+/* .navigation ul li:last-child{
     margin: 0;
-}
+} */
 .navigation ul li a{
     float: left;
     width: 100%;
@@ -111,7 +111,7 @@ export default {}
     opacity: 1;
     visibility: visible;
 }
-.navigation ul li .children .children{
+/* .navigation ul li .children .children{
   left: 100%;
   top: 0;
 }
@@ -122,7 +122,7 @@ export default {}
 .navigation ul li.last .children .children{
   right: 100%;
   left: auto;
-}
+} */
 .navigation ul li .children li{
   float: left;
   width: 100%;

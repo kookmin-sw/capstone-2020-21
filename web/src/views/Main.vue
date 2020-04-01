@@ -6,7 +6,7 @@
         날씨 api 가져오는 부분
       </div>
       <div class="row">
-        <TextRecommend/>
+        <TextRecommend />
         <MainComponent/>
       </div>
     </div>
