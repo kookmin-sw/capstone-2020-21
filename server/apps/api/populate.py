@@ -21,7 +21,6 @@ def populate_users(number=10):
             nickname=nickname,
             gender=gender,
             birthday=birthday)
-        print(created)
 
 
 def populate_clothes(number=10):
@@ -52,7 +51,6 @@ def populate_clothes(number=10):
             alias=alias,
             created_at=created_at
         )
-        print(created)
 
 
 def populate_clothes_set(number=10):
@@ -83,7 +81,6 @@ def populate_clothes_set(number=10):
             clothes=clothes,
             owner=owner
         )
-        print(created)
 
 
 def populate_clothes_set_review(number=10):
@@ -134,4 +131,23 @@ def populate_clothes_set_review(number=10):
             clothes_set_id=clothes_set_id,
             owner=owner
         )
-        print(created)
+
+
+def populate_database(users=10, clothes=300, clothes_set=50, clothes_set_review=100):
+    print('Creating ', users, ' Users ... ')
+    populate_users(users)
+    print('Created ', users, ' Users !\n')
+    
+
+    print('Creating ', clothes, ' Clothes ... ')
+    populate_clothes(clothes)
+    print('Created ', clothes, ' Clothes !\n')
+
+    print('Creating ', clothes_set, ' ClothesSets ... ')
+    populate_clothes_set(clothes_set)
+    print('Created ', clothes_set, ' ClothesSets !\n')
+
+    print('Creating ', clothes_set_review, ' ClothesSetReviews ... ')
+    populate_clothes_set_review(clothes_set_review)
+    print('Created ', clothes_set_review, ' ClothesSetReviews !')
+
