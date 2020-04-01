@@ -43,7 +43,7 @@ export default {}
 .wrapper{
   float:left;
   width:100%;
-  min-height:250px;
+  /* min-height:250px; */
 }
 .navigation{
     float: left;
