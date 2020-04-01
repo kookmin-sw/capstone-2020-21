@@ -3,7 +3,7 @@ from faker import Faker
 from apps.api.factories import (
     UserFactory, ClothesFactory, ClothesSetFactory, ClothesSetReviewFactory
 )
-from .models import Clothes, ClothesSet
+from .models import User, Clothes, ClothesSet
 
 def populate_users(number=10):
     fake = Faker('ko_KR')
@@ -58,10 +58,12 @@ def populate_clothes(number=10):
 def populate_clothes_set(number=10):
     fake = Faker('ko_KR')
 
+    users = User.objects.all()
     for i in range(number):
-        created = ClothesSetFactory.build()
+        user_index = fake.pyint(min_value=0, max_value=len(users)-1)
+        owner = users[user_index]
 
-        clothes = Clothes.objects.all().filter(owner_id=created.owner_id)
+        clothes = Clothes.objects.all().filter(owner_id=owner.id)
 
         clothes_set = set()
         for cloth in clothes:
@@ -73,12 +75,13 @@ def populate_clothes_set(number=10):
         image_url = fake.image_url(width=None, height=None)
         created_at = fake.date_time_between(start_date='-60d', end_date='-30d')
 
-        ClothesSetFactory.create(
+        created = ClothesSetFactory.create(
             name=name, 
             style=style,
             image_url=image_url,
             created_at=created_at,
             clothes=clothes,
+            owner=owner
         )
         print(created)
 
@@ -86,10 +89,12 @@ def populate_clothes_set(number=10):
 def populate_clothes_set_review(number=10):
     fake = Faker('ko_KR')
 
+    users = User.objects.all()
     for i in range(number):
-        created = ClothesSetReviewFactory.build()
+        user_index = fake.pyint(min_value=0, max_value=len(users)-1)
+        owner = users[user_index]
 
-        filtered_clothes_set = ClothesSet.objects.all().filter(owner_id=created.owner_id)
+        filtered_clothes_set = ClothesSet.objects.all().filter(owner_id=owner.id)
         
         filtered_clothes = []
         for clothes_set in filtered_clothes_set:
@@ -127,6 +132,6 @@ def populate_clothes_set_review(number=10):
             comment=comment,
             created_at=created_at,
             clothes_set_id=clothes_set_id,
-            owner_id=created.owner_id
+            owner=owner
         )
         print(created)

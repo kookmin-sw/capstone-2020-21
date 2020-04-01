@@ -33,8 +33,6 @@ class ClothesSetFactory(factory.DjangoModelFactory):
         model = ClothesSet
         django_get_or_create = ('name', 'style', 'image_url', 'owner', 'created_at')
         
-    owner = factory.Iterator(User.objects.all())
-
     @factory.post_generation
     def clothes(self, create, extracted, **kwargs):
         if not create:
@@ -58,5 +56,4 @@ class ClothesSetReviewFactory(factory.DjangoModelFactory):
                                 'precipitation', 'comment', 'created_at'
                                 )
         
-    owner = factory.Iterator(User.objects.all())
     
