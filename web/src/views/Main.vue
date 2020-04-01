@@ -27,12 +27,12 @@ export default {
 
 }
 </script>
-<style>
+<style scoped>
 .closet {
     width: 100%;
     margin-right: auto;
     margin-left: auto;
-    margin-top: 200px;
+    /* margin-top: 200px; */
 }
 .container_1{
   margin-top: 100px;
