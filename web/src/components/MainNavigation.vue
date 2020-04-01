@@ -5,7 +5,7 @@
 <template>
 <div class="wrapper">
 <!--Navigation Start-->
-<nav class="navigation">
+<nav class="navigation" style="margin-top:50px">
   <ul>
     <li class="home">
       <a href="/">Home</a>

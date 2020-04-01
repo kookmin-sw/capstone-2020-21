@@ -1,9 +1,12 @@
 <template>
-<div class="col-md-3 left_side">
-    <div class="well" style="margin-top:90px">
-      <p>hi</p>
+<div class="col-md-4 left_side">
+    <div class="" style="border: solid 2px; padding:10px">
+      <p>shirts</p>
+      <p>pants</p>
+      <p>jacket</p>
+      <p>......</p>
     </div>
-    <div class="" style="text-align:right">
+    <div class="" style="text-align:right; margin-top:10px">
       <b-button v-b-toggle.collapse-1>펼쳐보기</b-button>
       <b-collapse id="collapse-1" class="mt-2">
           <b-card>

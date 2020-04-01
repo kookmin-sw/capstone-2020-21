@@ -7,7 +7,9 @@
             </div>
             <div class="row">
                 <!-- <ClassificationComponent></ClassificationComponent> -->
-                <CodyComponent></CodyComponent>
+                <div class="col-md-10">
+                  <CodyComponent></CodyComponent>
+                </div>
             </div>
         </div>
     </div>
