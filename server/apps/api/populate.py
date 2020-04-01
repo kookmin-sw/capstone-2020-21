@@ -20,7 +20,8 @@ def populate_users(number=10):
             password=password, 
             nickname=nickname,
             gender=gender,
-            birthday=birthday)
+            birthday=birthday
+        )
 
 
 def populate_clothes(number=10):
