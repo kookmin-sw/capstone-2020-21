@@ -92,10 +92,13 @@ def populate_clothes_set_review(number=10):
 
         filtered_clothes_set = ClothesSet.objects.all().filter(owner_id=created.owner_id)
         
-        filtered_clothes = set()
+        filtered_clothes = []
         for clothes_set in filtered_clothes_set:
-                filtered_clothes.add(clothes_set.id)
+                filtered_clothes.append(clothes_set.id)
 
+        clothes_set_key = fake.random_elements(elements=filtered_clothes, length=len(filtered_clothes), unique=True)
+        clothes_set_id = clothes_set_key[0]
+        
         start_datetime = fake.date_time_between(start_date='-30d', end_date='-15d')
         end_datetime = fake.date_time_between(start_date='-15d', end_date='-3d')
         location = fake.pyint(min_value=0, max_value=3379)
@@ -109,8 +112,7 @@ def populate_clothes_set_review(number=10):
         precipitation = fake.pyint(max_value=200, min_value=0)
         comment = fake.image_url(width=None, height=None)
         created_at = fake.date_time_between(start_date='-2d', end_date='now')
-        clothes_set_id = fake.random_elements(elements=filtered_clothes, length=1, unique=True)
-        
+
         created = ClothesSetReviewFactory.create(
             start_datetime=start_datetime, 
             end_datetime=end_datetime, 
