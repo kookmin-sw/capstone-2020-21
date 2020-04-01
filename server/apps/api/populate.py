@@ -63,6 +63,10 @@ def populate_clothes_set(number=10):
 
         clothes = Clothes.objects.all().filter(owner_id=owner.id)
 
+        if len(clothes) == 0:
+            i = i - 1
+            continue
+
         clothes_set = set()
         for cloth in clothes:
                 clothes_set.add(cloth)
@@ -92,6 +96,10 @@ def populate_clothes_set_review(number=10):
         owner = users[user_index]
 
         filtered_clothes_set = ClothesSet.objects.all().filter(owner_id=owner.id)
+
+        if len(filtered_clothes_set) == 0:
+            i = i - 1
+            continue
         
         filtered_clothes = []
         for clothes_set in filtered_clothes_set:
