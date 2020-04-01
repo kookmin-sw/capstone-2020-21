@@ -8,6 +8,7 @@ import Review from './views/Review.vue'
 import ClosetDetail from './views/ClosetDetail.vue'
 import Main from './views/Main.vue'
 import ClosetAdd from './views/ClosetAdd.vue'
+import Cody from './views/Cody.vue'
 
 Vue.use(Router)
 
@@ -54,6 +55,11 @@ export default new Router({
       path: '/closet/add',
       name: 'ClosetAdd',
       component: ClosetAdd
+    },
+    {
+      path: '/cody',
+      name: 'Cody',
+      component: Cody
     }
   ]
 })
