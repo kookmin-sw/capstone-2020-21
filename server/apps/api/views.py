@@ -220,6 +220,10 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
                 analysis_upper_category_dict[clothes.upper_category].append(clothes.lower_category)
 
         for key in analysis_upper_category_dict.keys():
+            if len(analysis_upper_category_dict[key]) == 0:
+                analysis_upper_category_dict[key] = ""
+                continue
+
             analysis_upper_category_dict[key] = mode(analysis_upper_category_dict[key])
 
         return Response(analysis_upper_category_dict)       
