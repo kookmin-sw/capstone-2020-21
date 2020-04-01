@@ -1,5 +1,5 @@
 <template>
-<div class="col-md-10 my_closet">
+<div class="my_closet">
   <div class="row" style="padding:20px">
     <div class="col-md-6 cody_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
       <div class="box">
