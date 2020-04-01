@@ -1,7 +1,7 @@
 <template>
   <div class="closet">
     <MainNavigation></MainNavigation>
-    <div class="container_1">
+    <div class="container">
       <div class="add_container">
         <b-button class="btn_add" style="margin-right:10px" href="/closet/add">등록하기</b-button>
       </div>
