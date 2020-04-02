@@ -1,5 +1,4 @@
 <template>
-<div class="col-md-10 my_closet">
   <div class="row" style="padding:20px">
     <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
       <a href="closet/detail">
@@ -45,7 +44,6 @@
       </a>
     </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -55,11 +53,6 @@ export default {
 </script>
 
 <style scoped>
-.my_closet{
-  background-color: #faf5ef;
-  border-color: #d3f4ff;
-  border-style: solid;
-}
 .closet_item {
   background-position: center;
   background-repeat: no-repeat;
