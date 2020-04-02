@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from statistics import mode
 
 from .models import Clothes, ClothesSet, ClothesSetReview, User
+from .permissions import UserPermissions
 from .serializers import (
     ClothesSerializer,
     ClothesSetSerializer,
@@ -52,7 +53,7 @@ class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     filter_validation_schema = user_query_schema
     
     # Permissions.
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [UserPermissions]
 
     def update(self, request, *args, **kwargs):
         user = request.user

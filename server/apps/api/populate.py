@@ -9,10 +9,18 @@ def populate_users(number=10):
     fake = Faker('ko_KR')
 
     for i in range(number):
-        username = fake.user_name()
+        while True:
+            username = fake.user_name()
+            if len(User.objects.all().filter(username=username)) == 0:
+                break
+        
+        while True:
+            nickname = fake.name()
+            if len(User.objects.all().filter(nickname=nickname)) == 0:
+                break
+                
         password = make_password(''.join(fake.random_letters(length=8)))
-        nickname = fake.name()
-        gender = fake.random_element(elements=(True,False))
+        gender = fake.random_element(elements=('남자','여자'))
         birthday = fake.date_between(start_date='-30y', end_date='-20y')
         
         created = UserFactory.create(
@@ -28,14 +36,14 @@ def populate_clothes(number=10):
     fake = Faker('ko_KR')
 
     category_dict = {
-        'bottom' : ['shorts', 'hot_pants', 'slacks', 'jeans', 'golden_pants', 'sweatpants'],
-        'dress' : ['dress'],
-        'outer' : ['blazer', 'short_padding', 'vest_padding', 'long_padding', 'stadium_jacket', 
-                    'coach_jacket', 'windbreaker', 'field_jacket', 'mustang', 'coat', 'track_top', 
-                    'leather_jacket', 'blue_jacket', 'cardigan', 'dress', ],
-        'skirt' : ['skirt', 'long_skirt'],
-        'top' : ['short_sleeve', 'long_sleeve', 'short_sleeve_shirt', 'long_sleeve_shirt', 'sweatshirt', 
-                'turtleneck', 'hoodie',  'sweater', 'blouse', 'spaghetti_strap', 'sleeveless'] 
+        '하의' : ['반바지', '핫팬츠', '슬랙스', '청바지', '골덴바지', '트레이닝바지'],
+        '원피스' : ['원피스'],
+        '아우터' : ['블레이져', '숏패딩', '조끼패딩', '롱패딩', '야구점퍼', 
+                    '항공점퍼', '바람막이', '야상', '무스탕', '코트', '트랙탑', 
+                    '가죽자켓', '청자켓', '가디건'],
+        '치마' : ['미니스커트', '롱스커트'],
+        '상의' : ['반팔티셔츠', '긴팔티셔츠', '반팔셔츠', '긴팔셔츠', '맨투맨', 
+                '터틀넥', '후드티',  '니트', '블라우스', '끈나시', '민소매'] 
     }
 
     for i in range(number):
@@ -74,7 +82,7 @@ def populate_clothes_set(number=10):
 
         clothes = fake.random_elements(elements=clothes_set, length=4, unique=True)
         name = fake.word(ext_word_list=None)
-        style = fake.random_element(elements=('simple', 'street', 'suit', 'date', 'splendor'))
+        style = fake.random_element(elements=('심플', '스트릿', '정장', '데이트', '화려'))
         image_url = fake.image_url(width=None, height=None)
         created_at = fake.date_time_between(start_date='-60d', end_date='-30d')
 
@@ -113,12 +121,12 @@ def populate_clothes_set_review(number=10):
         end_datetime = fake.date_time_between(start_date='-15d', end_date='-3d')
         location = fake.pyint(min_value=0, max_value=3379)
         review = fake.random_element(elements=(1, 2, 3, 4, 5))
-        max_temp = fake.pyfloat(max_value=35.0, min_value=15.0)
-        min_temp = fake.pyfloat(max_value=15.0, min_value=-20.0)
-        max_sensible_temp = fake.pyfloat(max_value=35.0, min_value=15.0)
-        min_sensible_temp = fake.pyfloat(max_value=15.0, min_value=-20.0)
+        max_temp = fake.pyfloat(max_value=35.0, min_value=15.0, right_digits=1)
+        min_temp = fake.pyfloat(max_value=15.0, min_value=-20.0, right_digits=1)
+        max_sensible_temp = fake.pyfloat(max_value=35.0, min_value=15.0, right_digits=1)
+        min_sensible_temp = fake.pyfloat(max_value=15.0, min_value=-20.0, right_digits=1)
         humidity = fake.pyint(max_value=100, min_value=0)
-        wind_speed = fake.pyint(max_value=150, min_value=0)
+        wind_speed = fake.pyfloat(max_value=20, min_value=0, right_digits=1)
         precipitation = fake.pyint(max_value=200, min_value=0)
         comment = fake.image_url(width=None, height=None)
         created_at = fake.date_time_between(start_date='-2d', end_date='now')
