@@ -9,9 +9,17 @@ def populate_users(number=10):
     fake = Faker('ko_KR')
 
     for i in range(number):
-        username = fake.user_name()
+        while True:
+            username = fake.user_name()
+            if len(User.objects.all().filter(username=username)) == 0:
+                break
+        
+        while True:
+            nickname = fake.name()
+            if len(User.objects.all().filter(nickname=nickname)) == 0:
+                break
+                
         password = make_password(''.join(fake.random_letters(length=8)))
-        nickname = fake.name()
         gender = fake.random_element(elements=('남자','여자'))
         birthday = fake.date_between(start_date='-30y', end_date='-20y')
         
