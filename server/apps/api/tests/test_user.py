@@ -14,8 +14,7 @@ class UserCreateTests(APITestCase):
         self.username = 'test-user'
         self.password = 'test-password'
         self.nickname = 'test-nickname'
-        # TODO(mskwon1): change this to '남자' or '여자'.
-        self.gender = True
+        self.gender = '남자'
         self.birthday = '1996-01-14'        
         
     def test_create_user_success(self):
@@ -96,9 +95,8 @@ class UserCreateTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['username'][0], 'This field is required.')
         self.assertEqual(response.data['password'][0], 'This field is required.')
-        # TODO(mskwon1): Enable this.
-        # self.assertEqual(response.data['nickname'][0], 'This field is required.')
-        # self.assertEqual(response.data['gender'][0], 'This field is required.')
+        self.assertEqual(response.data['nickname'][0], 'This field is required.')
+        self.assertEqual(response.data['gender'][0], 'This field is required.')
         
     def test_create_user_duplicate_username(self):
         """
@@ -122,8 +120,7 @@ class UserCreateTests(APITestCase):
         
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(str(response.data['username'][0]), "user with this username already exists.")
-        # TODO(mskwon1): Enable this.
-        # self.assertEqual(str(response.data['nickname'][0]), "user with this nickname already exists.")
+        self.assertEqual(str(response.data['nickname'][0]), "user with this nickname already exists.")
 
 
 class UserRetrieveTests(APITestCase):
@@ -136,8 +133,7 @@ class UserRetrieveTests(APITestCase):
         self.username = 'test-user'
         self.password = 'test-password'
         self.nickname = 'test-nickname'
-        # TODO(mskwon1): change this to '남자' or '여자'.
-        self.gender = True
+        self.gender = '남자'
         self.birthday = '1996-01-14'
         
         # Create user for test.
@@ -205,8 +201,7 @@ class UserUpdateTests(APITestCase):
         self.username = 'test-user'
         self.password = 'test-password'
         self.nickname = 'test-nickname'
-        # TODO(mskwon1): change this to '남자' or '여자'.
-        self.gender = True
+        self.gender = '남자'
         self.birthday = '1996-01-14'
         
         # Create user for test.
@@ -238,8 +233,7 @@ class UserUpdateTests(APITestCase):
         username = 'new_username'
         password = 'new_password'
         nickname = 'new_nickname'
-        # TODO(mskwon1): Change this to '남자' or '여자'.
-        gender = True
+        gender = '여자'
         birthday = '2000-01-01'
         
         data = {
@@ -258,8 +252,7 @@ class UserUpdateTests(APITestCase):
         
     def test_update_user_partial(self):
         nickname = 'new_nickname'
-        # TODO(mskwon1): Change this to '남자' or '여자'.
-        gender = True
+        gender = '여자'
         birthday = '2000-01-01'
         
         data = {
@@ -274,15 +267,16 @@ class UserUpdateTests(APITestCase):
         self.assertEqual(response.data['gender'], gender)
         self.assertEqual(response.data['birthday'], birthday)
 
-    def test_update_user_duplicate_username(self):
+    def test_update_user_duplicate_name(self):
         username = 'test-user-dup'
+        nickname = 'test-user-dup'
         
         # Create user for test.
         url = reverse('users-list')
         data = {
             'username': username,
             'password': self.password,
-            'nickname': self.nickname,
+            'nickname': nickname,
             'gender': self.gender, 
             'birthday': self.birthday
         }
@@ -290,11 +284,13 @@ class UserUpdateTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
         data = {
-            'username': username
+            'username': username,
+            'nickname': nickname
         }
         response = self.client.patch('/users/1/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(str(response.data['username'][0]), 'user with this username already exists.')
+        self.assertEqual(str(response.data['nickname'][0]), 'user with this nickname already exists.')
         
     def test_update_not_authorized(self):
         self.client.credentials(HTTP_AUTHORIZATION='')
@@ -346,8 +342,7 @@ class UserDeleteTests(APITestCase):
         self.username = 'test-user'
         self.password = 'test-password'
         self.nickname = 'test-nickname'
-        # TODO(mskwon1): change this to '남자' or '여자'.
-        self.gender = True
+        self.gender = '남자'
         self.birthday = '1996-01-14'
         
         # Create user for test.
