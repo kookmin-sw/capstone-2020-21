@@ -2,9 +2,9 @@
 <div class="info">
     <div class="text">
         <h1>{{ title }}</h1>
-        <p>대분류 :</p>
-        <p>소분류 :</p>
-        <p>별칭 :</p>
+        <p>{{ upper }}</p>
+        <p>{{ lower }}</p>
+        <p>{{ starname }}</p>
     </div>
 </div>
 </template>
@@ -12,7 +12,7 @@
 <script>
 export default {
   name: 'ClosetDetailInfoComponent',
-  props: ['title']
+  props: ['title', 'upper', 'lower', 'starname']
 }
 </script>
 

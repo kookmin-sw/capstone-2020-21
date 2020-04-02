@@ -8,7 +8,7 @@
         <ClosetDetailComponent></ClosetDetailComponent>
         <div class="information">
         <ClosetDeletedComponent></ClosetDeletedComponent>
-        <ClosetDetailInfoComponent title="상세정보"></ClosetDetailInfoComponent>
+        <ClosetDetailInfoComponent title="상세정보" upper="대분류" lower="소분류" starname="별칭"></ClosetDetailInfoComponent>
         <ClosetModifiedComponent></ClosetModifiedComponent>
         <b-button size="lg">확인</b-button>
         </div>
@@ -55,7 +55,7 @@ export default {
     position: absolute;
     top: 50%;
      margin-top: -200px;
-     width: 300px;
+     width: 500px;
      height: 300px;
 
 }
