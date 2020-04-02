@@ -195,7 +195,7 @@ class UserRetrieveTests(APITestCase):
         self.assertEqual(response.data['detail'], "Authentication credentials were not provided.")
         
 
-class UserUpdatetests(APITestCase):
+class UserUpdateTests(APITestCase):
     def setUp(self):
         """
         Sets up username, password, nickname, gender, birthday,
@@ -274,5 +274,124 @@ class UserUpdatetests(APITestCase):
         self.assertEqual(response.data['gender'], gender)
         self.assertEqual(response.data['birthday'], birthday)
 
+    def test_update_user_duplicate_username(self):
+        username = 'test-user-dup'
+        
+        # Create user for test.
+        url = reverse('users-list')
+        data = {
+            'username': username,
+            'password': self.password,
+            'nickname': self.nickname,
+            'gender': self.gender, 
+            'birthday': self.birthday
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        data = {
+            'username': username
+        }
+        response = self.client.patch('/users/1/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data['username'][0]), 'user with this username already exists.')
+        
+    def test_update_not_authorized(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        
+        username = 'new_username'
+        password = 'new_password'
+        nickname = 'new_nickname'
+        gender = '여자'
+        birthday = '2000-01-01'
+        
+        data = {
+            'username': username,
+            'password': password,
+            'nickname': nickname,
+            'gender': gender, 
+            'birthday': birthday
+        }
+        
+        response = self.client.put('/users/1/', data, format='json')
+        self.assertEqual(response.data['detail'], 'Authentication credentials were not provided.')
+    
+    def test_update_invalid_token(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer invalid_token')
+        
+        username = 'new_username'
+        password = 'new_password'
+        nickname = 'new_nickname'
+        gender = '여자'
+        birthday = '2000-01-01'
+        
+        data = {
+            'username': username,
+            'password': password,
+            'nickname': nickname,
+            'gender': gender, 
+            'birthday': birthday
+        }
+        
+        response = self.client.put('/users/1/', data, format='json')
+        self.assertEqual(response.data['detail'], 'Given token not valid for any token type')
+        
+class UserDeleteTests(APITestCase):
+    def setUp(self):
+        """
+        Sets up username, password, nickname, gender, birthday,
+        created_user, credentials for self.client.
+        Creates one user.
+        """
+        self.username = 'test-user'
+        self.password = 'test-password'
+        self.nickname = 'test-nickname'
+        # TODO(mskwon1): change this to '남자' or '여자'.
+        self.gender = True
+        self.birthday = '1996-01-14'
+        
+        # Create user for test.
+        url = reverse('users-list')
+        data = {
+            'username': self.username,
+            'password': self.password,
+            'nickname': self.nickname,
+            'gender': self.gender, 
+            'birthday': self.birthday
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.created_user = response.data
+        
+        # Log the user in.
+        token_data = {
+            'username': self.username,
+            'password': self.password
+        }
+        response = self.client.post('/api/token/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        access_token = response.data['access']
+        
+        # Set credentials.
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+        
+    def test_delete_existing_user(self):
+        response = self.client.delete('/users/1')
+        self.assertEqual(response.status_code, status.HTTP_301_MOVED_PERMANENTLY)
+        
+    def test_delete_non_existing_user(self):
+        response = self.client.delete('/users/2')
+        self.assertEqual(response.status_code, status.HTTP_301_MOVED_PERMANENTLY)
 
+    def test_delete_not_authorized(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        
+        response = self.client.delete('/users/1/')
+        self.assertEqual(response.data['detail'], 'Authentication credentials were not provided.')
+    
+    def test_update_invalid_token(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer invalid_token')
+        
+        response = self.client.delete('/users/2/')
+        self.assertEqual(response.data['detail'], 'Given token not valid for any token type')
 
