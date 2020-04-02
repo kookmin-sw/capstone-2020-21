@@ -191,13 +191,13 @@ def get_upper_category(lower_index):
     lower category index
     """
     if lower_index < 11:
-        return 'top'
+        return '상의'
     elif lower_index < 17:
-        return 'bottom'
+        return '하의'
     elif lower_index < 19:
-        return 'skirt'
+        return '치마'
     elif lower_index < 33:
-        return 'outer'
+        return '아우터'
     else:
-        return 'dress'
+        return '원피스'
     

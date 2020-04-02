@@ -11,7 +11,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     birthday = models.DateField(null=True)
     date_joined = models.DateTimeField(default=timezone.now)
-    gender = models.BooleanField(default=True, choices=GENDER_CHOICES)
+    gender = models.CharField(choices=GENDER_CHOICES, default="성별을 입력해주세요.", max_length=2)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     username = models.CharField(max_length=30,unique=True)

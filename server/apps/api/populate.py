@@ -28,14 +28,14 @@ def populate_clothes(number=10):
     fake = Faker('ko_KR')
 
     category_dict = {
-        'bottom' : ['shorts', 'hot_pants', 'slacks', 'jeans', 'golden_pants', 'sweatpants'],
-        'dress' : ['dress'],
-        'outer' : ['blazer', 'short_padding', 'vest_padding', 'long_padding', 'stadium_jacket', 
-                    'coach_jacket', 'windbreaker', 'field_jacket', 'mustang', 'coat', 'track_top', 
-                    'leather_jacket', 'blue_jacket', 'cardigan', 'dress', ],
-        'skirt' : ['skirt', 'long_skirt'],
-        'top' : ['short_sleeve', 'long_sleeve', 'short_sleeve_shirt', 'long_sleeve_shirt', 'sweatshirt', 
-                'turtleneck', 'hoodie',  'sweater', 'blouse', 'spaghetti_strap', 'sleeveless'] 
+        '하의' : ['반바지', '핫팬츠', '슬랙스', '청바지', '골덴바지', '트레이닝바지'],
+        '원피스' : ['원피스'],
+        '아우터' : ['블레이져', '숏패딩', '조끼패딩', '롱패딩', '야구점퍼', 
+                    '항공점퍼', '바람막이', '야상', '무스탕', '코트', '트랙탑', 
+                    '가죽자켓', '청자켓', '가디건'],
+        '치마' : ['미니스커트', '롱스커트'],
+        '상의' : ['반팔티셔츠', '긴팔티셔츠', '반팔셔츠', '긴팔셔츠', '맨투맨', 
+                '터틀넥', '후드티',  '니트', '블라우스', '끈나시', '민소매'] 
     }
 
     for i in range(number):
@@ -74,7 +74,7 @@ def populate_clothes_set(number=10):
 
         clothes = fake.random_elements(elements=clothes_set, length=4, unique=True)
         name = fake.word(ext_word_list=None)
-        style = fake.random_element(elements=('simple', 'street', 'suit', 'date', 'splendor'))
+        style = fake.random_element(elements=('심플', '스트릿', '정장', '데이트', '화려'))
         image_url = fake.image_url(width=None, height=None)
         created_at = fake.date_time_between(start_date='-60d', end_date='-30d')
 
