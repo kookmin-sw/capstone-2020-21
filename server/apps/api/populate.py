@@ -12,7 +12,7 @@ def populate_users(number=10):
         username = fake.user_name()
         password = make_password(''.join(fake.random_letters(length=8)))
         nickname = fake.name()
-        gender = fake.random_element(elements=(True,False))
+        gender = fake.random_element(elements=('남자','여자'))
         birthday = fake.date_between(start_date='-30y', end_date='-20y')
         
         created = UserFactory.create(
