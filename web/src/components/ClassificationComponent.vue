@@ -58,7 +58,6 @@
   <div v-else class="inCody">
     <b-dropdown id="dropdown-dropright" dropright text="스타일" variant="outline-info" class="m-2" size="lg">
       <b-dropdown-item href="?upper_category">전체</b-dropdown-item>
-      <b-dropdown-item href="?upper_category=hoodie">후드티</b-dropdown-item>
       <b-dropdown-item href="#">심플</b-dropdown-item>
       <b-dropdown-item href="#">스트릿</b-dropdown-item>
       <b-dropdown-item href="#">화려</b-dropdown-item>
