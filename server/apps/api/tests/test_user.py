@@ -41,12 +41,11 @@ class UserCreateTests(APITestCase):
         self.assertEqual(response.data['birthday'], self.birthday)
         
         # Check Login.
-        token_url = reverse('token_obtain_pair')
         token_data = {
             'username': self.username,
             'password': self.password
         }
-        response = self.client.post('/api/token/', data, format='json')
+        response = self.client.post('/api/token/', token_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_create_user_required(self):
@@ -154,7 +153,7 @@ class UserRetrieveTests(APITestCase):
             'username': self.username,
             'password': self.password
         }
-        response = self.client.post('/api/token/', data, format='json')
+        response = self.client.post('/api/token/', token_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         access_token = response.data['access']
         
@@ -190,6 +189,21 @@ class UserRetrieveTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data['detail'], "Authentication credentials were not provided.")
         
+    def test_login_failure(self):
+        """
+        Check if login fail message is returned.
+        """
+        # Set credentials.
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        
+        token_data = {
+            'username': self.username,
+            'password': 'wrong-password'
+        }
+        response = self.client.post('/api/token/', token_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data['detail'], 'No active account found with the given credentials')
+        
 
 class UserUpdateTests(APITestCase):
     def setUp(self):
@@ -222,7 +236,7 @@ class UserUpdateTests(APITestCase):
             'username': self.username,
             'password': self.password
         }
-        response = self.client.post('/api/token/', data, format='json')
+        response = self.client.post('/api/token/', token_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         access_token = response.data['access']
         
@@ -363,7 +377,7 @@ class UserDeleteTests(APITestCase):
             'username': self.username,
             'password': self.password
         }
-        response = self.client.post('/api/token/', data, format='json')
+        response = self.client.post('/api/token/', token_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         access_token = response.data['access']
         
