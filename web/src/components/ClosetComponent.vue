@@ -1,54 +1,45 @@
 <template>
   <div class="row" style="padding:20px">
     <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
-      <a href="closet/detail">
+      <div v-if="showCloset" class="show_more" @click="goDetail()">
         <div class="txt">
           <p>상의 / 후드</p>
         </div>
-        <!-- <img src="../assets/hh.png" alt=""> -->
-      </a>
+      </div>
+    </div>
+    <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/yb.png')+ ')' }" >
+      <div v-if="showCloset" class="show_more" @click="goDetail()">
+        <div class="txt">
+          <p>상의 / 후드</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hb.png')+ ')' }" >
+      <div v-if="showCloset" class="show_more" @click="goDetail()">
+        <div class="txt">
+          <p>상의 / 후드</p>
+        </div>
+      </div>
     </div>
     <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
-      <a href="#">
+      <div v-if="showCloset" class="show_more" @click="goDetail()">
         <div class="txt">
           <p>상의 / 후드</p>
         </div>
-      </a>
-    </div>
-    <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
-      <a href="#">
-        <div class="txt">
-          <p>상의 / 후드</p>
-        </div>
-      </a>
-    </div>
-    <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
-      <a href="#">
-        <div class="txt">
-          <p>상의 / 후드</p>
-        </div>
-      </a>
-    </div>
-    <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
-      <a href="#">
-        <div class="txt">
-          <p>상의 / 후드</p>
-        </div>
-      </a>
-    </div>
-    <div class="col-md-4 closet_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
-      <a href="#">
-        <div class="txt">
-          <p>상의 / 후드</p>
-        </div>
-      </a>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'ClosetComponent'
+  name: 'ClosetComponent',
+  props: ['showCloset'],
+  methods: {
+    goDetail: function () {
+      this.$router.push({ name: 'ClosetDetail' })
+    }
+  }
 }
 </script>
 
@@ -61,13 +52,13 @@ export default {
   position: relative;
 }
 
-.closet_item > a {
+.closet_item > .show_more {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.closet_item > a > .txt {
+.closet_item > .show_more > .txt {
   display: none;
   position: absolute;
   left: 0;
@@ -81,5 +72,5 @@ export default {
   text-align: center;
 }
 
-.closet_item > a:hover > .txt {display: block;}
+.closet_item > div:hover > .txt {display: block;}
 </style>

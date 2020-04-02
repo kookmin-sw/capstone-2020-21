@@ -8,7 +8,7 @@
       <div class="row">
         <ClassificationComponent :inCloset="true"></ClassificationComponent>
         <div class="col-md-10 my_closet">
-          <ClosetComponent></ClosetComponent>
+          <ClosetComponent :showCloset="true"></ClosetComponent>
       </div>
     </div>
   </div>
