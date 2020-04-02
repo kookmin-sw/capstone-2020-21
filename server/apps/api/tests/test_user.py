@@ -186,3 +186,93 @@ class UserRetrieveTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self.created_user)
+        
+    def test_me_query_fail(self):
+        url = reverse('users-me')
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data['detail'], "Authentication credentials were not provided.")
+        
+
+class UserUpdatetests(APITestCase):
+    def setUp(self):
+        """
+        Sets up username, password, nickname, gender, birthday,
+        created_user, credentials for self.client.
+        Creates one user.
+        """
+        self.username = 'test-user'
+        self.password = 'test-password'
+        self.nickname = 'test-nickname'
+        # TODO(mskwon1): change this to '남자' or '여자'.
+        self.gender = True
+        self.birthday = '1996-01-14'
+        
+        # Create user for test.
+        url = reverse('users-list')
+        data = {
+            'username': self.username,
+            'password': self.password,
+            'nickname': self.nickname,
+            'gender': self.gender, 
+            'birthday': self.birthday
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.created_user = response.data
+        
+        # Log the user in.
+        token_data = {
+            'username': self.username,
+            'password': self.password
+        }
+        response = self.client.post('/api/token/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        access_token = response.data['access']
+        
+        # Set credentials.
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+    
+    def test_update_user_full(self):
+        username = 'new_username'
+        password = 'new_password'
+        nickname = 'new_nickname'
+        # TODO(mskwon1): Change this to '남자' or '여자'.
+        gender = True
+        birthday = '2000-01-01'
+        
+        data = {
+            'username': username,
+            'password': password,
+            'nickname': nickname,
+            'gender': gender, 
+            'birthday': birthday
+        }
+        
+        response = self.client.put('/users/1/', data, format='json')
+        self.assertEqual(response.data['username'], username)
+        self.assertEqual(response.data['nickname'], nickname)
+        self.assertEqual(response.data['gender'], gender)
+        self.assertEqual(response.data['birthday'], birthday)
+        
+    def test_update_user_partial(self):
+        nickname = 'new_nickname'
+        # TODO(mskwon1): Change this to '남자' or '여자'.
+        gender = True
+        birthday = '2000-01-01'
+        
+        data = {
+            'nickname': nickname,
+            'gender': gender, 
+            'birthday': birthday
+        }
+        
+        response = self.client.patch('/users/1/', data, format='json')
+        self.assertEqual(response.data['username'], self.username)
+        self.assertEqual(response.data['nickname'], nickname)
+        self.assertEqual(response.data['gender'], gender)
+        self.assertEqual(response.data['birthday'], birthday)
+
+
+
