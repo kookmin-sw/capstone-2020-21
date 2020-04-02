@@ -1,13 +1,13 @@
 <template>
 <div class="col-md-4 left_side">
-    <div class="" style="border: solid 2px; padding:10px">
+    <div class="recommend">
       <p>shirts</p>
       <p>pants</p>
       <p>jacket</p>
       <p>......</p>
     </div>
     <div class="" style="text-align:right; margin-top:10px">
-      <b-button v-b-toggle.collapse-1>펼쳐보기</b-button>
+      <b-button class="button" v-b-toggle.collapse-1>펼쳐보기</b-button>
       <b-collapse id="collapse-1" class="mt-2">
           <b-card>
               <div class="row" style="padding:10px">
@@ -32,6 +32,16 @@ export default {
 </script>
 
 <style scoped>
+.recommend{
+  border: solid 3px;
+  border-color: rgb(143, 203, 223);
+  padding: 10px;
+}
+.button{
+  background-color: rgb(143, 203, 223);
+  color: gray;
+  border-color: white;
+}
 .left_side{
     display: inline-block;
 }
