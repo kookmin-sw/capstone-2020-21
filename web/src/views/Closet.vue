@@ -6,11 +6,14 @@
         <b-button class="btn_add" style="margin-right:10px" href="/closet/add">등록하기</b-button>
       </div>
       <div class="row">
-        <ClassificationComponent></ClassificationComponent>
-        <ClosetComponent></ClosetComponent>
+        <ClassificationComponent :inCloset="true"></ClassificationComponent>
+        <div class="col-md-10 my_closet">
+          <ClosetComponent :showCloset="true"></ClosetComponent>
       </div>
     </div>
   </div>
+
+</div>
 </template>
 
 <script>
@@ -43,5 +46,10 @@ export default {
   width:100%;
   text-align:right;
   margin-bottom: 20px;
+}
+.my_closet{
+  background-color: #faf5ef;
+  border-color: #d3f4ff;
+  border-style: solid;
 }
 </style>

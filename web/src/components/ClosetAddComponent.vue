@@ -50,7 +50,7 @@ export default {
 <style>
 .clothes_add{
   display: inline-block;
-  margin-right: 200px;
+  margin-right: 100px;
   margin-left: 200px;
 }
 .add_box{

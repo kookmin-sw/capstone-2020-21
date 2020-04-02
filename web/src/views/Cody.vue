@@ -6,7 +6,7 @@
             <b-button class="btn_add" style="margin-right:10px" href="/cody/add">등록하기</b-button>
             </div>
             <div class="row">
-                <!-- <ClassificationComponent></ClassificationComponent> -->
+                <ClassificationComponent :inCloset="false"></ClassificationComponent>
                 <div class="col-md-10">
                   <CodyComponent></CodyComponent>
                 </div>
@@ -17,13 +17,13 @@
 
 <script>
 import MainNavigation from '@/components/MainNavigation.vue'
-// import ClassificationComponent from '@/components/ClassificationComponent.vue'
+import ClassificationComponent from '@/components/ClassificationComponent.vue'
 import CodyComponent from '@/components/CodyComponent.vue'
 export default {
   name: 'Cody',
   components: {
     MainNavigation,
-    // ClassificationComponent,
+    ClassificationComponent,
     CodyComponent
   }
 

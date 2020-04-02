@@ -4,7 +4,7 @@
     <div class="container_1">
         <ClosetAddComponent></ClosetAddComponent>
         <div class="information">
-        <ClosetDetailInfoComponent title="분석결과"></ClosetDetailInfoComponent>
+        <ClosetDetailInfoComponent title="분석결과" upper="대분류" lower="소분류" starname="별칭"></ClosetDetailInfoComponent>
         <ClosetModifiedComponent></ClosetModifiedComponent>
         <b-button size="lg">확인</b-button>
         </div>
@@ -29,7 +29,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .closet_add {
     width: 100%;
     margin-right: auto;
@@ -49,7 +49,7 @@ export default {
     position: absolute;
     top: 50%;
      margin-top: -200px;
-     width: 300px;
+     width: 500px;
      height: 300px;
 }
 </style>

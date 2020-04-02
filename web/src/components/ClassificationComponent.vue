@@ -1,6 +1,6 @@
 <template>
 <div class="col-md-2 left_side">
-  <div class="inCloset">
+  <div v-if="inCloset" class="inCloset">
     <b-dropdown id="dropdown-dropright" dropright text="상의" variant="outline-info" class="m-2" size="lg">
       <b-dropdown-item href="?upper_category">전체</b-dropdown-item>
       <b-dropdown-item href="?upper_category=hoodie">후드티</b-dropdown-item>
@@ -55,10 +55,9 @@
       <b-dropdown-item href="#">전체</b-dropdown-item>
     </b-dropdown>
   </div>
-  <div class="inCody">
+  <div v-else class="inCody">
     <b-dropdown id="dropdown-dropright" dropright text="스타일" variant="outline-info" class="m-2" size="lg">
       <b-dropdown-item href="?upper_category">전체</b-dropdown-item>
-      <b-dropdown-item href="?upper_category=hoodie">후드티</b-dropdown-item>
       <b-dropdown-item href="#">심플</b-dropdown-item>
       <b-dropdown-item href="#">스트릿</b-dropdown-item>
       <b-dropdown-item href="#">화려</b-dropdown-item>
@@ -68,14 +67,15 @@
     <br/>
     <b-dropdown id="dropdown-dropright" dropright text="리뷰" variant="outline-info" class="m-2" size="lg">
       <b-dropdown-item href="#">전체</b-dropdown-item>
-      <b-dropdown-item href="#">미등록</b-dropdown-item>>
+      <b-dropdown-item href="#">미등록</b-dropdown-item>
     </b-dropdown>
   </div>
 </div>
 </template>
 <script>
 export default {
-  name: 'ClassificationComponent'
+  name: 'ClassificationComponent',
+  props: ['inCloset']
 
 }
 </script>
