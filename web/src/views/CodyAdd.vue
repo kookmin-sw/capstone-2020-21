@@ -2,10 +2,7 @@
   <div class="closet_add">
     <MainNavigation></MainNavigation>
     <div class="container_1">
-      <div class="clothes_detail">
-        <div class="detail_box">
-        </div>
-      </div>
+      <CodyDetailComponent></CodyDetailComponent>
       <div class="information">
         <div class="add_container">
           <div class="list">
@@ -34,12 +31,15 @@
 import MainNavigation from '@/components/MainNavigation.vue'
 import ClosetComponent from '@/components/ClosetComponent.vue'
 import ClosetDetailInfoComponent from '@/components/ClosetDetailInfoComponent.vue'
+import CodyDetailComponent from '@/components/CodyDetailComponent.vue'
+
 export default {
   name: 'ClosetAdd',
   components: {
     ClosetComponent,
     MainNavigation,
-    ClosetDetailInfoComponent
+    ClosetDetailInfoComponent,
+    CodyDetailComponent
   }
 
 }
