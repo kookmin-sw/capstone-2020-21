@@ -314,7 +314,7 @@ class ClothesDeleteTests(APITestCase):
         ClothesFactory.create(
             upper_category='상의',
             lower_category='반팔티셔츠',
-            image_url='https://www.test_img.com',
+            image_url='https://www.naver.com',
             alias='test-alias',
             created_at=timezone.now(),
             owner_id=2
