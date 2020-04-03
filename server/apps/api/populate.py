@@ -128,7 +128,7 @@ def populate_clothes_set_review(number=10):
         humidity = fake.pyint(max_value=100, min_value=0)
         wind_speed = fake.pyfloat(max_value=20, min_value=0, right_digits=1)
         precipitation = fake.pyint(max_value=200, min_value=0)
-        comment = fake.image_url(width=None, height=None)
+        comment = fake.sentence()
         created_at = fake.date_time_between(start_date='-2d', end_date='now')
 
         created = ClothesSetReviewFactory.create(
