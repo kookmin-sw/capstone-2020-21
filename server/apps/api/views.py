@@ -209,11 +209,11 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         filtered_clothes_set = ClothesSet.objects.filter(pk__in=filtered_clothes_set_id)
 
         analysis_upper_category_dict = {
-            'bottom' : [],
-            'dress' : [],
-            'outer' : [],
-            'skirt' : [],
-            'top' : []        
+            '하의' : [],
+            '원피스' : [],
+            '아우터' : [],
+            '치마' : [],
+            '상의' : []        
         }
 
         for clothes_set in filtered_clothes_set:
