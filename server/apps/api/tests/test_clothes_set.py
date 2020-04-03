@@ -85,7 +85,7 @@ class ClohtesSetCreateTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='')
         response = self.client.post('/clothes-sets/', {}, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(response.data['detail'], "Authentication credentials were not provided.")
+        self.assertEqual(response.data['detail'], 'Authentication credentials were not provided.')
 
 class ClothesSetRetrieveTests(APITestCase):
     def setUp(self):

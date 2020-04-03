@@ -131,6 +131,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         # Move image from temp to saved on s3 storage.
+        # TODO(mskwon1): data 타입이 json이 아닐 경우 바꿔줘야함.
         # request.data._mutable = True
         if 'image_url' in request.data.keys():
             image_url = request.data['image_url']
@@ -247,7 +248,7 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return queryset
     
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == 'create' or 'update':
             return ClothesSetSerializer
         return ClothesSetReadSerializer 
 
@@ -277,20 +278,23 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
     
     def create(self, request, *args, **kwargs):
-        user = request.user
-        
-        all_clothes = Clothes.objects.all()
-        filtered_clothes = all_clothes.filter(owner_id=user.id)
-        filtered_clothes_id = []
-        for clothes in filtered_clothes:
-            filtered_clothes_id.append(int(clothes.id))
+        if 'clothes' in request.data.keys():
+            user = request.user
             
-        # 입력된 옷들이 모두 해당 유저의 것인지 확인.
-        for clothes_id in request.data.getlist('clothes'):
-            if int(clothes_id) not in filtered_clothes_id:
-                return Response({
-                    "error" : "this is not your clothes : " + clothes_id
-                }, status=status.HTTP_200_OK)
+            all_clothes = Clothes.objects.all()
+            filtered_clothes = all_clothes.filter(owner_id=user.id)
+            filtered_clothes_id = []
+            for clothes in filtered_clothes:
+                filtered_clothes_id.append(int(clothes.id))
+                
+            # 입력된 옷들이 모두 해당 유저의 것인지 확인.
+            # TODO(mskwon1): content-type이 json이 아닌경우 바꿔줘야함.
+            # for clothes_id in request.data.getlist('clothes'):
+            for clothes_id in request.data['clothes']:
+                if int(clothes_id) not in filtered_clothes_id:
+                    return Response({
+                        "error" : "this is not your clothes : " + clothes_id
+                    }, status=status.HTTP_200_OK)
         
         return super().create(request, *args, **kwargs)
     
@@ -369,19 +373,20 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     
     # TODO(mskwon1): 날씨정보 받아오기
     def create(self, request, *args, **kwargs):
-        user = request.user
-        
-        all_clothes_set = ClothesSet.objects.all()
-        filtered_clothes_set = all_clothes_set.filter(owner_id=user.id)
-        filtered_clothes_set_id = []
-        for clothes_set in filtered_clothes_set:
-            filtered_clothes_set_id.append(int(clothes_set.id))
+        if 'clothes_set' in request.data:
+            user = request.user
             
-        # 입력된 코디가 해당 유저의 것인지 확인.
-        if int(request.data['clothes_set']) not in filtered_clothes_set_id:
-            return Response({
-                "error" : "this is not your clothes set : " + request.data['clothes_set']
-            }, status=status.HTTP_200_OK)
+            all_clothes_set = ClothesSet.objects.all()
+            filtered_clothes_set = all_clothes_set.filter(owner_id=user.id)
+            filtered_clothes_set_id = []
+            for clothes_set in filtered_clothes_set:
+                filtered_clothes_set_id.append(int(clothes_set.id))
+                
+            # 입력된 코디가 해당 유저의 것인지 확인.
+            if int(request.data['clothes_set']) not in filtered_clothes_set_id:
+                return Response({
+                    "error" : "this is not your clothes set : " + request.data['clothes_set']
+                }, status=status.HTTP_200_OK)
         
         return super().create(request, *args, **kwargs)
     
