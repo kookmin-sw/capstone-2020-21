@@ -9,6 +9,7 @@ from sagemaker.predictor import RealTimePredictor
 import time
 
 from .choices import LOWER_CATEGORY_CHOICES
+from .exceptions import S3FileError
 
 def byte_to_image(inp):
     """
@@ -159,10 +160,13 @@ def move_image_to_saved(image_url):
                     aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
     
     # Copy from temp to saved.
-    s3.copy_object(Bucket=BUCKET_NAME, 
-                   CopySource= COPY_SOURCE, 
-                   Key=KEY_NAME,
-                   ACL='public-read')
+    try:
+        s3.copy_object(Bucket=BUCKET_NAME, 
+                    CopySource= COPY_SOURCE, 
+                    Key=KEY_NAME,
+                    ACL='public-read')
+    except:
+        raise S3FileError
     
     # Delete temp.
     s3.delete_object(Bucket=BUCKET_NAME,

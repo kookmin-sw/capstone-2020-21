@@ -9,6 +9,7 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from statistics import mode
 
+from .exceptions import S3FileError
 from .models import Clothes, ClothesSet, ClothesSetReview, User
 from .permissions import UserPermissions
 from .serializers import (
@@ -123,16 +124,22 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         # If me parameter is set, check authentication.
         if request.query_params.get('me') and not request.user.is_authenticated:
             return Response({
-                'error' : 'token authorization failed ... please log in'
+                'error': 'token authorization failed ... please log in'
             }, status=status.HTTP_401_UNAUTHORIZED)
             
         return super().list(request, *args, **kwargs)
     
     def create(self, request, *args, **kwargs):
         # Move image from temp to saved on s3 storage.
-        request.data._mutable = True
-        image_url = request.data['image_url']
-        request.data['image_url']  = move_image_to_saved(image_url)
+        # request.data._mutable = True
+        if 'image_url' in request.data.keys():
+            image_url = request.data['image_url']
+            try:
+                request.data['image_url']  = move_image_to_saved(image_url)
+            except S3FileError:
+                return Response({
+                    'error': 'image does not exist ... plesase try again'
+                }, status=status.HTTP_400_BAD_REQUEST)
         
         return super(ClothesView, self).create(request, *args, **kwargs)  
     
@@ -168,7 +175,6 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         """
         An endpoint where the analysis of a clothes is returned
         """
-        
         image = byte_to_image(request.body)
         image = remove_background(image)
         image_url = save_image_s3(image)
