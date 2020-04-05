@@ -13,7 +13,7 @@ ServiceKey = settings.WEATHER_API_KEY_1
 
 # 날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
 # 예시 input_date : 2020-03-31 15:26:23, location : "1" location index
-def get_weather_date(input_date, location) : 
+def get_weather_date(input_date, location): 
 
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
@@ -86,7 +86,7 @@ def get_weather_date(input_date, location) :
     return passing_data
 
 # 날씨 불러오기 날짜, 시간, location(index)
-def get_weather_time_date(date, time, location) :
+def get_weather_time_date(date, time, location):
 
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
@@ -144,19 +144,11 @@ def get_weather_time_date(date, time, location) :
     return passing_data
 
 # start_date와 end_date 사이에 날씨 API 발표시각이 있으면 중간 값 떼오기
-def get_weather_between(start_date, end_date, location) :
+def get_weather_between(start_date, end_date, location):
 
     with open('apps/api/locations/data_full_address.json') as json_file:
         json_data = json.load(json_file)
 
-    # days = input_date.split()
-    # times= days[0].split('-')
-    # month = times[1]
-    # day = times[2]
-
-    # api_date = times[0]+times[1]+times[2]
-    # times1 = days[1].split(':')
-    # api_time =times1[0]+times1[1]        
     start_days = start_date.split()
     start_times= start_days[0].split('-')
     start_month = start_times[1]
@@ -197,16 +189,16 @@ def get_weather_between(start_date, end_date, location) :
 
 # 입력 받은 시간을 API 요청가능 시간으로 바꿔주기
 # 날씨 API에서 확정적으로 호출 가능한 시간은 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회 3시간 간격)
-def convert_time(time, month, day) : 
+def convert_time(time, month, day): 
     # 2시 이전일 때 전날 23:00 날씨를 받아옴
-    if int(time) < 200 : 
+    if int(time) < 200: 
         day =int(day)
         day = day-1
         month = int(month)
         if day == 0 :
-            if month == 5 or 7 or 10 or 12 :
+            if month == 5 or 7 or 10 or 12:
                 day = 30
-            elif month == 1 or 2 or 4 or 6 or 8 or 9 or 11 :
+            elif month == 1 or 2 or 4 or 6 or 8 or 9 or 11:
                 day = 31
             elif month == 3 :
                 day = 28
@@ -214,35 +206,35 @@ def convert_time(time, month, day) :
             month = month-1
             str_month = str(month)
 
-            if(month/10 == 0) :
+            if(month/10 == 0):
                 str_month = "0" + str_month
-            if int(day) / 10 == 0 :
+            if int(day) / 10 == 0:
                 str_day = "0" +str(day)
 
         time = "2300"
     
-    elif int(time) < 500 : # 05:00 이전 일 때 02:00 날씨를 받아옴
+    elif int(time) < 500: # 05:00 이전 일 때 02:00 날씨를 받아옴
         time = "0200"
 
-    elif int(time) < 800 : # 08:00 이전 일 때 05:00 날씨를 받아옴
+    elif int(time) < 800: # 08:00 이전 일 때 05:00 날씨를 받아옴
         time = "0500"
 
-    elif int(time) < 1100 : # 11:00 이전 일 때 08:00 날씨를 받아옴
+    elif int(time) < 1100: # 11:00 이전 일 때 08:00 날씨를 받아옴
         time = "0800"
     
-    elif int(time) < 1400 : # 14:00 이전 일 때 14:00 날씨를 받아옴
+    elif int(time) < 1400: # 14:00 이전 일 때 14:00 날씨를 받아옴
         time = "1100"
 
-    elif int(time) < 1700 : # 17:00 이전 일 때 14:00 날씨를 받아옴
+    elif int(time) < 1700  # 17:00 이전 일 때 14:00 날씨를 받아옴
         time = "1400"
 
-    elif int(time) < 2000 : # 20:00 이전 일 때 17:00 날씨를 받아옴
+    elif int(time) < 2000: # 20:00 이전 일 때 17:00 날씨를 받아옴
         time = "1700"
 
-    elif int(time) < 2300 :
+    elif int(time) < 2300:
         time = "2000"
 
-    elif int(time) < 2400 :
+    elif int(time) < 2400:
         time = "2300"
 
     str_day = str(day) 
