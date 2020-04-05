@@ -1,10 +1,14 @@
 from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.hashers import make_password
 from django.utils.translation import ugettext_lazy as _
 
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where username is the unique identifiers.
     """
+    def create(self, username, password, **extra_fields):
+        return self.create_user(username, password, **extra_fields)
+    
     def create_user(self, username, password, **extra_fields):
         """
         Create and save a User with the given username and password

@@ -11,11 +11,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     birthday = models.DateField(null=True)
     date_joined = models.DateTimeField(default=timezone.now)
-    gender = models.BooleanField(default=True, choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=2, choices=GENDER_CHOICES)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     username = models.CharField(max_length=30,unique=True)
-    nickname = models.CharField(max_length=30, default="닉네임을 입력해주세요.")
+    nickname = models.CharField(max_length=30, unique=True)
     
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []

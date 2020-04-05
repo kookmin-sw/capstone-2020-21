@@ -9,6 +9,7 @@ from sagemaker.predictor import RealTimePredictor
 import time
 
 from .choices import LOWER_CATEGORY_CHOICES
+from .exceptions import S3FileError
 
 def byte_to_image(inp):
     """
@@ -159,10 +160,13 @@ def move_image_to_saved(image_url):
                     aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
     
     # Copy from temp to saved.
-    s3.copy_object(Bucket=BUCKET_NAME, 
-                   CopySource= COPY_SOURCE, 
-                   Key=KEY_NAME,
-                   ACL='public-read')
+    try:
+        s3.copy_object(Bucket=BUCKET_NAME, 
+                    CopySource= COPY_SOURCE, 
+                    Key=KEY_NAME,
+                    ACL='public-read')
+    except:
+        raise S3FileError
     
     # Delete temp.
     s3.delete_object(Bucket=BUCKET_NAME,
@@ -191,13 +195,13 @@ def get_upper_category(lower_index):
     lower category index
     """
     if lower_index < 11:
-        return 'top'
+        return '상의'
     elif lower_index < 17:
-        return 'bottom'
+        return '하의'
     elif lower_index < 19:
-        return 'skirt'
+        return '치마'
     elif lower_index < 33:
-        return 'outer'
+        return '아우터'
     else:
-        return 'dress'
+        return '원피스'
     

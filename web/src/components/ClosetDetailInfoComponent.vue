@@ -1,16 +1,18 @@
 <template>
 <div class="info">
     <div class="text">
-        <h1>상세정보</h1>
-        <p>대분류 :</p>
-        <p>소분류 :</p>
-        <p>별칭 :</p>
+        <h1>{{ title }}</h1>
+        <p>{{ upper }}</p>
+        <p>{{ lower }}</p>
+        <p>{{ starname }}</p>
     </div>
 </div>
 </template>
 
 <script>
 export default {
+  name: 'ClosetDetailInfoComponent',
+  props: ['title', 'upper', 'lower', 'starname']
 }
 </script>
 

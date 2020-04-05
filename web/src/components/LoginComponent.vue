@@ -9,11 +9,11 @@
                             <h3 class="text-center">Login</h3>
                             <div class="form-group text-left">
                                 <label for="id">ID:</label><br/>
-                                <input type="text" name="id" id="id" class="form-control">
+                                <input type="text" name="id" id="id" class="form-control" v-model="id">
                             </div>
                             <div class="form-group text-left">
                                 <label for="password">PASSWORD:</label>
-                                <input type="text" name="password" id="password" class="form-control">
+                                <input type="text" name="password" id="password" class="form-control" v-model="password">
                             </div>
                             <div class="form-group">
                                 <input type="submit" name="submit" class="btn btn-md" value="Log In">
@@ -29,7 +29,13 @@
 
 <script>
 export default {
-  name: 'logincomponent'
+  name: 'logincomponent',
+  data () {
+    return {
+      id: '',
+      password: ''
+    }
+  }
 }
 </script>
 

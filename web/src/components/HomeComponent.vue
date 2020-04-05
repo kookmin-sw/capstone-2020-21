@@ -5,7 +5,7 @@
       <!-- Header -->
   <header class="masthead d-flex">
     <div class="container text-center my-auto">
-      <img src="../assets/logo.png" width="250" height="250" alt="로고">
+      <img src="../assets/logo.png" width="250" alt="로고">
       <h1 class="mb-1">OTTE 옷때?</h1>
       <h3 class="mb-5">
         <span class='text-primary'>O</span>

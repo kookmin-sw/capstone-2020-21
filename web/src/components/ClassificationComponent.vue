@@ -1,6 +1,7 @@
 <template>
 <div class="col-md-2 left_side">
-  <b-dropdown id="dropdown-dropright" dropright text="상의" variant="outline-info" class="m-2" size="lg">
+  <div v-if="inCloset" class="inCloset">
+    <b-dropdown id="dropdown-dropright" dropright text="상의" variant="outline-info" class="m-2" size="lg">
       <b-dropdown-item href="?upper_category">전체</b-dropdown-item>
       <b-dropdown-item href="?upper_category=hoodie">후드티</b-dropdown-item>
       <b-dropdown-item href="#">반팔티셔츠</b-dropdown-item>
@@ -15,8 +16,8 @@
       <b-dropdown-item href="#">민소매</b-dropdown-item>
 
     </b-dropdown>
-  <br/>
-  <b-dropdown id="dropdown-dropright" dropright text="바지" variant="outline-info" class="m-2" size="lg">
+    <br/>
+    <b-dropdown id="dropdown-dropright" dropright text="바지" variant="outline-info" class="m-2" size="lg">
       <b-dropdown-item href="#">전체</b-dropdown-item>
       <b-dropdown-item href="#">반바지</b-dropdown-item>
       <b-dropdown-item href="#">핫팬츠</b-dropdown-item>
@@ -25,14 +26,14 @@
       <b-dropdown-item href="#">골덴바지</b-dropdown-item>
       <b-dropdown-item href="#">트레이닝바지</b-dropdown-item>
     </b-dropdown>
-  <br/>
-  <b-dropdown id="dropdown-dropright" dropright text="치마" variant="outline-info" class="m-2" size="lg">
+    <br/>
+    <b-dropdown id="dropdown-dropright" dropright text="치마" variant="outline-info" class="m-2" size="lg">
       <b-dropdown-item href="#">전체</b-dropdown-item>
       <b-dropdown-item href="#">미니스커트</b-dropdown-item>
       <b-dropdown-item href="#">롱스커트</b-dropdown-item>
     </b-dropdown>
-  <br/>
-  <b-dropdown id="dropdown-dropright" dropright text="아우터" variant="outline-info" class="m-2" size="lg">
+    <br/>
+    <b-dropdown id="dropdown-dropright" dropright text="아우터" variant="outline-info" class="m-2" size="lg">
       <b-dropdown-item href="#">전체</b-dropdown-item>
       <b-dropdown-item href="#">블레이져</b-dropdown-item>
       <b-dropdown-item href="#">숏패딩</b-dropdown-item>
@@ -49,17 +50,32 @@
       <b-dropdown-item href="#">청자켓</b-dropdown-item>
       <b-dropdown-item href="#">가디건</b-dropdown-item>
     </b-dropdown>
-  <br/>
-  <b-dropdown id="dropdown-dropright" dropright text="원피스" variant="outline-info" class="m-2" size="lg">
+    <br/>
+    <b-dropdown id="dropdown-dropright" dropright text="원피스" variant="outline-info" class="m-2" size="lg">
       <b-dropdown-item href="#">전체</b-dropdown-item>
     </b-dropdown>
-  <br/>
-
+  </div>
+  <div v-else class="inCody">
+    <b-dropdown id="dropdown-dropright" dropright text="스타일" variant="outline-info" class="m-2" size="lg">
+      <b-dropdown-item href="?upper_category">전체</b-dropdown-item>
+      <b-dropdown-item href="#">심플</b-dropdown-item>
+      <b-dropdown-item href="#">스트릿</b-dropdown-item>
+      <b-dropdown-item href="#">화려</b-dropdown-item>
+      <b-dropdown-item href="#">데이트</b-dropdown-item>
+      <b-dropdown-item href="#">정장</b-dropdown-item>
+    </b-dropdown>
+    <br/>
+    <b-dropdown id="dropdown-dropright" dropright text="리뷰" variant="outline-info" class="m-2" size="lg">
+      <b-dropdown-item href="#">전체</b-dropdown-item>
+      <b-dropdown-item href="#">미등록</b-dropdown-item>
+    </b-dropdown>
+  </div>
 </div>
 </template>
 <script>
 export default {
-  name: 'ClassificationComponent.vue'
+  name: 'ClassificationComponent',
+  props: ['inCloset']
 
 }
 </script>

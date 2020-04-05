@@ -1,7 +1,7 @@
 <template>
-  <div class="clothes_detail">
+  <div class="cody_detail_c">
     <div class="detail_box">
-      <div class="detail_item" v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }">
+      <div class="detail_item" v-bind:style="{ backgroundImage: 'url(' +require('../assets/logo.png')+ ')' }">
       </div>
     </div>
   </div>
@@ -9,12 +9,12 @@
 
 <script>
 export default {
-  name: 'ClosetDetailComponent'
+  name: 'CodyDetailComponent'
 }
 </script>
 
 <style>
-.clothes_detail{
+.cody_detail_c{
   display: inline-block;
   margin-right: 100px;
   margin-left: 200px;

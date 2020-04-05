@@ -1,25 +1,22 @@
 <template>
-  <div class="review">
+  <div class="login">
     <MainNavigation/>
-    <div class="add_container">
-        <b-button class="btn btn_xs" style="margin-right:10px" @click="goAdd()">새 리뷰 작성하기</b-button>
-    </div>
-    <div class="col">
-        <ReviewComponent/>
-    </div>
+    <ReviewComponent/>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import ReviewComponent from '@/components/ReviewComponent.vue'
 import MainNavigation from '@/components/MainNavigation.vue'
-
+import ReviewComponent from '@/components/ReviewComponent.vue'
 export default {
   name: 'review',
   components: {
-    ReviewComponent,
-    MainNavigation
+    MainNavigation,
+    ReviewComponent
   }
 }
 </script>
+
+<style>
+
+</style>
