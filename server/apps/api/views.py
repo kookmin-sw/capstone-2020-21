@@ -27,7 +27,7 @@ from .validations import (
     clothes_set_query_schema, 
     clothes_set_review_query_schema
 )
-from .weather import get_weather_date
+from .weather import get_weather_date, get_weather_between, get_weather_time_date
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -391,50 +391,33 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         start = request.data['start_datetime']
         end = request.data['end_datetime']
         location = request.data['location']
-        
+
         # API 요청하기
-        start_weather = get_weather_date(start, location)
-        end_weather = get_weather_date(end, location)
-
+        weather_data = get_weather_between(start, end, location)
+        
         # 온도 구하기
-        start_min = start_weather['TMN']
-        start_max = start_weather['TMX']
-        
-        start_cur = start_weather['T3H']
-        start_sense_max = start_weather['WCIMAX']
-        start_sense_min = start_weather['WCIMIN']
-        start_sense = start_weather['WCI']
 
-        end_min = end_weather['TMN']
-        end_max = end_weather['TMX']
-
-        end_sense_max = end_weather['WCIMAX']
-        end_sense_min = end_weather['WCIMIN']
-        end_cur = end_weather['T3H']
-        end_sense = end_weather['WCI']
-
-        maximum_temp = max(start_cur, end_cur)
-        minimum_temp = min(start_cur, end_cur)
-        
-        maximum_sensible_temp =  max(start_sense, end_sense)
-        minimum_sensible_temp =  min(start_sense, end_sense)
+        maximum_temp = weather_data['MAX']
+        minimum_temp = weather_data['MIN']
+        maximum_sensible_temp = weather_data['WCIMAX']
+        minimum_sensible_temp = weather_data['WCIMIN']
 
         # 데이터 저장하기
         min_temp = minimum_temp
-        max_sensible_temp = maximum_sensible_temp
-        min_sensible_temp = minimum_sensible_temp
-        humidity =  start_weather['REH']
-        precipitation =  start_weather['R06']
-        wind_speed = start_weather['WSD']
+
+        humidity =  weather_data['REH']
+        precipitation =  weather_data['R06']
+        wind_speed = weather_data['WSD']
 
         # self.get_serializer(data=request.data) request.data에 정보 넣기
         request.data['max_temp'] = maximum_temp 
         request.data['min_temp'] = minimum_temp
         request.data['max_sensible_temp'] = maximum_sensible_temp
         request.data['min_sensible_temp'] = minimum_sensible_temp
-        request.data['humidiy'] = humidity
+        request.data['humidity'] = humidity
         request.data['wind_speed'] = wind_speed
         request.data['percipitation'] = precipitation
+        
         return super().create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
