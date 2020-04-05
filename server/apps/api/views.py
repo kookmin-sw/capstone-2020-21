@@ -388,6 +388,55 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     "error" : "this is not your clothes set : " + request.data['clothes_set']
                 }, status=status.HTTP_200_OK)
         
+        json_datas = request.body
+        datas = json.loads(json_datas)
+        start = datas['start_datetime']
+        end = datas['end_datetime']
+        location = datas['location']
+        # API 요청하기
+        start_weather = get_weather_date(start, location)
+        end_weather = get_weather_date(end, location)
+
+        # 온도 구하기
+        start_min = start_weather['TMN']
+        start_max = start_weather['TMX']
+        
+        start_cur = start_weather['T3H']
+        start_sense_max = start_weather['WCIMAX']
+        start_sense_min = start_weather['WCIMIN']
+        start_sense = start_weather['WCI']
+
+        end_min = end_weather['TMN']
+        end_max = end_weather['TMX']
+
+        end_sense_max = end_weather['WCIMAX']
+        end_sense_min = end_weather['WCIMIN']
+        end_cur = end_weather['T3H']
+        end_sense = end_weather['WCI']
+
+        maximum_temp = max(start_cur, end_cur)
+        minimum_temp = min(start_cur, end_cur)
+        
+        maximum_sensible_temp =  max(start_sense, end_sense)
+        minimum_sensible_temp =  min(start_sense, end_sense)
+
+        # 데이터 저장하기
+        min_temp = minimum_temp
+        max_sensible_temp = maximum_sensible_temp
+        min_sensible_temp = minimum_sensible_temp
+        humidity =  start_weather['REH']
+        precipitation =  start_weather['R06']
+        wind_speed = start_weather['WSD']
+
+        #self.get_serializer(data=request.data) request.data에 정보 넣기
+        request.data['max_temp'] = maximum_temp 
+        request.data['min_temp'] = minimum_temp
+        request.data['max_sensible_temp'] = maximum_sensible_temp
+        request.data['min_sensible_temp'] = minimum_sensible_temp
+        request.data['humidiy'] = humidity
+        request.data['wind_speed'] = wind_speed
+        request.data['percipitation'] = precipitation
+
         return super().create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
@@ -462,56 +511,4 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'count': count,
                 'next': offset + limit_count,
                 'results': final_results,
-            }, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['post'])
-    def get_weather(self, request, *args, **kwargs):   
-
-        # 데이터 받아오기
-        json_datas = request.body
-        datas = json.loads(json_datas)
-        start = datas['start_datetime']
-        end = datas['end_datetime']
-        location = datas['location']
-        
-        # API 요청하기
-        start_weather = get_weather_date(start, location)
-        end_weather = get_weather_date(start, location)
-
-        # 온도 구하기
-        start_min = start_weather['TMN']
-        start_max = start_weather['TMX']
-        start_sense_max = start_weather['WCIMAX']
-        start_sense_min = start_weather['WCIMIN']
-
-        end_min = end_weather['TMN']
-        end_max = end_weather['TMX']
-
-        end_sense_max = end_weather['WCIMAX']
-        end_sense_min = end_weather['WCIMIN']
-
-        maximum_temp = max(start_max, end_max)
-        minimum_temp = min(start_min, end_min)
-        
-        maximum_sensible_temp =  max(start_sense_max, end_sense_max)
-        minimum_sensible_temp =  min(start_sense_min, end_sense_min)
-
-        # 데이터 저장하기
-        weatherData = ClothesSetReview()
-        weatherData.max_temp = maximum_temp
-        weatherData.min_temp = minimum_temp
-        weatherData.max_sensible_temp = maximum_sensible_temp
-        weatherData.min_sensible_temp = minimum_sensible_temp
-        weatherData.humidity =  start_weather['REH']
-        weatherData.precipitation =  start_weather['R06']
-        weatherData.wind_speed = start_weather['WSD']
-        weatherData.save()
-    
-        return Response({
-                'min_temp': weatherData.min_temp,
-                'max_temp': weatherData.max_temp,
-                'max_sense' : weatherData.max_sensible_temp,
-                'min_sense' : weatherData.min_sensible_temp,
-                'windspeed' : weatherData.wind_speed,
-                'location': location,
             }, status=status.HTTP_200_OK)
