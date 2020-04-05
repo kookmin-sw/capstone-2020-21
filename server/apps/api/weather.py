@@ -8,7 +8,7 @@ from django.conf import settings
 from urllib.request import urlopen
 from pprint import pprint
 
-ServiceKey = settings.WEATHER_API_KEY_1
+ServiceKey = settings.WEATHER_API_KEY
 # ServiceKey = settings.SERVICE_API_KEY
 
 # 날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
