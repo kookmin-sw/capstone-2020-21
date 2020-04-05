@@ -86,7 +86,7 @@ def get_weather_date(input_date, location) :
     return passing_data
 
 # 날씨 불러오기 날짜, 시간, location(index)
-def get_weather_by_time_date(date, time, location) :
+def get_weather_time_date(date, time, location) :
 
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
@@ -148,21 +148,36 @@ def get_weather_between(start_date, end_date, location) :
 
     with open('apps/api/locations/data_full_address.json') as json_file:
         json_data = json.load(json_file)
-        
+
+    # days = input_date.split()
+    # times= days[0].split('-')
+    # month = times[1]
+    # day = times[2]
+
+    # api_date = times[0]+times[1]+times[2]
+    # times1 = days[1].split(':')
+    # api_time =times1[0]+times1[1]        
     start_days = start_date.split()
     start_times= start_days[0].split('-')
+    start_month = start_times[1]
+    start_day = start_times[2]
+
     # times = yyyymmzdd  yyyy -> 년 mm ->달 dd --> 일
     end_days = end_date.split()
-    end_times = end_date.spilt()
+    end_times = end_date.spilt('-')
+    end_month = end_times[1]
+    end_day = end_times[2]
 
     start_api_date = start_times[0]+start_times[1]+start_times[2]
     start_times1 = start_days[1].split(':')
     start_api_time =start_times1[0]+start_times1[1]
-
+    convert_start_api_time, convert_start_api_date = convert_time(strat_api_time, start_month, start_day)
+    
     end_api_date = end_times[0]+end_times[1]+end_times[2]
     end_times1 = end_days[1].split(':')
     end_api_time =end_times1[0]+end_times1[1]
-    
+    convert_end_api_time, convert_end_api_date = convert_time(end_api_time, end_month, end_day)
+
     start_weather =  get_weather_date(start_date, location)
     end_weather = get_weather_date(end_date, location)
 
@@ -170,19 +185,14 @@ def get_weather_between(start_date, end_date, location) :
     end_T3H = float(end_weather['T3H'])
 
     passing_data = {}
+
     # api_time tiems1는 시간 xxyy xx -> 시간 yy -> 분
     # TODO(Jaeho) 사이 시간에 API 호출 시간이 있으면 호출 가능한 시간 온도도 다시 구해오기, 구현 완료 후 삭제
     # start와 end time 사이에 날씨 API 갱신 시간이 있으면 그시간을 불러옴
-    if  end_api_time - start_api_time > 3  : # 3시간 이상 6시간 미만 이면
-        between_api_time = end_api_time - start_api_time
-        between_data =  get_weather_by_time_date(start_api_date, first_api_time, location)
-        between_T3H = float(between_data['T3H'])
-        #MIN -> MAX TEMP
-        passing_data['MINT'] = min(start_T3H, end_T3H, between_T3H)
-        #MAX -> MIN TEMP
-        passing_data['MAXT'] = max(start_T3H, end_T3H, between_T3H)
-        passing_data['VVV'] = start_weather['WSD']
-        
+    if  convert_end_api_time - convert_start_api_time < 300: # 3시간 미만 이면
+        max_temp = max(start_T3H, end_T3H)
+        min_temp = min(start_T3H, end_T3H)
+
     return passing_data
 
 # 입력 받은 시간을 API 요청가능 시간으로 바꿔주기
@@ -230,7 +240,7 @@ def convert_time(time, month, day) :
         time = "1700"
 
     elif int(time) < 2300 :
-        time = " 2000"
+        time = "2000"
 
     elif int(time) < 2400 :
         time = "2300"
