@@ -133,7 +133,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         # Move image from temp to saved on s3 storage.
         # TODO(mskwon1): data 타입이 json이 아닐 경우 바꿔줘야함.
-        # request.data._mutable = True
+        request.data._mutable = True
         if 'image_url' in request.data.keys():
             image_url = request.data['image_url']
             try:
@@ -360,7 +360,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     filter_validation_schema = clothes_set_review_query_schema
     
     # Permissions.
-    # permission_classes = [IsAuthenticatedOrReadOnly]    
+    permission_classes = [IsAuthenticatedOrReadOnly]    
     
     def list(self, request, *args, **kwargs):
         # If me parameter is set, check authentication.
@@ -387,12 +387,10 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 return Response({
                     "error" : "this is not your clothes set : " + request.data['clothes_set']
                 }, status=status.HTTP_200_OK)
-        
-        json_datas = request.body
-        datas = json.loads(json_datas)
-        start = datas['start_datetime']
-        end = datas['end_datetime']
-        location = datas['location']
+
+        start = request.data['start_datetime']
+        end = request.data['end_datetime']
+        location = request.data['location']
         # API 요청하기
         start_weather = get_weather_date(start, location)
         end_weather = get_weather_date(end, location)
@@ -428,7 +426,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         precipitation =  start_weather['R06']
         wind_speed = start_weather['WSD']
 
-        #self.get_serializer(data=request.data) request.data에 정보 넣기
+        # self.get_serializer(data=request.data) request.data에 정보 넣기
         request.data['max_temp'] = maximum_temp 
         request.data['min_temp'] = minimum_temp
         request.data['max_sensible_temp'] = maximum_sensible_temp
@@ -436,7 +434,6 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         request.data['humidiy'] = humidity
         request.data['wind_speed'] = wind_speed
         request.data['percipitation'] = precipitation
-
         return super().create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
@@ -463,7 +460,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
         return super().destroy(request, *args, **kwargs)    
            
     @action(detail=False, methods=['get'])

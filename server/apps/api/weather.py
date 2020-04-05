@@ -225,7 +225,7 @@ def convert_time(time, month, day):
     elif int(time) < 1400: # 14:00 이전 일 때 14:00 날씨를 받아옴
         time = "1100"
 
-    elif int(time) < 1700  # 17:00 이전 일 때 14:00 날씨를 받아옴
+    elif int(time) < 1700:  # 17:00 이전 일 때 14:00 날씨를 받아옴
         time = "1400"
 
     elif int(time) < 2000: # 20:00 이전 일 때 17:00 날씨를 받아옴
