@@ -300,7 +300,7 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return super().create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
-        serializer.save(owner_id = self.request.user.id)    
+        serializer.save(owner_id = self.request.user.id)
 
     def update(self, request, *args, **kwargs):
         user = request.user
@@ -450,7 +450,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             }, status=status.HTTP_401_UNAUTHORIZED)
 
         return super().destroy(request, *args, **kwargs)    
-           
+    
     @action(detail=False, methods=['get'])
     def location_search(self, request, *args, **kwargs):
         """
