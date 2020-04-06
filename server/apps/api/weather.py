@@ -9,10 +9,6 @@ from urllib.request import urlopen
 from pprint import pprint
 
 ServiceKey = settings.WEATHER_API_KEY
-<<<<<<< Updated upstream
-# ServiceKey = settings.SERVICE_API_KEY
-=======
->>>>>>> Stashed changes
 
 # 날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
 # 예시 input_date : 2020-03-31 15:26:23, location : "1" location index
