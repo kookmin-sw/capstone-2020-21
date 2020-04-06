@@ -58,16 +58,16 @@ class ClohtesSetReviewCreateTests(APITestCase):
             'start_datetime': self.start_datetime,
             'end_datetime': self.end_datetime,
             'location': self.location,
-            'review': self.location,
+            'review': self.review,
             'comment': self.comment
         }
         
-        expected_keys = set(
+        expected_keys = set([
             'id', 'clothes_set', 'start_datetime', 'end_datetime', 
             'location', 'review', 'max_temp', 'min_temp', 
             'max_sensible_temp', 'min_sensible_temp', 'humidity', 
             'wind_speed', 'precipitation', 'comment', 'owner'
-        )
+        ])
         response = self.client.post('/clothes-set-reviews/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(set(response.data.keys()), expected_keys)
@@ -83,12 +83,12 @@ class ClohtesSetReviewCreateTests(APITestCase):
             'location': self.location,
             'review': self.location,
         }
-        expected_keys = set(
+        expected_keys = set([
             'id', 'clothes_set', 'start_datetime', 'end_datetime', 
             'location', 'review', 'max_temp', 'min_temp', 
             'max_sensible_temp', 'min_sensible_temp', 'humidity', 
             'wind_speed', 'precipitation', 'comment', 'owner'
-        )
+        ])
         response = self.client.post('/clothes-set-reviews/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(set(response.data.keys()), expected_keys)

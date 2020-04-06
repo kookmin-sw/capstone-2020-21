@@ -9,7 +9,10 @@ from urllib.request import urlopen
 from pprint import pprint
 
 ServiceKey = settings.WEATHER_API_KEY
+<<<<<<< Updated upstream
 # ServiceKey = settings.SERVICE_API_KEY
+=======
+>>>>>>> Stashed changes
 
 # 날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
 # 예시 input_date : 2020-03-31 15:26:23, location : "1" location index
@@ -18,7 +21,7 @@ def get_weather_date(input_date, location):
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
 
-    days = input_date.split()
+    days = input_date.split('T')
     times= days[0].split('-')
     month = times[1]
     day = times[2]
@@ -37,8 +40,8 @@ def get_weather_date(input_date, location):
     date = "&base_date=" + convert_api_date
     time = "&base_time=" + convert_api_time
 
-    x = (json_data[location]['x'])
-    y = (json_data[location]['y'])
+    x = (json_data[str(location)]['x'])
+    y = (json_data[str(location)]['y'])
 
     nx = "&nx=" + x
     ny = "&ny=" + y

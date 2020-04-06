@@ -27,11 +27,7 @@ from .validations import (
     clothes_set_query_schema, 
     clothes_set_review_query_schema
 )
-<<<<<<< HEAD
-from .weather import get_weather_date
-=======
 from .weather import get_weather_date, get_weather_between, get_weather_time_date
->>>>>>> 41ba14a680508bac4cecaf9c906390ea9c952786
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -137,7 +133,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         # Move image from temp to saved on s3 storage.
         # TODO(mskwon1): data 타입이 json이 아닐 경우 바꿔줘야함.
-        request.data._mutable = True
+        # request.data._mutable = True
         if 'image_url' in request.data.keys():
             image_url = request.data['image_url']
             try:
@@ -342,7 +338,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         return queryset
 
     def  get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == 'create' or 'update':
             return ClothesSetReviewSerializer
         return ClothesSetReviewReadSerializer
 
@@ -391,84 +387,88 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 return Response({
                     "error" : "this is not your clothes set : " + request.data['clothes_set']
                 }, status=status.HTTP_200_OK)
-
-        start = request.data['start_datetime']
-        end = request.data['end_datetime']
-        location = request.data['location']
         
-        # API 요청하기
-        start_weather = get_weather_date(start, location)
-        end_weather = get_weather_date(end, location)
+        if set(['clothes_set', 'start_datetime', 'end_datetime', 'location', 'review' ]).issubset(request.data.keys()):
+            start = request.data['start_datetime']
+            end = request.data['end_datetime']
+            location = request.data['location']
+            
+            # API 요청하기
+            start_weather = get_weather_date(start, location)
+            end_weather = get_weather_date(end, location)
 
-        # 온도 구하기
-        start_min = start_weather['TMN']
-        start_max = start_weather['TMX']
+            # 온도 구하기
+            start_min = start_weather['TMN']
+            start_max = start_weather['TMX']
 
-        # API 요청하기
-        weather_data = get_weather_between(start, end, location)
+            # API 요청하기
+            weather_data = get_weather_between(start, end, location)
+            
+            # 온도 구하기
+
+            maximum_temp = weather_data['MAX']
+            minimum_temp = weather_data['MIN']
+            maximum_sensible_temp = weather_data['WCIMAX']
+            minimum_sensible_temp = weather_data['WCIMIN']
+
+            # 데이터 저장하기
+            min_temp = minimum_temp
+
+            humidity =  weather_data['REH']
+            precipitation =  weather_data['R06']
+            wind_speed = weather_data['WSD']
+
+            # self.get_serializer(data=request.data) request.data에 정보 넣기
+            request.data['max_temp'] = maximum_temp 
+            request.data['min_temp'] = minimum_temp
+            request.data['max_sensible_temp'] = maximum_sensible_temp
+            request.data['min_sensible_temp'] = minimum_sensible_temp
+            request.data['humidity'] = humidity
+            request.data['wind_speed'] = wind_speed
+            request.data['percipitation'] = precipitation
+            
+            start_cur = start_weather['T3H']
+            start_sense_max = start_weather['WCIMAX']
+            start_sense_min = start_weather['WCIMIN']
+            start_sense = start_weather['WCI']
+
+            end_min = end_weather['TMN']
+            end_max = end_weather['TMX']
+
+            end_sense_max = end_weather['WCIMAX']
+            end_sense_min = end_weather['WCIMIN']
+            end_cur = end_weather['T3H']
+            end_sense = end_weather['WCI']
+
+            maximum_temp = max(start_cur, end_cur)
+            minimum_temp = min(start_cur, end_cur)
+            
+            maximum_sensible_temp =  max(start_sense, end_sense)
+            minimum_sensible_temp =  min(start_sense, end_sense)
+
+            # 데이터 저장하기
+            min_temp = minimum_temp
+            max_sensible_temp = maximum_sensible_temp
+            min_sensible_temp = minimum_sensible_temp
+            humidity =  start_weather['REH']
+            precipitation =  start_weather['R06']
+            wind_speed = start_weather['WSD']
+
+            # self.get_serializer(data=request.data) request.data에 정보 넣기
+            request.data['max_temp'] = float(maximum_temp)
+            request.data['min_temp'] = float(minimum_temp)
+            request.data['max_sensible_temp'] = float(maximum_sensible_temp)
+            request.data['min_sensible_temp'] = float(minimum_sensible_temp)
+            request.data['humidity'] = int(humidity)
+            request.data['wind_speed'] = float(wind_speed)
+            request.data['precipitation'] = int(precipitation)
         
-        # 온도 구하기
-
-        maximum_temp = weather_data['MAX']
-        minimum_temp = weather_data['MIN']
-        maximum_sensible_temp = weather_data['WCIMAX']
-        minimum_sensible_temp = weather_data['WCIMIN']
-
-        # 데이터 저장하기
-        min_temp = minimum_temp
-
-        humidity =  weather_data['REH']
-        precipitation =  weather_data['R06']
-        wind_speed = weather_data['WSD']
-
-        # self.get_serializer(data=request.data) request.data에 정보 넣기
-        request.data['max_temp'] = maximum_temp 
-        request.data['min_temp'] = minimum_temp
-        request.data['max_sensible_temp'] = maximum_sensible_temp
-        request.data['min_sensible_temp'] = minimum_sensible_temp
-        request.data['humidity'] = humidity
-        request.data['wind_speed'] = wind_speed
-        request.data['percipitation'] = precipitation
-        
-        start_cur = start_weather['T3H']
-        start_sense_max = start_weather['WCIMAX']
-        start_sense_min = start_weather['WCIMIN']
-        start_sense = start_weather['WCI']
-
-        end_min = end_weather['TMN']
-        end_max = end_weather['TMX']
-
-        end_sense_max = end_weather['WCIMAX']
-        end_sense_min = end_weather['WCIMIN']
-        end_cur = end_weather['T3H']
-        end_sense = end_weather['WCI']
-
-        maximum_temp = max(start_cur, end_cur)
-        minimum_temp = min(start_cur, end_cur)
-        
-        maximum_sensible_temp =  max(start_sense, end_sense)
-        minimum_sensible_temp =  min(start_sense, end_sense)
-
-        # 데이터 저장하기
-        min_temp = minimum_temp
-        max_sensible_temp = maximum_sensible_temp
-        min_sensible_temp = minimum_sensible_temp
-        humidity =  start_weather['REH']
-        precipitation =  start_weather['R06']
-        wind_speed = start_weather['WSD']
-
-        # self.get_serializer(data=request.data) request.data에 정보 넣기
-        request.data['max_temp'] = maximum_temp 
-        request.data['min_temp'] = minimum_temp
-        request.data['max_sensible_temp'] = maximum_sensible_temp
-        request.data['min_sensible_temp'] = minimum_sensible_temp
-        request.data['humidiy'] = humidity
-        request.data['wind_speed'] = wind_speed
-        request.data['percipitation'] = precipitation
-        return super().create(request, *args, **kwargs)
+        return super(ClothesSetReviewView, self).create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
-        serializer.save(owner_id = self.request.user.id)
+        serializer.save(
+            owner_id=self.request.user.id
+        )
 
     def update(self, request, *args, **kwargs):
         user = request.user
@@ -479,8 +479,57 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        
+        if set(['clothes_set', 'start_datetime', 'end_datetime', 'location', 'review' ]).issubset(request.data.keys()):
+            start = request.data['start_datetime']
+            end = request.data['end_datetime']
+            location = request.data['location']
+            # API 요청하기
+            start_weather = get_weather_date(start, location)
+            end_weather = get_weather_date(end, location)
+
+            # 온도 구하기
+            start_min = start_weather['TMN']
+            start_max = start_weather['TMX']
             
-        return super().update(request, *args, **kwargs)
+            start_cur = start_weather['T3H']
+            start_sense_max = start_weather['WCIMAX']
+            start_sense_min = start_weather['WCIMIN']
+            start_sense = start_weather['WCI']
+
+            end_min = end_weather['TMN']
+            end_max = end_weather['TMX']
+
+            end_sense_max = end_weather['WCIMAX']
+            end_sense_min = end_weather['WCIMIN']
+            end_cur = end_weather['T3H']
+            end_sense = end_weather['WCI']
+
+            maximum_temp = max(start_cur, end_cur)
+            minimum_temp = min(start_cur, end_cur)
+            
+            maximum_sensible_temp =  max(start_sense, end_sense)
+            minimum_sensible_temp =  min(start_sense, end_sense)
+
+            # 데이터 저장하기
+            min_temp = minimum_temp
+            max_sensible_temp = maximum_sensible_temp
+            min_sensible_temp = minimum_sensible_temp
+            humidity =  start_weather['REH']
+            precipitation =  start_weather['R06']
+            wind_speed = start_weather['WSD']
+
+            # self.get_serializer(data=request.data) request.data에 정보 넣기
+            request.data['max_temp'] = float(maximum_temp)
+            request.data['min_temp'] = float(minimum_temp)
+            request.data['max_sensible_temp'] = float(maximum_sensible_temp)
+            request.data['min_sensible_temp'] = float(minimum_sensible_temp)
+            request.data['humidity'] = int(humidity)
+            request.data['wind_speed'] = float(wind_speed)
+            request.data['precipitation'] = int(precipitation)
+        
+        return super(ClothesSetReviewView, self).update(request, *args, **kwargs)
     
     def destroy(self, request, *args, **kwargs):
         user = request.user
