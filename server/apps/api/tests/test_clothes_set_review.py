@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from rest_framework import status
@@ -43,8 +43,8 @@ class ClohtesSetReviewCreateTests(APITestCase):
         populate_clothes_set(3)
 
         self.clothes_set = 1
-        self.start_datetime = timezone.now() - datetime.timedelta(hours=12)
-        self.end_datetime = timezone.now()
+        self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.end_datetime = str(datetime.now())
         self.location = 1
         self.review = 3
         self.comment = 'test-comment'
@@ -81,7 +81,7 @@ class ClohtesSetReviewCreateTests(APITestCase):
             'start_datetime': self.start_datetime,
             'end_datetime': self.end_datetime,
             'location': self.location,
-            'review': self.location,
+            'review': self.review,
         }
         expected_keys = set([
             'id', 'clothes_set', 'start_datetime', 'end_datetime', 
@@ -145,8 +145,8 @@ class ClothesSetReviewRetrieveTests(APITestCase):
         populate_clothes_set_review(3)
     
         self.clothes_set = 1
-        self.start_datetime = timezone.now() - datetime.timedelta(hours=12)
-        self.end_datetime = timezone.now()
+        self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.end_datetime = str(datetime.now())
         self.location = 1
         self.review = 3
         self.comment = 'test-comment'
@@ -258,8 +258,8 @@ class ClothesSetReviewUpdateTests(APITestCase):
         populate_clothes_set_review(1)
     
         self.clothes_set = 1
-        self.start_datetime = timezone.now() - datetime.timedelta(hours=12)
-        self.end_datetime = timezone.now()
+        self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.end_datetime = str(datetime.now())
         self.location = 1
         self.review = 3
         self.comment = 'test-comment'
@@ -273,7 +273,7 @@ class ClothesSetReviewUpdateTests(APITestCase):
             'start_datetime': self.start_datetime,
             'end_datetime': self.end_datetime,
             'location': self.location,
-            'review': self.location,
+            'review': self.review,
             'comment': self.comment
         }
         response = self.client.put('/clothes-set-reviews/1/', data, format='json')
@@ -288,7 +288,7 @@ class ClothesSetReviewUpdateTests(APITestCase):
             'start_datetime': self.start_datetime,
             'end_datetime': self.end_datetime,
             'location': self.location,
-            'review': self.location,
+            'review': self.review,
         }
         response = self.client.put('/clothes-set-reviews/1/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -382,8 +382,8 @@ class ClothesSetReviewDeleteTests(APITestCase):
         populate_clothes_set_review(1)
         
         self.clothes_set = 1
-        self.start_datetime = timezone.now() - datetime.timedelta(hours=12)
-        self.end_datetime = timezone.now()
+        self.start_datetime = datetime.now() - timedelta(hours=12)
+        self.end_datetime = datetime.now()
         self.location = 1
         self.review = 3
         self.comment = 'test-comment'

@@ -17,7 +17,7 @@ def get_weather_date(input_date, location):
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
 
-    days = input_date.split('T')
+    days = input_date.split()
     times= days[0].split('-')
     month = times[1]
     day = times[2]
@@ -96,8 +96,8 @@ def get_weather_time_date(date, time, location):
     date = "&base_date=" + api_date
     time = "&base_time=" + api_time
 
-    x = (json_data[location]['x'])
-    y = (json_data[location]['y'])
+    x = (json_data[str(location)]['x'])
+    y = (json_data[str(location)]['y'])
 
     nx = "&nx=" + x
     ny = "&ny=" + y
@@ -114,6 +114,8 @@ def get_weather_time_date(date, time, location):
 
     for parsed in parsed_json:
         passing_data[parsed['category']] = parsed['fcstValue']
+    
+    passing_data['T3H'] = float(passing_data['T3H'])
     
     t = passing_data['T3H'] # current 3hour temp
     v = passing_data['WSD'] # current wind speed
@@ -171,8 +173,8 @@ def get_weather_between(start_date, end_date, location):
     start_weather =  get_weather_date(start_date, location)
     end_weather = get_weather_date(end_date, location)
 
-    start_T3H = start_weather['T3H']
-    end_T3H = end_weather['T3H']
+    start_T3H = int(start_weather['T3H'])
+    end_T3H = int(end_weather['T3H'])
 
     weather_data = start_weather
 
@@ -244,7 +246,7 @@ def get_weather_between(start_date, end_date, location):
 
     else:
         weather_data['MIN'] = min(start_weather['TMN'], end_weather['TMN'])
-        weather_data['MAX'] = max(start_weather['TMX'], start_weather['TMX'])
+        weather_data['MAX'] = max(start_weather['TMX'], end_weather['TMX'])
         weather_data['WCIMAX'] = max(start_weather['WCIMAX'], end_weather['WCIMAX']) 
         weather_data['WCIMIN'] = min(start_weather['WCIMIN'], end_weather['WCIMIN'])
         
