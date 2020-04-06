@@ -27,7 +27,11 @@ from .validations import (
     clothes_set_query_schema, 
     clothes_set_review_query_schema
 )
+<<<<<<< HEAD
 from .weather import get_weather_date
+=======
+from .weather import get_weather_date, get_weather_between, get_weather_time_date
+>>>>>>> 41ba14a680508bac4cecaf9c906390ea9c952786
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -391,6 +395,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         start = request.data['start_datetime']
         end = request.data['end_datetime']
         location = request.data['location']
+        
         # API 요청하기
         start_weather = get_weather_date(start, location)
         end_weather = get_weather_date(end, location)
@@ -398,6 +403,32 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         # 온도 구하기
         start_min = start_weather['TMN']
         start_max = start_weather['TMX']
+
+        # API 요청하기
+        weather_data = get_weather_between(start, end, location)
+        
+        # 온도 구하기
+
+        maximum_temp = weather_data['MAX']
+        minimum_temp = weather_data['MIN']
+        maximum_sensible_temp = weather_data['WCIMAX']
+        minimum_sensible_temp = weather_data['WCIMIN']
+
+        # 데이터 저장하기
+        min_temp = minimum_temp
+
+        humidity =  weather_data['REH']
+        precipitation =  weather_data['R06']
+        wind_speed = weather_data['WSD']
+
+        # self.get_serializer(data=request.data) request.data에 정보 넣기
+        request.data['max_temp'] = maximum_temp 
+        request.data['min_temp'] = minimum_temp
+        request.data['max_sensible_temp'] = maximum_sensible_temp
+        request.data['min_sensible_temp'] = minimum_sensible_temp
+        request.data['humidity'] = humidity
+        request.data['wind_speed'] = wind_speed
+        request.data['percipitation'] = precipitation
         
         start_cur = start_weather['T3H']
         start_sense_max = start_weather['WCIMAX']
