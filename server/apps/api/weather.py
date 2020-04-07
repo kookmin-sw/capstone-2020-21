@@ -15,22 +15,22 @@ def get_weather_date(input_date, location):
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
 
-    days = input_date.split()
-    times = days[0].split('-')
-    month = times[1]
-    day = times[2]
+    date = input_date.split()
+    year_month_day = date[0].split('-')
+    month = year_month_day[1]
+    day = year_month_day[2]
 
-    api_date = times[0] + times[1] + times[2]
-    times1 = days[1].split(':')
-    api_time =times1[0] + times1[1]
+    api_date = year_month_day[0] + year_month_day[1] + year_month_day[2]
+    time = date[1].split(':')
+    api_time =time[0] + time[1]
 
     convert_api_time, convert_api_date = convert_time(api_time, month, day)
-    convert_api_date = times[0] + convert_api_date # times[0] -> 년도 년도 합쳐주기
+    convert_api_date = year_month_day[0] + convert_api_date # year_month_day[0] -> 년도 년도 합쳐주기
 
     url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?"
     key = "serviceKey=" + ServiceKey
     numOfRows = "&numOfRows=100"
-    type = "&dataType=JSON"
+    typeOfData = "&dataType=JSON"
     date = "&base_date=" + convert_api_date
     time = "&base_time=" + convert_api_time
 
@@ -40,7 +40,7 @@ def get_weather_date(input_date, location):
     nx = "&nx=" + x
     ny = "&ny=" + y
 
-    api_url = url + key + numOfRows + type + date + time + nx + ny
+    api_url = url + key + numOfRows + typeOfData + date + time + nx + ny
     data = urllib.request.urlopen(api_url).read().decode('utf8')
     data_json = json.loads(data)
     # get date and time
@@ -90,7 +90,7 @@ def get_weather_time_date(date, time, location):
     url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?"
     key = "serviceKey=" + ServiceKey
     numOfRows = "&numOfRows=100"
-    type = "&dataType=JSON"
+    typeOfData = "&dataType=JSON"
     date = "&base_date=" + api_date
     time = "&base_time=" + api_time
 
@@ -100,7 +100,7 @@ def get_weather_time_date(date, time, location):
     nx = "&nx=" + x
     ny = "&ny=" + y
 
-    api_url = url + key + numOfRows + type + date + time + nx + ny
+    api_url = url + key + numOfRows + typeOfData + date + time + nx + ny
     data = urllib.request.urlopen(api_url).read().decode('utf8')
     data_json = json.loads(data)
 
@@ -142,34 +142,34 @@ def get_weather_time_date(date, time, location):
     return passing_data
 
 # start_date와 end_date 사이에 날씨 API 발표시각이 있으면 중간 값 떼오기
-def get_weather_between(start_date, end_date, location):
+def get_weather_between(start_input_date, end_input_date, location):
 
     with open('apps/api/locations/data_full_address.json') as json_file:
         json_data = json.load(json_file)
 
-    start_days = start_date.split()
-    start_times= start_days[0].split('-')
-    start_month = start_times[1]
-    start_day = start_times[2]
+    start_date = start_input_date.split()
+    start_year_month_day= start_date[0].split('-')
+    start_month = start_year_month_day[1]
+    start_day = start_year_month_day[2]
 
-    # times = yyyymmzdd  yyyy -> 년 mm ->달 dd --> 일
-    end_days = end_date.split()
-    end_times = end_days[0].split('-')
-    end_month = end_times[1]
-    end_day = end_times[2]
+    # year_month_day = yyyymmzdd  yyyy -> 년 mm ->달 dd --> 일
+    end_date = end_input_date.split()
+    end_year_month_day = end_date[0].split('-')
+    end_month = end_year_month_day[1]
+    end_day = end_year_month_day[2]
 
-    start_api_date = start_times[0]+start_times[1]+start_times[2]
-    start_times1 = start_days[1].split(':')
-    start_api_time =start_times1[0] + start_times1[1]
+    start_api_date = start_year_month_day[0] + start_year_month_day[1] + start_year_month_day[2]
+    start_time = start_date[1].split(':')
+    start_api_time =start_time[0] + start_time[1]
     convert_start_api_time, convert_start_api_date = convert_time(start_api_time, start_month, start_day)
     
-    end_api_date = end_times[0] + end_times[1] + end_times[2]
-    end_times1 = end_days[1].split(':')
-    end_api_time =end_times1[0] + end_times1[1]
+    end_api_date = end_year_month_day[0] + end_year_month_day[1] + end_year_month_day[2]
+    end_time = end_date[1].split(':')
+    end_api_time =end_time[0] + end_time[1]
     convert_end_api_time, convert_end_api_date = convert_time(end_api_time, end_month, end_day)
 
-    start_weather =  get_weather_date(start_date, location)
-    end_weather = get_weather_date(end_date, location)
+    start_weather =  get_weather_date(start_input_date, location)
+    end_weather = get_weather_date(end_input_date, location)
 
     start_T3H = int(start_weather['T3H'])
     end_T3H = int(end_weather['T3H'])
@@ -204,7 +204,7 @@ def get_weather_between(start_date, end_date, location):
             temp_int = int(convert_start_api_time) # 날짜가 안바 뀔 때 3시간 뒤 날씨도 확인해서 더해주기
             temp_int += 300
             temp_time = str(temp_int)
-            if temp_int/1000 == 0:
+            if temp_int // 1000 == 0:
                 temp_time = "0" + temp_time
             temp_weather = get_weather_time_date(start_api_date, temp_time, location)
             weather_data['MIN'] = min(start_T3H, end_T3H, temp_weather['T3H'])
@@ -233,7 +233,7 @@ def get_weather_between(start_date, end_date, location):
             temp_int = int(convert_start_api_time) # 날짜가 안바 뀔 때 3시간 뒤 날씨도 확인해서 더해주기
             temp_int += 600
             temp_time = str(temp_int)
-            if temp_int/1000 == 0:
+            if temp_int // 1000 == 0:
                 temp_time = "0" + temp_time
             temp_weather = get_weather_time_date(start_api_date, temp_time, location)
             
