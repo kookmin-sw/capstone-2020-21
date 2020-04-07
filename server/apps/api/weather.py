@@ -9,9 +9,10 @@ ServiceKey = settings.WEATHER_API_KEY
 
 
 def get_weather_date(input_date, location): 
-    # 날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
-    # 예시 input_date : 2020-03-31 15:26:23, location : "1" location index
-
+    """
+     날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
+     예시 input_date : 2020-03-31 15:26:23, location : "1" location index
+    """
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
 
@@ -56,19 +57,19 @@ def get_weather_date(input_date, location):
     v = float(v)
     
     # 체감 온도 계산
-    wci = 13.12 + 0.6215 * t -  11.37 * math.pow(v, 0.16) + 0.3965 * t * math.pow(v, 0.16)
+    wci = getWCI(t, v)
     wci = round(wci, 2)
-    passing_data['WCI'] = wci
 
     t_high = passing_data['TMX']
     t_min = passing_data['TMN']
     t_high = float(t_high)
     t_min = float(t_min)
 
-    wci_high = 13.12 + 0.6215*t_high - 11.37 * math.pow(v, 0.16) + 0.3965 * t_high * math.pow(v, 0.16)
-    wci_high = round(wci_high, 2)
-    wci_low = 13.12 + 0.6215*t_min - 11.37*math.pow(v, 0.16) + 0.3965 * t_min*math.pow(v, 0.16)
-    wci_low = round(wci_low, 2)
+    wci_high = getWCI(t_high, v)
+    wci_high = round(wci, 2)
+    wci_low = getWCI(t_min, v)
+    wci_low = round(wci, 2)
+
 
     passing_data['WCI'] = wci # current wind chill temp
     passing_data['WCIMAX'] = wci_high # maximum chill temp
@@ -139,9 +140,10 @@ def get_weather_time_date(date, time, location):
     return passing_data
 
 def get_weather_between(start_input_date, end_input_date, location):
-    # 입력 받은 두 기간 내의 최저 최고 온도를 받으며 날씨 데이터를 weather_data로 반환한다.
-    # 예시 : 2020-04-07 08:45, 2020-04-07 22:24, location : "1" location index
-
+    """"
+     입력 받은 두 기간 내의 최저 최고 온도를 받으며 날씨 데이터를 weather_data로 반환한다.
+     예시 : 2020-04-07 08:45, 2020-04-07 22:24, location : "1" location index
+    """
     with open('apps/api/locations/data_full_address.json') as json_file:
         json_data = json.load(json_file)
 
@@ -172,8 +174,8 @@ def get_weather_between(start_input_date, end_input_date, location):
     start_weather =  get_weather_date(start_input_date, location)
     end_weather = get_weather_date(end_input_date, location)
 
-    start_T3H = int(start_weather['T3H'])
-    end_T3H = int(end_weather['T3H'])
+    start_T3H = float(start_weather['T3H'])
+    end_T3H = float(end_weather['T3H'])
 
     weather_data = start_weather
 
@@ -181,25 +183,25 @@ def get_weather_between(start_input_date, end_input_date, location):
     # 중간 시점 temp_time을 구해 중간 시간, 시작 시간, 종료 시간 세 구간의 온도를 고려해 기준 내 최저 최고 온도를 구한다.
 
     if int(convert_end_api_time) - int(convert_start_api_time) < 0: # 날짜가 바뀌면
-        weather_data['MAX'] = max(start_T3H, end_T3H)
-        weather_data['MIN'] = min(start_T3H, end_T3H)
-        weather_data['WCIMAX'] = max(start_weather['WCIMAX'], end_weather['WCIMAX'])
-        weather_data['WCIMIN'] = min(start_weather['WCIMIN'], end_weather['WCIMIN'])
+        weather_data['MAX'] = max(float(start_T3H), float(end_T3H))
+        weather_data['MIN'] = min(float(start_T3H), float(end_T3H))
+        weather_data['WCIMAX'] = max(float(start_weather['WCIMAX']), float(end_weather['WCIMAX']))
+        weather_data['WCIMIN'] = min(float(start_weather['WCIMIN']), float(end_weather['WCIMIN']))
 
     elif int(convert_end_api_time) - int(convert_start_api_time) < 300:
-        weather_data['MAX'] = max(start_weather['T3H'], end_weather['T3H'])
-        weather_data['MIN'] = min(start_weather['T3H'], end_weather['T3H'])
-        weather_data['WCIMAX'] = max(start_weather['WCI'], end_weather['WCI'])
-        weather_data['WCIMIN'] = min(start_weather['WCI'], end_weather['WCI'])
+        weather_data['MAX'] = max(float(start_weather['T3H']), float(end_weather['T3H']))
+        weather_data['MIN'] = min(float(start_weather['T3H']), float(end_weather['T3H']))
+        weather_data['WCIMAX'] = max(float(start_weather['WCI']), float(end_weather['WCI']))
+        weather_data['WCIMIN'] = min(float(start_weather['WCI']), float(end_weather['WCI']))
 
     elif int(convert_end_api_time) - int(convert_start_api_time) < 900:
         if(convert_start_api_time == "2300"):
             temp_time = "0200"
             temp_weather = get_weather_time_date(end_api_date, temp_time, location)
-            weather_data['MIN'] = min(start_T3H, end_T3H, temp_weather['T3H'])
-            weather_data['MAX'] = max(start_T3H, end_T3H, temp_weather['T3H'])
-            weather_data['WCIMAX'] = max(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
-            weather_data['WCIMIN'] = min(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
+            weather_data['MIN'] = min(start_T3H, end_T3H, float(temp_weather['T3H']))
+            weather_data['MAX'] = max(start_T3H, end_T3H, float(temp_weather['T3H']))
+            weather_data['WCIMAX'] = max(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
+            weather_data['WCIMIN'] = min(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
 
         else:
             temp_int = int(convert_start_api_time) # 날짜가 안바 뀔 때 3시간 뒤 날씨도 확인
@@ -208,28 +210,28 @@ def get_weather_between(start_input_date, end_input_date, location):
             if temp_int // 1000 == 0:
                 temp_time = "0" + temp_time
             temp_weather = get_weather_time_date(start_api_date, temp_time, location)
-            weather_data['MIN'] = min(start_T3H, end_T3H, temp_weather['T3H'])
-            weather_data['MAX'] = max(start_T3H, end_T3H, temp_weather['T3H'])
-            weather_data['WCIMAX'] = max(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
-            weather_data['WCIMIN'] = min(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
+            weather_data['MIN'] = min(start_T3H, end_T3H, float(temp_weather['T3H']))
+            weather_data['MAX'] = max(start_T3H, end_T3H, float(temp_weather['T3H']))
+            weather_data['WCIMAX'] = max(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
+            weather_data['WCIMIN'] = min(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
 
     elif int(convert_end_api_time) - int(convert_start_api_time) < 1500:
 
         if convert_start_api_time == "1700" or convert_start_api_time == "2000":
             temp_time = "0200"
             temp_weather = get_weather_time_date(end_api_date, temp_time, location)
-            weather_data['MIN'] = min(start_T3H, end_T3H, temp_weather['T3H'])
-            weather_data['MAX'] = max(start_T3H, end_T3H, temp_weather['T3H'])
-            weather_data['WCIMAX'] = max(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
-            weather_data['WCIMIN'] = min(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
+            weather_data['MIN'] = min(start_T3H, end_T3H, float(temp_weather['T3H']))
+            weather_data['MAX'] = max(start_T3H, end_T3H, float(temp_weather['T3H']))
+            weather_data['WCIMAX'] = max(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
+            weather_data['WCIMIN'] = min(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
 
         elif convert_start_api_time == "2300":
             temp_time = "0500"
             temp_weather = get_weather_time_date(end_api_date, temp_time, location)
-            weather_data['MIN'] = min(start_T3H, end_T3H, temp_weather['T3H'])
-            weather_data['MAX'] = max(start_T3H, end_T3H, temp_weather['T3H'])
-            weather_data['WCIMAX'] = max(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
-            weather_data['WCIMIN'] = min(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
+            weather_data['MIN'] = min(start_T3H, end_T3H, float(temp_weather['T3H']))
+            weather_data['MAX'] = max(start_T3H, end_T3H, float(temp_weather['T3H']))
+            weather_data['WCIMAX'] = max(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
+            weather_data['WCIMIN'] = min(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
 
         else:
             temp_int = int(convert_start_api_time) # 날짜가 안바 뀔 때 6시간 뒤 날씨도 확인
@@ -239,34 +241,36 @@ def get_weather_between(start_input_date, end_input_date, location):
                 temp_time = "0" + temp_time
             temp_weather = get_weather_time_date(start_api_date, temp_time, location)
             
-            weather_data['MIN'] = min(start_T3H, end_T3H, temp_weather['T3H'])
-            weather_data['MAX'] = max(start_T3H, end_T3H, temp_weather['T3H'])
-            weather_data['WCIMAX'] = max(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
-            weather_data['WCIMIN'] = min(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
+            weather_data['MIN'] = min(start_T3H, end_T3H, float(temp_weather['T3H']))
+            weather_data['MAX'] = max(start_T3H, end_T3H, float(temp_weather['T3H']))
+            weather_data['WCIMAX'] = max(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
+            weather_data['WCIMIN'] = min(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
 
     else: 
-        weather_data['MIN'] = min(start_weather['TMN'], end_weather['TMN'])
-        weather_data['MAX'] = max(start_weather['TMX'], end_weather['TMX'])
-        weather_data['WCIMAX'] = max(start_weather['WCIMAX'], end_weather['WCIMAX']) 
-        weather_data['WCIMIN'] = min(start_weather['WCIMIN'], end_weather['WCIMIN'])
+        weather_data['MIN'] = min(float(start_weather['TMN']), float(end_weather['TMN']))
+        weather_data['MAX'] = max(float(start_weather['TMX']), float(end_weather['TMX']))
+        weather_data['WCIMAX'] = max(float(start_weather['WCIMAX']), float(end_weather['WCIMAX']))
+        weather_data['WCIMIN'] = min(float(start_weather['WCIMIN']), float(end_weather['WCIMIN']))
         
     return weather_data
 
 
-def convert_time(time, year, month, day): 
+def convert_time(time, year, month, day):
+    """ 
     # 입력 받은 시간을 API 요청가능 시간으로 변환한다.
-    # 예시 : 1230, 2020, 04, 07 (시간, 년도, 달, 날짜)
-    # 날씨 API에서 확정적으로 호출 가능한 시간(Basetime)은 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회 3시간 간격)
-    # 날씨 API에서 Basetime 제공 시간은 Basetime 에서 10분 뒤이다.
-    # 2시 이전일 때 전날 23:00 날씨를 받아온다.
+     예시 : 1230, 2020, 04, 07 (시간, 년도, 달, 날짜)
+     날씨 API에서 확정적으로 호출 가능한 시간(Basetime)은 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회 3시간 간격)
+     날씨 API에서 Basetime 제공 시간은 Basetime 에서 10분 뒤이다.
+     2시 이전일 때 전날 23:00 날씨를 받아온다.
+    """
 
     year = int(year)
     day = int(day)
     month = int(month)
 
     current_date = datetime.date(year, month, day)
-    subtracted_date = current_date + datetime.timedelta(days=-1)
-
+    subtracted_date = current_date - datetime.timedelta(days=1)
+ 
     if int(time) < 211: # 2시 11분 이전 일 때
         year = subtracted_date.year
         month = subtracted_date.month
@@ -309,8 +313,10 @@ def convert_time(time, year, month, day):
 
 # 체감 온도 구하기
 def getWCI(temperature, wind_velocity): 
-    # 기온과 풍속을 입력 받아 체감온도를 반환한다.
-    # 예시 : 12, 9.5
+    """
+     기온과 풍속을 입력 받아 체감온도를 반환한다.
+     예시 : 12, 9.5
+    """
     WCI = 13.12 + 0.6215 * temperature - 11.37 * math.pow(wind_velocity, 0.16) + 0.3965 * temperature * math.pow(wind_velocity, 0.16)
  
     return WCI
