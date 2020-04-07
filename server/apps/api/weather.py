@@ -140,7 +140,7 @@ def get_weather_time_date(date, time, location):
     return passing_data
 
 def get_weather_between(start_input_date, end_input_date, location):
-    """"
+    """
      입력 받은 두 기간 내의 최저 최고 온도를 받으며 날씨 데이터를 weather_data로 반환한다.
      예시 : 2020-04-07 08:45, 2020-04-07 22:24, location : "1" location index
     """
@@ -270,7 +270,7 @@ def convert_time(time, year, month, day):
 
     current_date = datetime.date(year, month, day)
     subtracted_date = current_date - datetime.timedelta(days=1)
- 
+    
     if int(time) < 211: # 2시 11분 이전 일 때
         year = subtracted_date.year
         month = subtracted_date.month
