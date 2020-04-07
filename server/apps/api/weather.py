@@ -2,15 +2,15 @@ import datetime
 from django.conf import settings
 import json
 import math
-from pprint import pprint
 import urllib
 from urllib.request import urlopen
 
 ServiceKey = settings.WEATHER_API_KEY
 
-# 날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
-# 예시 input_date : 2020-03-31 15:26:23, location : "1" location index
+
 def get_weather_date(input_date, location): 
+    # 날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
+    # 예시 input_date : 2020-03-31 15:26:23, location : "1" location index
 
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
@@ -25,7 +25,7 @@ def get_weather_date(input_date, location):
     api_time =time[0] + time[1]
 
     convert_api_time, convert_api_date = convert_time(api_time, year, month, day)
-    convert_api_date = year_month_day[0] + convert_api_date # year_month_day[0] -> 년도 년도 합쳐주기
+    convert_api_date = convert_api_date # year_month_day[0] -> 년도 년도 합쳐주기
 
     url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?"
     key = "serviceKey=" + ServiceKey
@@ -78,6 +78,8 @@ def get_weather_date(input_date, location):
 
 # 날씨 불러오기 날짜, 시간, location(index)
 def get_weather_time_date(date, time, location):
+    # convert_time으로 변환된 시간과 장소를 입력 받아 get_weather_between에 필요한 기상 데이터를 딕셔너니로 반환한다.
+    # 예시 : 2020-04-07 08:45, 2020-04-07 22:24, location : "1" location index
 
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
@@ -136,8 +138,9 @@ def get_weather_time_date(date, time, location):
 
     return passing_data
 
-# start_date와 end_date 사이에 날씨 API 발표시각이 있으면 중간 값 떼오기
 def get_weather_between(start_input_date, end_input_date, location):
+    # 입력 받은 두 기간 내의 최저 최고 온도를 받으며 날씨 데이터를 weather_data로 반환한다.
+    # 예시 : 2020-04-07 08:45, 2020-04-07 22:24, location : "1" location index
 
     with open('apps/api/locations/data_full_address.json') as json_file:
         json_data = json.load(json_file)
@@ -149,6 +152,7 @@ def get_weather_between(start_input_date, end_input_date, location):
     start_day = start_year_month_day[2]
 
     # year_month_day = yyyymmzdd  yyyy -> 년 mm ->달 dd --> 일
+
     end_date = end_input_date.split()
     end_year_month_day = end_date[0].split('-')
     end_year = end_year_month_day[0]
@@ -174,8 +178,8 @@ def get_weather_between(start_input_date, end_input_date, location):
     weather_data = start_weather
 
     # api_time tiems1는 시간 xxyy xx -> 시간 yy -> 분
-    # TODO(Jaeho) 사이 시간에 API 호출 시간이 있으면 호출 가능한 시간 온도도 다시 구해오기, 구현 완료 후 삭제
-    # start와 end time 사이에 날씨 API 갱신 시간이 있으면 그시간을 불러옴
+    # 중간 시점 temp_time을 구해 중간 시간, 시작 시간, 종료 시간 세 구간의 온도를 고려해 기준 내 최저 최고 온도를 구한다.
+
     if int(convert_end_api_time) - int(convert_start_api_time) < 0: # 날짜가 바뀌면
         weather_data['MAX'] = max(start_T3H, end_T3H)
         weather_data['MIN'] = min(start_T3H, end_T3H)
@@ -198,7 +202,7 @@ def get_weather_between(start_input_date, end_input_date, location):
             weather_data['WCIMIN'] = min(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
 
         else:
-            temp_int = int(convert_start_api_time) # 날짜가 안바 뀔 때 3시간 뒤 날씨도 확인해서 더해주기
+            temp_int = int(convert_start_api_time) # 날짜가 안바 뀔 때 3시간 뒤 날씨도 확인
             temp_int += 300
             temp_time = str(temp_int)
             if temp_int // 1000 == 0:
@@ -210,6 +214,7 @@ def get_weather_between(start_input_date, end_input_date, location):
             weather_data['WCIMIN'] = min(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
 
     elif int(convert_end_api_time) - int(convert_start_api_time) < 1500:
+
         if convert_start_api_time == "1700" or convert_start_api_time == "2000":
             temp_time = "0200"
             temp_weather = get_weather_time_date(end_api_date, temp_time, location)
@@ -227,7 +232,7 @@ def get_weather_between(start_input_date, end_input_date, location):
             weather_data['WCIMIN'] = min(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
 
         else:
-            temp_int = int(convert_start_api_time) # 날짜가 안바 뀔 때 3시간 뒤 날씨도 확인해서 더해주기
+            temp_int = int(convert_start_api_time) # 날짜가 안바 뀔 때 6시간 뒤 날씨도 확인
             temp_int += 600
             temp_time = str(temp_int)
             if temp_int // 1000 == 0:
@@ -239,7 +244,7 @@ def get_weather_between(start_input_date, end_input_date, location):
             weather_data['WCIMAX'] = max(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
             weather_data['WCIMIN'] = min(start_weather['WCI'], end_weather['WCI'], temp_weather['WCI'])
 
-    else:
+    else: 
         weather_data['MIN'] = min(start_weather['TMN'], end_weather['TMN'])
         weather_data['MAX'] = max(start_weather['TMX'], end_weather['TMX'])
         weather_data['WCIMAX'] = max(start_weather['WCIMAX'], end_weather['WCIMAX']) 
@@ -247,44 +252,50 @@ def get_weather_between(start_input_date, end_input_date, location):
         
     return weather_data
 
-# 입력 받은 시간을 API 요청가능 시간으로 바꿔주기
-# 날씨 API에서 확정적으로 호출 가능한 시간은 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회 3시간 간격)
+
 def convert_time(time, year, month, day): 
-    # 2시 이전일 때 전날 23:00 날씨를 받아옴
+    # 입력 받은 시간을 API 요청가능 시간으로 변환한다.
+    # 예시 : 1230, 2020, 04, 07 (시간, 년도, 달, 날짜)
+    # 날씨 API에서 확정적으로 호출 가능한 시간(Basetime)은 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회 3시간 간격)
+    # 날씨 API에서 Basetime 제공 시간은 Basetime 에서 10분 뒤이다.
+    # 2시 이전일 때 전날 23:00 날씨를 받아온다.
+
     year = int(year)
     day = int(day)
     month = int(month)
 
     current_date = datetime.date(year, month, day)
-    subtracted_date = current_date - datetime.timedelta(days=1)
+    subtracted_date = current_date + datetime.timedelta(days=-1)
 
-    if int(time) < 200:
+    if int(time) < 211: # 2시 11분 이전 일 때
         year = subtracted_date.year
         month = subtracted_date.month
         day = subtracted_date.day
 
-    elif int(time) < 500: # 05:00 이전 일 때 02:00 날씨를 받아옴
+        time = "2300"
+
+    elif int(time) < 511: # 05:11 이전 일 때 02:00 날씨를 받아옴
         time = "0200"
 
-    elif int(time) < 800: # 08:00 이전 일 때 05:00 날씨를 받아옴
+    elif int(time) < 811: # 08:11 이전 일 때 05:00 날씨를 받아옴
         time = "0500"
 
-    elif int(time) < 1100: # 11:00 이전 일 때 08:00 날씨를 받아옴
+    elif int(time) < 1111: # 11:11 이전 일 때 08:00 날씨를 받아옴
         time = "0800"
     
-    elif int(time) < 1400: # 14:00 이전 일 때 14:00 날씨를 받아옴
+    elif int(time) < 1411: # 14:11 이전 일 때 14:00 날씨를 받아옴
         time = "1100"
 
-    elif int(time) < 1700:  # 17:00 이전 일 때 14:00 날씨를 받아옴
+    elif int(time) < 1711:  # 17:11 이전 일 때 14:00 날씨를 받아옴
         time = "1400"
 
-    elif int(time) < 2000: # 20:00 이전 일 때 17:00 날씨를 받아옴
+    elif int(time) < 2011: # 20:11 이전 일 때 17:00 날씨를 받아옴
         time = "1700"
 
-    elif int(time) < 2300:
+    elif int(time) < 2311: # 23: 11 이전 일 때 20:00 날씨를 받아옴
         time = "2000"
 
-    elif int(time) < 2400:
+    elif int(time) < 2400: # 24: 00 이전 일 때 20:00 날씨를 받아옴. 
         time = "2300"
     
     if int(month) // 10 == 0:
@@ -292,12 +303,14 @@ def convert_time(time, year, month, day):
     if int(day) // 10 == 0:
         str_day = "0" + str(day)
 
-    date = str_month + str_day
+    date = str(year) + str_month + str_day
 
     return time, date
 
 # 체감 온도 구하기
 def getWCI(temperature, wind_velocity): 
+    # 기온과 풍속을 입력 받아 체감온도를 반환한다.
+    # 예시 : 12, 9.5
     WCI = 13.12 + 0.6215 * temperature - 11.37 * math.pow(wind_velocity, 0.16) + 0.3965 * temperature * math.pow(wind_velocity, 0.16)
  
     return WCI
