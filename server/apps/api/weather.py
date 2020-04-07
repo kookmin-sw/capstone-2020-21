@@ -1,12 +1,10 @@
-import json
-import urllib
-import datetime
-import pytz
-import math
 from datetime import datetime
 from django.conf import settings
-from urllib.request import urlopen
+import json
+import math
 from pprint import pprint
+import urllib
+from urllib.request import urlopen
 
 ServiceKey = settings.WEATHER_API_KEY
 
@@ -18,13 +16,13 @@ def get_weather_date(input_date, location):
         json_data = json.load(json_file)
 
     days = input_date.split()
-    times= days[0].split('-')
+    times = days[0].split('-')
     month = times[1]
     day = times[2]
 
-    api_date = times[0]+times[1]+times[2]
+    api_date = times[0] + times[1] + times[2]
     times1 = days[1].split(':')
-    api_time =times1[0]+times1[1]
+    api_time =times1[0] + times1[1]
 
     convert_api_time, convert_api_date = convert_time(api_time, month, day)
     convert_api_date = times[0] + convert_api_date # times[0] -> 년도 년도 합쳐주기
@@ -47,7 +45,7 @@ def get_weather_date(input_date, location):
     data_json = json.loads(data)
     # get date and time
     parsed_json = data_json['response']['body']['items']['item']
-    target_date = parsed_json[0]['fcstDate']  
+    target_date = parsed_json[0]['fcstDate']
     target_time = parsed_json[0]['fcstTime']
 
     passing_data = {}
@@ -60,7 +58,7 @@ def get_weather_date(input_date, location):
     v = float(v)
     
     # 체감 온도 계산
-    wci = 13.12 + 0.6215*t -  11.37*math.pow(v, 0.16) + 0.3965*t*math.pow(v, 0.16)
+    wci = 13.12 + 0.6215 * t -  11.37 * math.pow(v, 0.16) + 0.3965 * t * math.pow(v, 0.16)
     wci = round(wci, 2)
     passing_data['WCI'] = wci
 
@@ -69,9 +67,9 @@ def get_weather_date(input_date, location):
     t_high = float(t_high)
     t_min = float(t_min)
 
-    wci_high = 13.12 + 0.6215*t_high -  11.37*math.pow(v, 0.16) + 0.3965*t_high*math.pow(v, 0.16)
+    wci_high = 13.12 + 0.6215*t_high - 11.37 * math.pow(v, 0.16) + 0.3965 * t_high * math.pow(v, 0.16)
     wci_high = round(wci_high, 2)
-    wci_low = 13.12 + 0.6215*t_min -  11.37*math.pow(v, 0.16) + 0.3965*t_min*math.pow(v, 0.16)
+    wci_low = 13.12 + 0.6215*t_min - 11.37*math.pow(v, 0.16) + 0.3965 * t_min*math.pow(v, 0.16)
     wci_low = round(wci_low, 2)
 
     passing_data['WCI'] = wci # current wind chill temp
@@ -138,8 +136,8 @@ def get_weather_time_date(date, time, location):
     wci_low = round(wci, 2)
 
     passing_data['WCI'] = wci # current wind chill temp
-    passing_data['WCIMAX'] = wci_high #maximum chill temp
-    passing_data['WCIMIN'] = wci_low #minium chill temp
+    passing_data['WCIMAX'] = wci_high # maximum chill temp
+    passing_data['WCIMIN'] = wci_low # minium chill temp
 
     return passing_data
 
@@ -162,12 +160,12 @@ def get_weather_between(start_date, end_date, location):
 
     start_api_date = start_times[0]+start_times[1]+start_times[2]
     start_times1 = start_days[1].split(':')
-    start_api_time =start_times1[0]+start_times1[1]
+    start_api_time =start_times1[0] + start_times1[1]
     convert_start_api_time, convert_start_api_date = convert_time(start_api_time, start_month, start_day)
     
-    end_api_date = end_times[0]+end_times[1]+end_times[2]
+    end_api_date = end_times[0] + end_times[1] + end_times[2]
     end_times1 = end_days[1].split(':')
-    end_api_time =end_times1[0]+end_times1[1]
+    end_api_time =end_times1[0] + end_times1[1]
     convert_end_api_time, convert_end_api_date = convert_time(end_api_time, end_month, end_day)
 
     start_weather =  get_weather_date(start_date, location)
@@ -256,25 +254,21 @@ def get_weather_between(start_date, end_date, location):
 # 날씨 API에서 확정적으로 호출 가능한 시간은 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회 3시간 간격)
 def convert_time(time, month, day): 
     # 2시 이전일 때 전날 23:00 날씨를 받아옴
+
+    day = int(day)
+    month = int(month)
+    
     if int(time) < 200: 
-        day =int(day)
         day = day-1
-        month = int(month)
         if day == 0 :
             if month == 5 or 7 or 10 or 12:
                 day = 30
             elif month == 1 or 2 or 4 or 6 or 8 or 9 or 11:
                 day = 31
-            elif month == 3 :
+            elif month == 3:
                 day = 28
 
             month = month-1
-            str_month = str(month)
-
-            if(month/10 == 0):
-                str_month = "0" + str_month
-            if int(day) / 10 == 0:
-                str_day = "0" +str(day)
 
         time = "2300"
     
@@ -302,8 +296,11 @@ def convert_time(time, month, day):
     elif int(time) < 2400:
         time = "2300"
 
-    str_day = str(day) 
-    str_month = str(month)
+    
+    if int(month) // 10 == 0:
+        str_month = "0" + str(month)
+    if int(day) // 10 == 0:
+        str_day = "0" +str(day)
     date = str_month+str_day
 
     return time, date
