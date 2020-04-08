@@ -88,7 +88,7 @@ class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             return Response(
                 {'error': 'please log in'},
                 status=status.HTTP_401_UNAUTHORIZED)
-    
+
 
 class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = Clothes.objects.all()
@@ -234,7 +234,29 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
             analysis_upper_category_dict[key] = mode(analysis_upper_category_dict[key])
 
-        return Response(analysis_upper_category_dict)       
+        return Response(analysis_upper_category_dict)    
+
+
+class ClothesNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = Clothes.objects.all()
+    serializer_class = ClothesSerializer  
+    
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
+
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'upper_category': 'upper_category',
+        'lower_category': 'lower_category',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_query_schema
+    
+    # Permissions.
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
@@ -325,6 +347,28 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             }, status=status.HTTP_401_UNAUTHORIZED)
             
         return super().destroy(request, *args, **kwargs)
+    
+    
+class ClothesSetNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = ClothesSet.objects.all()
+    serializer_class = ClothesSetReadSerializer  
+    
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
+
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'style': 'style',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_set_query_schema
+    
+    # Permissions.
+    permission_classes = [IsAuthenticatedOrReadOnly]
+        
         
 class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):    
     def get_queryset(self):
@@ -497,3 +541,28 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'next': offset + limit_count,
                 'results': final_results,
             }, status=status.HTTP_200_OK)
+        
+        
+class ClothesSetReviewNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = ClothesSetReview.objects.all()
+    serializer_class = ClothesSetReviewReadSerializer  
+
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
+
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'start_datetime': 'start_datetime',
+        'end_datetime': 'end_datetime',
+        'location' : 'location',
+        'max_sensible_temp' : 'max_sensible_temp',
+        'min_sensible_temp ' : 'min_sensible_temp',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_set_review_query_schema
+    
+    # Permissions.
+    permission_classes = [IsAuthenticatedOrReadOnly]   

@@ -10,27 +10,27 @@ router = ExtendedDefaultRouter()
 # Nested router for user.
 user_router = router.register('users', views.UserView, basename='users')
 user_router.register('clothes',
-                     views.ClothesView,
+                     views.ClothesNestedView,
                      basename='user-clothes',
                      parents_query_lookups=['owner'])
 user_router.register('clothes-sets',
-                     views.ClothesSetView,
+                     views.ClothesSetNestedView,
                      basename='user-clothes_sets',
                      parents_query_lookups=['owner'])
 user_router.register('clothes-set-reviews',
-                     views.ClothesSetReviewView,
+                     views.ClothesSetReviewNestedView,
                      basename='user-clothes_set_reviews',
                      parents_query_lookups=['owner'])
 
 clothes_router = router.register('clothes', views.ClothesView, basename='clothes')
 clothes_router.register('clothes-sets',
-                        views.ClothesSetView,
+                        views.ClothesSetNestedView,
                         basename='clothes-clothes_sets',
                         parents_query_lookups=['clothes'])
 
 clothes_sets_router = router.register('clothes-sets', views.ClothesSetView, basename='clothes-sets')
 clothes_sets_router.register('clothes-set-reviews',
-                             views.ClothesSetReviewView,
+                             views.ClothesSetReviewNestedView,
                              basename='clothes_sets-clothes_set_reviews',
                              parents_query_lookups=['clothes_set'])
 
