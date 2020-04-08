@@ -66,7 +66,7 @@ def populate_clothes_set(number=10):
     fake = Faker('ko_KR')
 
     users = User.objects.all()
-    
+
     for i in range(number):
         while True:
             user_index = fake.pyint(min_value=0, max_value=len(users)-1)
@@ -100,14 +100,12 @@ def populate_clothes_set_review(number=10):
 
     users = User.objects.all()
     for i in range(number):
-        user_index = fake.pyint(min_value=0, max_value=len(users)-1)
-        owner = users[user_index]
-
-        filtered_clothes_set = ClothesSet.objects.all().filter(owner_id=owner.id)
-
-        if len(filtered_clothes_set) == 0:
-            i = i - 1
-            continue
+        while True:
+            user_index = fake.pyint(min_value=0, max_value=len(users)-1)
+            owner = users[user_index]
+            filtered_clothes_set = ClothesSet.objects.all().filter(owner_id=owner.id)
+            if len(filtered_clothes_set) != 0:
+                break
         
         filtered_clothes = []
         for clothes_set in filtered_clothes_set:
