@@ -20,13 +20,14 @@ from .serializers import (
     ClothesSetReviewReadSerializer,
     UserSerializer
 )
+from .utils import *
 from .validations import (
     user_query_schema, 
     clothes_query_schema, 
     clothes_set_query_schema, 
     clothes_set_review_query_schema
 )
-from .utils import *
+from .weather import get_weather_date, get_weather_between, get_weather_time_date
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -87,7 +88,7 @@ class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             return Response(
                 {'error': 'please log in'},
                 status=status.HTTP_401_UNAUTHORIZED)
-    
+
 
 class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = Clothes.objects.all()
@@ -146,7 +147,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(owner_id = self.request.user.id)      
-    
+
     def update(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
@@ -168,9 +169,9 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+   
         return super().destroy(request, *args, **kwargs)
-    
+ 
     @action(detail=False, methods=['post'])
     def inference(self, request, *args, **kwargs):
         """
@@ -187,7 +188,6 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return Response({'image_url': image_url, 
                          'upper_category':upper, 
                          'lower_category':lower}, status=status.HTTP_200_OK)
-
     @action(detail=False, methods=['get'])
     def today_category(self, request, *args, **kwargs):
         """
@@ -234,7 +234,30 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
             analysis_upper_category_dict[key] = mode(analysis_upper_category_dict[key])
 
-        return Response(analysis_upper_category_dict)       
+        return Response(analysis_upper_category_dict)    
+
+
+class ClothesNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = Clothes.objects.all()
+    serializer_class = ClothesSerializer  
+    
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
+
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'upper_category': 'upper_category',
+        'lower_category': 'lower_category',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_query_schema
+    
+    # Permissions.
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
 
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     def get_queryset(self):
@@ -300,7 +323,7 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(owner_id = self.request.user.id)
-        
+
     def update(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
@@ -326,6 +349,27 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
     
     
+class ClothesSetNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = ClothesSet.objects.all()
+    serializer_class = ClothesSetReadSerializer  
+    
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
+
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'style': 'style',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_set_query_schema
+    
+    # Permissions.
+    permission_classes = [IsAuthenticatedOrReadOnly]
+        
+        
 class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):    
     def get_queryset(self):
         queryset = ClothesSetReview.objects.all()
@@ -338,7 +382,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         return queryset
 
     def  get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == 'create' or 'update':
             return ClothesSetReviewSerializer
         return ClothesSetReviewReadSerializer
 
@@ -371,7 +415,6 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             
         return super().list(request, *args, **kwargs)
     
-    # TODO(mskwon1): 날씨정보 받아오기
     def create(self, request, *args, **kwargs):
         if 'clothes_set' in request.data:
             user = request.user
@@ -388,11 +431,29 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     "error" : "this is not your clothes set : " + request.data['clothes_set']
                 }, status=status.HTTP_200_OK)
         
-        return super().create(request, *args, **kwargs)
+        if set(['clothes_set', 'start_datetime', 'end_datetime', 'location', 'review' ]).issubset(request.data.keys()):
+            start = request.data['start_datetime']
+            end = request.data['end_datetime']
+            location = request.data['location']
+
+            # API 요청하기
+            weather_data = get_weather_between(start, end, location)
+            
+            request.data['max_temp'] = float(weather_data['MAX'])
+            request.data['min_temp'] = float(weather_data['MIN'])
+            request.data['max_sensible_temp'] = float(weather_data['WCIMAX'])
+            request.data['min_sensible_temp'] = float(weather_data['WCIMIN'])
+            request.data['humidity'] = int(weather_data['REH'])
+            request.data['wind_speed'] = float(weather_data['WSD'])
+            request.data['precipitation'] = int(weather_data['R06'])
+        
+        return super(ClothesSetReviewView, self).create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
-        serializer.save(owner_id = self.request.user.id)
-    
+        serializer.save(
+            owner_id=self.request.user.id
+        )
+
     def update(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
@@ -402,8 +463,25 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        
+        if set(['clothes_set', 'start_datetime', 'end_datetime', 'location', 'review' ]).issubset(request.data.keys()):
+            start = request.data['start_datetime']
+            end = request.data['end_datetime']
+            location = request.data['location']
+
+            # API 요청하기
+            weather_data = get_weather_between(start, end, location)
             
-        return super().update(request, *args, **kwargs)
+            request.data['max_temp'] = float(weather_data['MAX'])
+            request.data['min_temp'] = float(weather_data['MIN'])
+            request.data['max_sensible_temp'] = float(weather_data['WCIMAX'])
+            request.data['min_sensible_temp'] = float(weather_data['WCIMIN'])
+            request.data['humidity'] = int(weather_data['REH'])
+            request.data['wind_speed'] = float(weather_data['WSD'])
+            request.data['precipitation'] = int(weather_data['R06'])
+        
+        return super(ClothesSetReviewView, self).update(request, *args, **kwargs)
     
     def destroy(self, request, *args, **kwargs):
         user = request.user
@@ -414,7 +492,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
         return super().destroy(request, *args, **kwargs)    
     
     @action(detail=False, methods=['get'])
@@ -464,3 +542,27 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'results': final_results,
             }, status=status.HTTP_200_OK)
         
+        
+class ClothesSetReviewNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = ClothesSetReview.objects.all()
+    serializer_class = ClothesSetReviewReadSerializer  
+
+    # Apply ordering, uses `ordering` query parameter.
+    filter_backends = (filters.OrderingFilter, )
+    ordering_fields = ('created_at', 'id', )
+    ordering = ('-created_at', )
+
+    # Apply filtering, using other query parameters.
+    filter_mappings = {
+        'start_datetime': 'start_datetime',
+        'end_datetime': 'end_datetime',
+        'location' : 'location',
+        'max_sensible_temp' : 'max_sensible_temp',
+        'min_sensible_temp ' : 'min_sensible_temp',
+    }
+
+    # Use filter validation.
+    filter_validation_schema = clothes_set_review_query_schema
+    
+    # Permissions.
+    permission_classes = [IsAuthenticatedOrReadOnly]   
