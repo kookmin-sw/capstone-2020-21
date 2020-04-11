@@ -27,7 +27,7 @@ from .validations import (
     clothes_set_query_schema, 
     clothes_set_review_query_schema
 )
-from .weather import get_weather_date, get_weather_between, get_weather_time_date
+from .weather import get_weather_date, get_weather_between, get_weather_time_date, get_current_weather
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -541,8 +541,33 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'next': offset + limit_count,
                 'results': final_results,
             }, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def current_weather(self, request, *args, **kwargs):
+        """
+        An endpoint that returns weather data for
+        location based on query parameter and current time
+        """
         
-        
+        # Get Location.
+        # location = request.query_params.get('location')
+        location = request.data['location']
+        weather_data = get_current_weather(location)
+
+        temperature = float(weather_data['T3H'])
+        sense = float(weather_data['WCI'])
+        humidity = int(weather_data['REH'])
+        wind_speed = float(weather_data['WSD'])
+        precipitation = int(weather_data['R06'])
+
+        return Response({
+                'temperature': temperature,
+                'chill temp': sense,
+                'humidity': humidity,
+                'wind_speed': wind_speed,
+                'precipitation': precipitation,
+            }, status=status.HTTP_200_OK)
+
 class ClothesSetReviewNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSetReview.objects.all()
     serializer_class = ClothesSetReviewReadSerializer  

@@ -254,6 +254,88 @@ def get_weather_between(start_input_date, end_input_date, location):
         
     return weather_data
 
+def get_current_weather(location): 
+    """
+     날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
+     예시 input_date : 2020-03-31 15:26:23, location : "1" location index
+    """
+    with open('apps/api/locations/data.json') as json_file:
+        json_data = json.load(json_file)
+
+    now = datetime.datetime.now()
+
+    # 현재 시간
+    year = str(now.year)
+    month = str(now.month)
+    day = str(now.day)
+    hour = str(now.hour)
+    minute = str(now.minute)
+
+    if int(month) // 10 == 0:
+        month = "0" + str(month)
+    
+    if int(day) // 10 == 0:
+        day = "0" + str(day)
+
+    if int(hour) // 10 == 0:
+        hour = "0" + str(hour)
+
+    if int(minute) // 10 == 0:
+        minute = "0" + str(minute)
+
+    api_time = hour + minute
+
+    convert_api_time, convert_api_date = convert_time(api_time, year, month, day)
+    convert_api_date = convert_api_date # year_month_day[0] -> 년도 년도 합쳐주기
+
+    url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?"
+    key = "serviceKey=" + ServiceKey
+    numOfRows = "&numOfRows=100"
+    typeOfData = "&dataType=JSON"
+    date = "&base_date=" + convert_api_date
+    time = "&base_time=" + convert_api_time
+
+    x = (json_data[str(location)]['x'])
+    y = (json_data[str(location)]['y'])
+
+    nx = "&nx=" + x
+    ny = "&ny=" + y
+
+    api_url = url + key + numOfRows + typeOfData + date + time + nx + ny
+    data = urllib.request.urlopen(api_url).read().decode('utf8')
+    data_json = json.loads(data)
+    # get date and time
+    parsed_json = data_json['response']['body']['items']['item']
+
+    passing_data = {}
+    for parsed in parsed_json:
+        passing_data[parsed['category']] = parsed['fcstValue']
+
+    t = passing_data['T3H']
+    v = passing_data['WSD']
+    t = float(t)
+    v = float(v)
+    
+    # 체감 온도 계산
+    wci = getWCI(t, v)
+    wci = round(wci, 2)
+
+    t_high = passing_data['TMX']
+    t_min = passing_data['TMN']
+    t_high = float(t_high)
+    t_min = float(t_min)
+
+    wci_high = getWCI(t_high, v)
+    wci_high = round(wci, 2)
+    wci_low = getWCI(t_min, v)
+    wci_low = round(wci, 2)
+
+
+    passing_data['WCI'] = wci # current wind chill temp
+    passing_data['WCIMAX'] = wci_high # maximum chill temp
+    passing_data['WCIMIN'] = wci_low # minium chill temp
+
+    return passing_data
 
 def convert_time(time, year, month, day):
     """ 
@@ -267,6 +349,9 @@ def convert_time(time, year, month, day):
     year = int(year)
     day = int(day)
     month = int(month)
+    str_day = str(day)
+    str_month = str(month)
+
     current_date = datetime.date(year, month, day)
     subtracted_date = current_date - datetime.timedelta(days=1)
     if int(time) < 211: # 2시 11분 이전 일 때
