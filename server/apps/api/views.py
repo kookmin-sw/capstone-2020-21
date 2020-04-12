@@ -550,7 +550,6 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         """
         
         # Get Location.
-        # location = request.query_params.get('location')
         location = request.data['location']
         weather_data = get_current_weather(location)
 

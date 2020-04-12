@@ -351,7 +351,6 @@ def convert_time(time, year, month, day):
     month = int(month)
     str_day = str(day)
     str_month = str(month)
-
     current_date = datetime.date(year, month, day)
     subtracted_date = current_date - datetime.timedelta(days=1)
     if int(time) < 211: # 2시 11분 이전 일 때
