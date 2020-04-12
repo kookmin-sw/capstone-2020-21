@@ -4,9 +4,8 @@
     <div class="container_1">
         <ClosetAddComponent></ClosetAddComponent>
         <div class="information">
-        <ClosetDetailInfoComponent title="분석결과" upper="대분류" lower="소분류" starname="별칭"></ClosetDetailInfoComponent>
-        <ClosetModifiedComponent></ClosetModifiedComponent>
-        <b-button size="lg">확인</b-button>
+        <ClosetDetailInfoComponent title="분석결과" v-bind:list="list"></ClosetDetailInfoComponent>
+        <!-- <ClosetModifiedComponent></ClosetModifiedComponent> -->
         </div>
     </div>
   </div>
@@ -14,18 +13,39 @@
 
 <script>
 import MainNavigation from '@/components/MainNavigation.vue'
-import ClosetModifiedComponent from '@/components/ClosetModifiedComponent.vue'
+// import ClosetModifiedComponent from '@/components/ClosetModifiedComponent.vue'
 import ClosetDetailInfoComponent from '@/components/ClosetDetailInfoComponent.vue'
 import ClosetAddComponent from '@/components/ClosetAddComponent.vue'
 export default {
   name: 'ClosetAdd',
   components: {
     MainNavigation,
-    ClosetModifiedComponent,
+    // ClosetModifiedComponent,
     ClosetDetailInfoComponent,
     ClosetAddComponent
+  },
+  data: function () {
+    return {
+      list: [
+        {
+          name: '상의',
+          details: ['전체', '후드티', '반팔티셔츠', '긴팔티셔츠', '반팔셔츠', '긴팔셔츠', '맨투맨', '터틀넥', '니트', '블라우스', '끈나시', '민소매']
+        },
+        {
+          name: '바지',
+          details: ['전체', '반바지', '핫팬츠', '슬랙스', '청바지', '골덴바지', '트레이닝바지']
+        },
+        {
+          name: '치마',
+          details: ['전체', '미니스커트', '롱스커트']
+        },
+        {
+          name: '아우터',
+          details: ['전체', '블레이져', '숏패딩', '조끼패딩', '롱패딩', '야구점퍼', '항공점퍼', '바람막이', '야상', '무스탕', '코트', '트랙탑', '가죽자켓', '청자켓', '가디건']
+        }
+      ]
+    }
   }
-
 }
 </script>
 

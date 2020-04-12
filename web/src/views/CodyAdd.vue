@@ -20,8 +20,7 @@
        <div class="show_clothes">
          <ClosetComponent :showCloset="false"></ClosetComponent>
        </div>
-        <ClosetDetailInfoComponent title="코디등록" upper="스타일"  starname="별칭"></ClosetDetailInfoComponent>
-        <b-button size="lg">확인</b-button>
+        <CodyDetailInfoComponent title="코디등록" v-bind:list="list"></CodyDetailInfoComponent>
       </div>
     </div>
   </div>
@@ -30,7 +29,7 @@
 <script>
 import MainNavigation from '@/components/MainNavigation.vue'
 import ClosetComponent from '@/components/ClosetComponent.vue'
-import ClosetDetailInfoComponent from '@/components/ClosetDetailInfoComponent.vue'
+import CodyDetailInfoComponent from '@/components/CodyDetailInfoComponent.vue'
 import CodyDetailComponent from '@/components/CodyDetailComponent.vue'
 
 export default {
@@ -38,8 +37,13 @@ export default {
   components: {
     ClosetComponent,
     MainNavigation,
-    ClosetDetailInfoComponent,
+    CodyDetailInfoComponent,
     CodyDetailComponent
+  },
+  data: function () {
+    return {
+      list: ['심플', '스트릿', '화려', '데이트', '정장']
+    }
   }
 
 }
