@@ -3,7 +3,9 @@
     <MainNavigation></MainNavigation>
     <div class="container">
       <div class="add_container">
-        <b-button class="btn_add" style="margin-right:10px" href="/closet/add">등록하기</b-button>
+        <router-link to="/closet/add">
+            <b-button class="btn_add" size="sm" style="margin-right:10px">등록하기</b-button>
+          </router-link>
       </div>
       <div class="row">
         <ClassificationComponent v-bind:list="list"></ClassificationComponent>
