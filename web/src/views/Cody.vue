@@ -3,10 +3,13 @@
         <MainNavigation></MainNavigation>
         <div class="container">
             <div class="add_container">
-            <b-button class="btn_add" style="margin-right:10px" href="/cody/add">등록하기</b-button>
+            <router-link to="/cody/add">
+              <b-button class="btn_add" size="sm" style="margin-right:10px">등록하기</b-button>
+          </router-link>
+
             </div>
             <div class="row">
-                <ClassificationComponent :inCloset="false"></ClassificationComponent>
+                <ClassificationComponent v-bind:list="list"></ClassificationComponent>
                 <div class="col-md-10">
                   <CodyComponent></CodyComponent>
                 </div>
@@ -25,6 +28,20 @@ export default {
     MainNavigation,
     ClassificationComponent,
     CodyComponent
+  },
+  data: function () {
+    return {
+      list: [
+        {
+          name: '스타일',
+          details: ['전체', '심플', '스트릿', '화려', '데이트', '정장']
+        },
+        {
+          name: '리뷰',
+          details: ['전체', '미등록']
+        }
+      ]
+    }
   }
 
 }
