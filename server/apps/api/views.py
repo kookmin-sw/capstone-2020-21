@@ -177,7 +177,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         """
         An endpoint where the analysis of a clothes is returned
         """
-        image = byte_to_image(request.body)
+        image = byte_to_image(request.data['image'])
         image = remove_background(image)
         image_url = save_image_s3(image)
         
