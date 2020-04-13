@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <NavigationBar/>
-    <router-view/>
+    <router-view class="mt-3"/>
+    <Footer/>
   </div>
 </template>
 

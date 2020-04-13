@@ -13,10 +13,10 @@
                             </div>
                             <div class="form-group text-left">
                                 <label for="password">PASSWORD:</label>
-                                <input type="text" name="password" id="password" class="form-control" v-model="password">
+                                <input type="password" name="password" id="password" class="form-control" v-model="password">
                             </div>
                             <div class="form-group">
-                                <input type="submit" name="submit" class="btn btn-md" value="Log In">
+                                <input type="submit" name="submit" class="btn btn-md" value="Log In" @click.prevent="handleLogin">
                             </div>
                         </form>
                     </div>
@@ -28,12 +28,33 @@
 </template>
 
 <script>
+import axios from 'axios'
+import consts from '@/consts.js'
+import { EventBus } from '@/event-bus.js'
+
 export default {
   name: 'logincomponent',
   data () {
     return {
       id: '',
       password: ''
+    }
+  },
+  methods: {
+    handleLogin: function () {
+      var token = ''
+      axios.post(`${consts.SERVER_BASE_URL}/api/token/`, { username: this.id, password: this.password })
+        .then(response => {
+          // TODO: delete console.log .
+          console.log(response)
+          token = response.data.access
+          window.localStorage.setItem('token', token)
+          EventBus.$emit('login-success')
+          this.$router.go(-1)
+        })
+        .then(ex => {
+          // TODO: handle errors.
+        })
     }
   }
 }

@@ -14,6 +14,9 @@
       <b-navbar-nav class="ml-auto">
         <template v-if="isLoggedIn">
           <!-- 로그인시 -->
+          <b-nav-text>
+            안녕하세요, <strong>{{ username }}</strong>님!
+          </b-nav-text>
           <b-nav-item to="/closet">
             내 옷장
           </b-nav-item>
@@ -39,21 +42,58 @@
 </template>
 
 <script>
+import axios from 'axios'
+import consts from '@/consts.js'
+import { EventBus } from '@/event-bus.js'
+
 export default {
   data: function () {
     return {
-      isLoggedIn: false
+      isLoggedIn: false,
+      username: ''
     }
   },
   methods: {
     // TODO: implement logout function.
     handleLogout: function () {
       this.isLoggedIn = false
-    },
-    // TODO: implement login function, need to receive event from login component.
-    handleLogin: function () {
-      // to be implemented
-      this.isLoggedIn = true
+      window.localStorage.removeItem('token')
+      this.$router.push('/')
+    }
+  },
+  created: function () {
+    var vm = this
+    if (window.localStorage.getItem('token')) {
+      vm.isLoggedIn = true
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      axios.get(`${consts.SERVER_BASE_URL}/users/me/`, config)
+        .then((response) => {
+          vm.username = response.data.username
+        })
+    } else {
+      vm.username = ''
+      vm.isLoggedIn = false
+    }
+    EventBus.$on('login-success', function () {
+      vm.isLoggedIn = true
+    })
+  },
+  updated: function () {
+    var vm = this
+    if (window.localStorage.getItem('token') && vm.isLoggedIn) {
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      axios.get(`${consts.SERVER_BASE_URL}/users/me/`, config)
+        .then((response) => {
+          vm.username = response.data.username
+        })
+    } else {
+      vm.username = ''
     }
   }
 }
