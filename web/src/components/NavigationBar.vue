@@ -72,10 +72,14 @@ export default {
       axios.get(`${consts.SERVER_BASE_URL}/users/me/`, config)
         .then((response) => {
           vm.username = response.data.username
+        }).catch((ex) => {
+          // TODO: error handling.
+          vm.isLoggedIn = false
+          vm.username = ''
         })
     } else {
-      vm.username = ''
       vm.isLoggedIn = false
+      vm.username = ''
     }
     EventBus.$on('login-success', function () {
       vm.isLoggedIn = true
@@ -91,6 +95,10 @@ export default {
       axios.get(`${consts.SERVER_BASE_URL}/users/me/`, config)
         .then((response) => {
           vm.username = response.data.username
+        }).catch((ex) => {
+          // TODO: error handling.
+          vm.isLoggedIn = false
+          vm.username = ''
         })
     } else {
       vm.username = ''
