@@ -1,3 +1,4 @@
+import base64
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from rest_framework import status
@@ -28,14 +29,16 @@ class ClohtesCreateTests(APITestCase):
         
         self.alias = 'test-alias'
         with open("temp/sample_image.png", 'rb') as image:
-            self.image = image.read()
+            self.image = base64.b64encode(image.read())
             
     def test_create(self):
         """
         정상생성 테스트.
         """
-        data = self.image
-        response = self.client.post('/clothes/inference/', data, content_type='image/png')
+        data = {
+            'image': self.image
+        }
+        response = self.client.post('/clothes/inference/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         image_url = response.data['image_url']
@@ -59,8 +62,10 @@ class ClohtesCreateTests(APITestCase):
         """
         필수필드생성 테스트.
         """
-        data = self.image
-        response = self.client.post('/clothes/inference/', data, content_type='image/png')
+        data = {
+            'image': self.image
+        }
+        response = self.client.post('/clothes/inference/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         image_url = response.data['image_url']
@@ -76,6 +81,7 @@ class ClohtesCreateTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['upper_category'], upper_category)
         self.assertEqual(response.data['lower_category'], lower_category)
+        print(response.data['image_url'])
     
     def test_create_error_no_required(self):
         """
