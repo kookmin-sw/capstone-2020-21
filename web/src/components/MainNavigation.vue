@@ -3,16 +3,21 @@
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>-->
 <!------ Include the above in your HEAD tag ---------->
 <template>
-<div class="wrapper">
 <!--Navigation Start-->
 <nav class="navigation" style="margin-top:50px">
   <ul>
+    <li>
+      <a href="/">About</a>
+    </li>
     <li class="home">
-      <a href="/">Home</a>
+      <a href="/main">Home</a>
     </li>
     <li>
       <a href="/closet">Closet</a>
       <ul class="children sub-menu">
+        <li>
+          <a href="/closet/add">Closet_Add</a>
+        </li>
         <li>
           <a href="/closet/detail">Closet_Detail</a>
         </li>
@@ -21,6 +26,9 @@
     <li>
       <a href="/cody">Cody</a>
       <ul class="children sub-menu">
+        <li>
+          <a href="/cody/add">Cody_Add</a>
+        </li>
         <li>
           <a href="/cody/detail">Cody_Detail</a>
         </li>
@@ -32,7 +40,6 @@
   </ul>
 </nav>
 <!--Navigation End-->
-</div>
 </template>
 
 <script>
@@ -43,6 +50,7 @@ export default {}
 .wrapper{
   float:left;
   width:100%;
+  min-height:250px;
   /* min-height:250px; */
 }
 .navigation{
@@ -145,10 +153,10 @@ export default {}
 }
 .navigation ul li .children  a:hover{
   color: #fff;
-  background-color:goldenrod;
+  background-color:rgb(143, 203, 223);
 }
 .navigation ul li a:hover{
-  color:goldenrod;
+  color:rgb(143, 203, 223);
 }
 </style>
 <!--<template>

@@ -20,9 +20,26 @@
                 <label for="comment">한줄평:</label>
                 <input type="text" name="comment" id="comment" class="form-control">
             </div>
+            <div class="text-left">
+                <label for="range-1">만족도:</label>
+                <b-form-input id="range-1" v-model="value" type="range" min="0" max="5"></b-form-input>
+                <div class="mt-2">Value: {{ value }}</div>
+            </div>
             <div class="form-group">
                 <input type="submit" name="submit" class="btn btn-md" value="확인">
                 <input type="new_submit" name="new_submit" class="btn btn-md" value="새 리뷰 작성하기">
+            </div>
+            <div>
+                <b-row>
+                    <b-col md="auto">
+                    <b-time v-model="value" locale="en" @context="onContext"></b-time>
+                    </b-col>
+                    <b-col>
+                    <p>Value: <b>'{{ value }}'</b></p>
+                    <p class="mb-0">Context:</p>
+                    <pre class="small">{{ context }}</pre>
+                    </b-col>
+                </b-row>
             </div>
         </form>
     </div>
@@ -31,7 +48,20 @@
 
 <script>
 export default {
-  name: 'reviewcomponent'
+  name: 'reviewcomponent',
+  data () {
+    return {
+      value: '2',
+      context: null
+    }
+  },
+  methods: {
+    methods: {
+      onContext(ctx) {
+        this.context = ctx
+      }
+    }
+  }
 }
 </script>
 
@@ -50,11 +80,11 @@ background-size: 100% 100%;
 }
 .date{
     border-radius: 4px;
-    border-color: rgb(231, 230, 230);
+    border-color: rgb(245, 245, 245);
 }
 .time{
     border-radius: 4px;
-    border-color: rgb(172, 172, 172);
+    border-color: rgb(245, 245, 245);
 }
 label {
     display: inline-block;
@@ -69,6 +99,5 @@ h3{
 }
 .text-left {
     text-align: left;
-    border-color: red;
 }
 </style>
