@@ -2,8 +2,8 @@
   <b-navbar sticky class="shadow" toggleable="md" type="dark" style="background-color:#17A2B8">
     <b-navbar-brand class="font-weight-bold" to="/" style="font-size: large">
       <!-- 로고, OTTE 타이틀 -->
-      <img src="../assets/logo.png" class="d-inline-block align-middle"
-            style="width:32px; height:38px; margin-bottom:0; margin-right:5px" alt="logo">
+      <img src="../assets/logo.png" class="d-inline-block align-middle mb-0 mr-1"
+            style="width: 2rem; height: 2.1rem;" alt="logo">
       OTTE?
     </b-navbar-brand>
 
@@ -64,13 +64,13 @@ export default {
   created: function () {
     var vm = this
     if (window.localStorage.getItem('token')) {
-      vm.isLoggedIn = true
       var token = window.localStorage.getItem('token')
       var config = {
         headers: { Authorization: `Bearer ${token}` }
       }
       axios.get(`${consts.SERVER_BASE_URL}/users/me/`, config)
         .then((response) => {
+          vm.isLoggedIn = true
           vm.username = response.data.username
         }).catch((ex) => {
           // TODO: error handling.
@@ -87,13 +87,14 @@ export default {
   },
   updated: function () {
     var vm = this
-    if (window.localStorage.getItem('token') && vm.isLoggedIn) {
+    if (window.localStorage.getItem('token')) {
       var token = window.localStorage.getItem('token')
       var config = {
         headers: { Authorization: `Bearer ${token}` }
       }
       axios.get(`${consts.SERVER_BASE_URL}/users/me/`, config)
         .then((response) => {
+          vm.isLoggedIn = true
           vm.username = response.data.username
         }).catch((ex) => {
           // TODO: error handling.
@@ -101,6 +102,7 @@ export default {
           vm.username = ''
         })
     } else {
+      vm.isLoggedIn = false
       vm.username = ''
     }
   }
