@@ -64,3 +64,18 @@ class ClothesSetReview(models.Model):
     comment = models.CharField(max_length=100, default='한줄평을 입력해주세요.')
     created_at = models.DateTimeField(default=timezone.now)
     
+
+class Weather(models.Model):
+    location_code = models.IntegerField()
+    date = models.DateField()
+    time = models.IntegerField(choices=TIME_CHOICE)
+    max_temp = models.FloatField()
+    min_temp = models.FloatField()
+    max_sensible_temp = models.FloatField()
+    min_sensible_temp = models.FloatField()
+    humidity = models.IntegerField()
+    wind_speed = models.FloatField()
+    precipitation = models.IntegerField()
+
+
+
