@@ -53,13 +53,13 @@ class ClothesSetReview(models.Model):
     end_datetime = models.DateTimeField()
     location = models.IntegerField(choices=LOCATION_CHOICES)
     review = models.IntegerField(choices=REVIEW_CHOICES)
-    max_temp = models.ManyToManyField(Weather)
-    min_temp = models.ManyToManyField(Weather)
-    max_sensible_temp = models.ManyToManyField(Weather)
-    min_sensible_temp = models.ManyToManyField(Weather)
-    humidity = models.ManyToManyField(Weather)
-    wind_speed = models.ManyToManyField(Weather)
-    precipitation = models.ManyToManyField(Weather)
+    max_temp = models.FloatField()
+    min_temp = models.FloatField()
+    max_sensible_temp = models.FloatField()
+    min_sensible_temp = models.FloatField()
+    humidity = models.IntegerField()
+    wind_speed = models.FloatField()
+    precipitation = models.IntegerField()
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
     comment = models.CharField(max_length=100, default='한줄평을 입력해주세요.')
     created_at = models.DateTimeField(default=timezone.now)
@@ -68,7 +68,7 @@ class ClothesSetReview(models.Model):
 class Weather(models.Model):
     location_code = models.IntegerField()
     date = models.DateField()
-    time = models.IntegerField(choices=TIME_CHOICE)
+    time = models.IntegerField(choices=TIME_CHOICES)
     max_temp = models.FloatField()
     min_temp = models.FloatField()
     max_sensible_temp = models.FloatField()
@@ -76,6 +76,4 @@ class Weather(models.Model):
     humidity = models.IntegerField()
     wind_speed = models.FloatField()
     precipitation = models.IntegerField()
-
-
 
