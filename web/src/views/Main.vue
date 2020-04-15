@@ -1,6 +1,5 @@
 <template>
   <div class="main">
-    <MainNavigation/>
     <div class="container">
       <div class="row">
         <TextRecommend />
@@ -27,14 +26,13 @@
 </template>
 
 <script>
-import MainNavigation from '@/components/MainNavigation.vue'
+// import MainNavigation from '@/components/MainNavigation.vue'
 import TextRecommend from '@/components/TextRecommend.vue'
 import MainComponent from '@/components/MainComponent.vue'
 // import CodyComponent from '@/components/CodyComponent.vue'
 export default {
   name: 'main',
   components: {
-    MainNavigation,
     TextRecommend,
     MainComponent
   }
