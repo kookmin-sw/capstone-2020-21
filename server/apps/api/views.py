@@ -29,6 +29,8 @@ from .validations import (
 )
 from .weather import get_weather_date, get_weather_between, get_weather_time_date
 
+from django.db.models import Max, Min, Avg
+
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -439,16 +441,16 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             # API 요청하기
             all_weather_data = Weather.objects.all()
             weather_data_set = all_weather_data.filter(location_code=location)
-            weather_data_on_start = weather_data_set.filter(date__gte=start.date & time__gte=start.time)
-            weather_data_on_end = weather_data_on_start.filter(date__lte=end.date & time__lte=end.time)
+            weather_data_on_start = weather_data_set.filter(date__gte=start.date, time__gte=start.time)
+            weather_data_on_end = weather_data_on_start.filter(date__lte=end.date, time__lte=end.time)
             
-            request.data['max_temp'] = weather_data_on_end.query_params.get('max_temp')
-            request.data['min_temp'] = weather_data_on_end.query_params.get('min_temp')
-            request.data['max_sensible_temp'] = weather_data_on_end.query_params.get('max_sensible_temp')
-            request.data['min_sensible_temp'] = weather_data_on_end.query_params.get('min_sensible_temp')
-            request.data['humidity'] = weather_data_on_end.query_params.get('humidity')
-            request.data['wind_speed'] = weather_data_on_end.query_params.get('wind_speed')
-            request.data['precipitation'] = weather_data_on_end.query_params.get('precipitation')
+            request.data['max_temp'] = weather_data_on_end.objects.aggregate(Max('max_temp'))
+            request.data['min_temp'] = weather_data_on_end.objects.aggregate(Min('min_temp'))
+            request.data['max_sensible_temp'] = weather_data_on_end.objects.aggregate(Max('max_sensible_temp'))
+            request.data['min_sensible_temp'] = weather_data_on_end.objects.aggregate(Min('min_sensible_temp'))
+            request.data['humidity'] = weather_data_on_end.objects.aggregate(Avg('humidity'))
+            request.data['wind_speed'] = weather_data_on_end.objects.aggregate(Avg('wind_speed'))
+            request.data['precipitation'] = weather_data_on_end.objects.aggregate(Avg('precipitation'))
         
         return super(ClothesSetReviewView, self).create(request, *args, **kwargs)
     
