@@ -1,66 +1,66 @@
 <template>
-  <div class="main">
-    <div class="container">
-      <div class="row">
-        <TextRecommend />
-        <div class="col-md-8">
-          <!-- <div class="add_container">
-            날씨 api 가져오는 부분
-          </div> -->
-          <!-- <div id="filtering" class="container-fluid">
-            <div id="nav filtering">
-              <router-link to="/">최신등록순</router-link> |
-              <router-link to="/">날씨별</router-link> |
-              <router-link to="/">심플</router-link> |
-              <router-link to="/">스트릿</router-link> |
-              <router-link to="/">화려</router-link> |
-              <router-link to="/">데이트</router-link> |
-              <router-link to="/">정장</router-link> |
-            </div>
-          </div> -->
-          <MainComponent/>
-        </div>
-      </div>
-    </div>
-  </div>
+  <b-container>
+    <b-row>
+      <b-col>
+        <!-- 날씨 컴포넌트 -->
+        <WeatherComponent />
+      </b-col>
+    </b-row>
+    <b-row cols=1 cols-md=2>
+      <b-col cols=12 cols-md=4>
+        <!-- 추천 카테고리 컴포넌트 -->
+        <RecommendedCategoriesComponent />
+      </b-col>
+      <b-col cols=12 cols-md=8>
+        <!-- 리뷰 컴포넌트 -->
+        <ReviewListComponent :reviews="userReviews"
+                              :maxTemp="weatherProps.maxTemp"
+                              :minTemp="weatherProps.minTemp" />
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
-// import MainNavigation from '@/components/MainNavigation.vue'
-import TextRecommend from '@/components/TextRecommend.vue'
-import MainComponent from '@/components/MainComponent.vue'
-// import CodyComponent from '@/components/CodyComponent.vue'
+import axios from 'axios'
+import consts from '@/consts.js'
+import WeatherComponent from '@/components/WeatherComponent'
+import RecommendedCategoriesComponent from '@/components/RecommendedCategoriesComponent'
+import ReviewListComponent from '@/components/ReviewListComponent'
+
 export default {
   name: 'main',
   components: {
-    TextRecommend,
-    MainComponent
+    WeatherComponent,
+    RecommendedCategoriesComponent,
+    ReviewListComponent
+  },
+  data: function () {
+    return {
+      weatherProps: {
+        minTemp: 4,
+        maxTemp: 22,
+        location: 0
+      },
+      recommendedCategories: [],
+      userClothes: [],
+      userReviews: []
+    }
+  },
+  created: function () {
+    var token = window.localStorage.getItem('token')
+    var config = {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+    var vm = this
+    axios.get(`${consts.SERVER_BASE_URL}/clothes-set-reviews/?limit=10&max_sensible_temp=${vm.weatherProps.maxTemp}&min_sensible_temp=${vm.weatherProps.minTemp}`, config)
+      .then((response) => {
+        vm.userReviews = response.data.results
+      })
   }
-
 }
 </script>
-<style scoped>
-#filtering {
-    padding: 5px;
-    margin-bottom: 10px;
-    font-size: small;
-    text-align: left;
-    margin-left: 420px;
-}
-.closet {
-    width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-    /* margin-top: 200px; */
-}
-/* .container_1{
-  margin-top: 100px;
-  text-align: left;
-  margin-left: 50px;
-} */
-.add_container{
-  width:100%;
-  text-align:right;
-  margin-bottom: 20px;
-}
+
+<style>
+
 </style>
