@@ -393,11 +393,9 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
 
     # Apply filtering, using other query parameters.
     filter_mappings = {
-        'start_datetime': 'start_datetime',
-        'end_datetime': 'end_datetime',
+        'start_datetime': 'start_datetime__gte',
+        'end_datetime': 'end_datetime__lte',
         'location' : 'location',
-        'max_sensible_temp' : 'max_sensible_temp',
-        'min_sensible_temp ' : 'min_sensible_temp',
     }
 
     # Use filter validation.
@@ -413,7 +411,27 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'error' : 'token authorization failed ... please log in'
             }, status=status.HTTP_401_UNAUTHORIZED)
             
-        return super().list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+
+        max_temp = request.query_params.get('max_sensible_temp')
+        min_temp = request.query_params.get('min_sensible_temp')
+        
+        if max_temp is not None:
+            max_temp = float(max_temp)
+            queryset = queryset.filter(max_sensible_temp__lte=(max_temp+2), max_sensible_temp__gte=(max_temp-2))
+
+        if min_temp is not None:
+            min_temp = float(min_temp)
+            queryset = queryset.filter(min_sensible_temp__lte=(min_temp+2), min_sensible_temp__gte=(min_temp-2))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        
+        return Response(serializer.data)
     
     def create(self, request, *args, **kwargs):
         if 'clothes_set' in request.data:
