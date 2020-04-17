@@ -76,23 +76,6 @@
                     </b-col>
                 </b-row>
             </div>
-            <!-- <div class="form-group text-left">
-                <label for="place">활동 장소:</label><br/>
-                <input type="text" name="place" id="place" class="form-control">
-            </div>
-            <div class="form-group text-left">
-                <label for="comment">한줄평:</label>
-                <input type="text" name="comment" id="comment" class="form-control">
-            </div>
-            <div class="text-left">
-                <label for="range-1">만족도:</label>
-                <b-form-input id="range-1" v-model="value" type="range" min="0" max="5"></b-form-input>
-                <div class="mt-2">...</div>
-            </div>
-            <div class="form-group">
-                <input type="submit" name="submit" class="btn btn-md" value="확인">
-                <input type="new_submit" name="new_submit" class="btn btn-md" value="새 리뷰 작성하기">
-            </div> -->
         </form>
     </div>
 </div>
