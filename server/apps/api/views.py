@@ -271,7 +271,7 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return queryset
     
     def get_serializer_class(self):
-        if self.action == 'create' or 'update':
+        if self.action == 'create' or self.action == 'update':
             return ClothesSetSerializer
         return ClothesSetReadSerializer 
 
@@ -382,7 +382,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         return queryset
 
     def  get_serializer_class(self):
-        if self.action == 'create' or 'update':
+        if self.action == 'create' or self.action == 'update':
             return ClothesSetReviewSerializer
         return ClothesSetReviewReadSerializer
 
