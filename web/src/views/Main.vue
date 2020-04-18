@@ -1,7 +1,7 @@
 <template>
   <b-container>
-    <b-row>
-      <b-col>
+    <b-row cols=1>
+      <b-col cols=12>
         <!-- 날씨 컴포넌트 -->
         <WeatherComponent />
       </b-col>
@@ -53,7 +53,13 @@ export default {
       headers: { Authorization: `Bearer ${token}` }
     }
     var vm = this
-    axios.get(`${consts.SERVER_BASE_URL}/clothes-set-reviews/?limit=10&max_sensible_temp=${vm.weatherProps.maxTemp}&min_sensible_temp=${vm.weatherProps.minTemp}`, config)
+    var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/'
+    url += '?limit=10&max_sensible_temp=' + vm.weatherProps.maxTemp
+    url += '&min_sensible_temp=' + vm.weatherProps.minTemp
+    url += '&review=3'
+    url += '&me=true'
+
+    axios.get(url, config)
       .then((response) => {
         vm.userReviews = response.data.results
       })

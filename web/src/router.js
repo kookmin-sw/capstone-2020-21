@@ -49,7 +49,7 @@ export default new Router({
       component: ClosetDetail
     },
     {
-      path: '/main',
+      path: '/mainpage',
       name: 'Main',
       component: Main
     },
