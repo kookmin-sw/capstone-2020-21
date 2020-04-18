@@ -99,16 +99,16 @@ export default {
     }
   },
   methods: {
-    onContextdate(ctx) {
+    onContextdate (ctx) {
       this.context = ctx
     },
-    onContexttime(ctx) {
+    onContexttime (ctx) {
       this.context = ctx
     },
-    onSubmit(evt) {
+    onSubmit (evt) {
       evt.preventDefault()
     },
-    onReset(evt) {
+    onReset (evt) {
       evt.preventDefault()
       // Reset our form values
       this.form.comment = ''

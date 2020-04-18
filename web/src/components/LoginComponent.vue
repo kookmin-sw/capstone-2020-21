@@ -1,5 +1,30 @@
 <template>
-<div>
+<div id="login-row" class="row justify-content-center align-items-center">
+    <div id="login-column" class="col-md-4" style="margin-top:44px">
+        <form id="login-form" class="form" action="" method="post">
+            <h3 class="text-center">Login</h3>
+            <div>
+              <b-form-group id="input-group-1" label="ID :" label-for="input-1">
+                  <b-form-input id="input-1" v-model="form.id" type="id"></b-form-input>
+              </b-form-group>
+              <b-form-group id="input-group-1" label="PASSWORD :" label-for="input-2">
+                  <b-form-input id="input-2" v-model="form.password" type="password"></b-form-input>
+              </b-form-group>
+            </div>
+            <div>
+              <b-row>
+                  <b-col class="col-6" style="margin:0 auto">
+                      <b-button pill class="w-75" type="new_submit" @click.prevent="handleLogin">확인</b-button>
+                  </b-col>
+              </b-row>
+            </div>
+        </form>
+    </div>
+</div>
+</template>
+
+<!-- <template> -->
+<!-- <div>
   <div id="login">
         <div class="container">
             <div id="login-row" class="row justify-content-center align-items-center">
@@ -24,8 +49,8 @@
             </div>
         </div>
     </div>
-</div>
-</template>
+</div> -->
+<!-- </template> -->
 
 <script>
 import axios from 'axios'
@@ -36,8 +61,10 @@ export default {
   name: 'logincomponent',
   data () {
     return {
-      id: '',
-      password: ''
+      form: {
+        id: '',
+        password: ''
+      }
     }
   },
   methods: {
