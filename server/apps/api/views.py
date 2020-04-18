@@ -396,6 +396,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         'start_datetime': 'start_datetime__gte',
         'end_datetime': 'end_datetime__lte',
         'location' : 'location',
+        'review': 'review',
     }
 
     # Use filter validation.
