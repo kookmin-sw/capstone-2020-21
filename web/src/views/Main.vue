@@ -7,12 +7,13 @@
       </b-col>
     </b-row>
     <b-row cols=1 cols-md=2>
-      <b-col cols=12 cols-md=4>
+      <b-col cols=12 lg=4>
         <!-- 추천 카테고리 컴포넌트 -->
-        <RecommendedCategoriesComponent />
+        <RecommendedCategoriesComponent class="border" :categories="recommendedCategories"/>
       </b-col>
-      <b-col cols=12 cols-md=8>
+      <b-col class="mt-3 mt-lg-0" cols=12 lg=8>
         <!-- 리뷰 컴포넌트 -->
+        <h4 class="mt-3 pb-0">유사한 날씨에 작성한 리뷰</h4>
         <ReviewListComponent :reviews="userReviews"
                               :maxTemp="weatherProps.maxTemp"
                               :minTemp="weatherProps.minTemp" />
@@ -29,7 +30,7 @@ import RecommendedCategoriesComponent from '@/components/RecommendedCategoriesCo
 import ReviewListComponent from '@/components/ReviewListComponent'
 
 export default {
-  name: 'main',
+  name: 'mainPage',
   components: {
     WeatherComponent,
     RecommendedCategoriesComponent,
@@ -56,12 +57,20 @@ export default {
     var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/'
     url += '?limit=10&max_sensible_temp=' + vm.weatherProps.maxTemp
     url += '&min_sensible_temp=' + vm.weatherProps.minTemp
-    url += '&review=3'
-    url += '&me=true'
+    // url += '&review=3'
+    // url += '&me=true'
 
     axios.get(url, config)
       .then((response) => {
         vm.userReviews = response.data.results
+      })
+
+    url = consts.SERVER_BASE_URL + '/clothes/today_category/'
+    url += '?max_sensible_temp=' + vm.weatherProps.maxTemp
+    url += '&min_sensible_temp=' + vm.weatherProps.minTemp
+    axios.get(url, config)
+      .then((response) => {
+        vm.recommendedCategories = response.data
       })
   }
 }
