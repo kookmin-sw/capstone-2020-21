@@ -3,6 +3,7 @@ from django.conf import settings
 import json
 import math
 import urllib
+import pprint
 from urllib.request import urlopen
 
 ServiceKey = settings.WEATHER_API_KEY
@@ -256,8 +257,9 @@ def get_weather_between(start_input_date, end_input_date, location):
 
 def get_current_weather(location): 
     """
-     날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
-     예시 input_date : 2020-03-31 15:26:23, location : "1" location index
+    장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
+    location : "1" location index
+    제공되는 날씨 데이터에서 최저 최고 기온은 기상예보에서 받아온 이후 3~4시간 내에서의 최저 최고 기온이다.
     """
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
@@ -285,10 +287,10 @@ def get_current_weather(location):
 
     api_time = hour + minute
 
-    convert_api_time, convert_api_date = convert_time(api_time, year, month, day)
+    convert_api_time, convert_api_date = convert_fcst_time(api_time, year, month, day)
     convert_api_date = convert_api_date # year_month_day[0] -> 년도 년도 합쳐주기
 
-    url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?"
+    url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getUltraSrtFcst?"
     key = "serviceKey=" + ServiceKey
     numOfRows = "&numOfRows=100"
     typeOfData = "&dataType=JSON"
@@ -304,42 +306,59 @@ def get_current_weather(location):
     api_url = url + key + numOfRows + typeOfData + date + time + nx + ny
     data = urllib.request.urlopen(api_url).read().decode('utf8')
     data_json = json.loads(data)
-    # get date and time
     parsed_json = data_json['response']['body']['items']['item']
-
+    data_size = int(len(parsed_json)/10) # 받아온 시간의 수
     passing_data = {}
-    for parsed in parsed_json:
-        passing_data[parsed['category']] = parsed['fcstValue']
 
-    t = passing_data['T3H']
+    min = 99.9
+    max = -99.9
+    passing_data_set = [] # 시간대 별로 저장할 리스트
+    for i in range(0,data_size):
+        passing_data_set.append({})
+        for j in range(0,10):
+            weather = parsed_json[(j*data_size)+i]
+            passing_data_set[i][weather['category']] = weather['fcstValue']
+    max = -999
+    min = 999
+    max_WSD = 0
+    min_WSD = 100
+
+    for i in range(0,data_size):
+        if float(passing_data_set[i]['T1H']) > float(max):
+            max = passing_data_set[i]['T1H']
+            max_WSD = passing_data_set[i]['WSD']
+
+        if float(passing_data_set[i]['T1H']) < float(min):
+            min = passing_data_set[i]['T1H']
+            min_WSD = passing_data_set[i]['WSD']
+        
+    passing_data = passing_data_set[0]
+    t = passing_data['T1H']
     v = passing_data['WSD']
     t = float(t)
     v = float(v)
-    
+
     # 체감 온도 계산
     wci = getWCI(t, v)
     wci = round(wci, 2)
 
-    t_high = passing_data['TMX']
-    t_min = passing_data['TMN']
-    t_high = float(t_high)
-    t_min = float(t_min)
+    # api 초단기예보 중 최저 최고온도 구하기
+    wci_max = getWCI(float(max), float(max_WSD))
+    wci_max = round(wci_max, 2)
+    wci_min = getWCI(float(min), float(min_WSD))
+    wci_min = round(wci_min, 2)
 
-    wci_high = getWCI(t_high, v)
-    wci_high = round(wci, 2)
-    wci_low = getWCI(t_min, v)
-    wci_low = round(wci, 2)
-
-
+    passing_data['MAX'] = max
+    passing_data['MIN'] = min
     passing_data['WCI'] = wci # current wind chill temp
-    passing_data['WCIMAX'] = wci_high # maximum chill temp
-    passing_data['WCIMIN'] = wci_low # minium chill temp
+    passing_data['WCIMIN'] = wci_min
+    passing_data['WCIMAX'] = wci_max
 
     return passing_data
 
 def convert_time(time, year, month, day):
     """ 
-    # 입력 받은 시간을 API 요청가능 시간으로 변환한다.
+     입력 받은 시간을 API 요청가능 시간으로 변환한다.
      예시 : 1230, 2020, 04, 07 (시간, 년도, 달, 날짜)
      날씨 API에서 확정적으로 호출 가능한 시간(Basetime)은 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회 3시간 간격)
      날씨 API에서 Basetime 제공 시간은 Basetime 에서 10분 뒤이다.
@@ -383,6 +402,108 @@ def convert_time(time, year, month, day):
 
     elif int(time) < 2400: # 24: 00 이전 일 때 20:00 날씨를 받아옴. 
         time = "2300"
+    
+    if int(month) // 10 == 0:
+        str_month = "0" + str(month)
+    if int(day) // 10 == 0:
+        str_day = "0" + str(day)
+
+    date = str(year) + str_month + str_day
+
+    return time, date
+
+def convert_fcst_time(time, year, month, day):
+    """ 
+     입력 받은 시간을 API 요청가능 시간으로 변환한다.
+     예시 : 1230, 2020, 04, 07 (시간, 년도, 달, 날짜)
+     날씨 API에서 확정적으로 호출 가능한 시간(Basetime)은 0030 부터 1시간 간격 basetime 호출 가능 시간은 45분부터이다.
+    """
+
+    year = int(year)
+    day = int(day)
+    month = int(month)
+    str_day = str(day)
+    str_month = str(month)
+    current_date = datetime.date(year, month, day)
+    subtracted_date = current_date - datetime.timedelta(days=1)
+    if int(time) < 1: # 0시 46분 이전 일 때
+        year = subtracted_date.year
+        month = subtracted_date.month
+        day = subtracted_date.day
+
+        time = "2330"
+
+    elif int(time) < 146:
+        time = "0030"
+
+    elif int(time) < 246: 
+        time = "0130"
+
+    elif int(time) < 346:
+        time = "0230"
+    
+    elif int(time) < 446:
+        time = "0330"
+
+    elif int(time) < 546:
+        time = "0430"
+
+    elif int(time) < 646:
+        time = "0530"
+
+    elif int(time) < 746: 
+        time = "0630"
+
+    elif int(time) < 846:
+        time = "0730"
+    
+    elif int(time) < 946:
+        time = "0830"
+
+    elif int(time) < 1046:
+        time = "0930"
+
+    elif int(time) < 1146:
+        time = "1030"
+    
+    elif int(time) < 1246:
+        time = "1130"
+
+    elif int(time) < 1346:
+        time = "1230"
+
+    elif int(time) < 1446:
+        time = "1330"
+
+    elif int(time) < 1546: 
+        time = "1430"
+
+    elif int(time) < 1646:
+        time = "1530"
+    
+    elif int(time) < 1746:
+        time = "1630"
+
+    elif int(time) < 1846:
+        time = "1730"
+
+    elif int(time) < 1946:
+        time = "1830"
+
+    elif int(time) < 2046:
+        time = "1930"
+
+    elif int(time) < 2146: 
+        time = "2030"
+
+    elif int(time) < 2246:
+        time = "2130"
+    
+    elif int(time) < 2346:
+        time = "2230"
+
+    elif int(time) < 2401:
+        time = "2330"
     
     if int(month) // 10 == 0:
         str_month = "0" + str(month)

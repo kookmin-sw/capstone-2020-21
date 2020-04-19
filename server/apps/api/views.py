@@ -567,20 +567,27 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         An endpoint that returns weather data for
         location based on query parameter and current time
         """
-        
         # Get Location.
         location = request.data['location']
         weather_data = get_current_weather(location)
-
-        temperature = float(weather_data['T3H'])
-        sense = float(weather_data['WCI'])
+        temperature = float(weather_data['T1H'])
+        max_temp = float(weather_data['MAX'])
+        min_temp = float(weather_data['MIN'])
         humidity = int(weather_data['REH'])
         wind_speed = float(weather_data['WSD'])
-        precipitation = int(weather_data['R06'])
+        precipitation = float(weather_data['RN1'])
+        sense = float(weather_data['WCI'])
+        max_sense = float(weather_data['WCIMAX'])
+        min_sense = float(weather_data['WCIMIN'])
 
+        # Return response
         return Response({
                 'temperature': temperature,
+                'min temperature': min_temp,
+                'max temperature': max_temp,
                 'chill temp': sense,
+                'min chill temp': min_sense,
+                'max chill temp': max_sense,
                 'humidity': humidity,
                 'wind_speed': wind_speed,
                 'precipitation': precipitation,
