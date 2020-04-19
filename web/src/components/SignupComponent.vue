@@ -1,4 +1,40 @@
 <template>
+<b-container>
+<div id="signup-row" class="row justify-content-center align-items-center">
+    <div id="signup-column" class="col-md-4" style="margin-top:44px">
+        <form id="signup-form" class="form" action="" method="post">
+            <h3 class="text-center">Signup</h3>
+            <div>
+                <b-form-group id="input-group-1" label="ID* :" label-for="input-1">
+                    <b-form-input id="input-1" v-model="form.id" type="id"></b-form-input>
+                </b-form-group>
+                <b-form-group id="input-group-2" label="PASSWORD* :" label-for="input-2">
+                    <b-form-input id="input-2" v-model="form.password" type="password"></b-form-input>
+                </b-form-group>
+                <b-form-group id="input-group-3" label="NICKNAME* :" label-for="input-3">
+                    <b-form-input id="input-3" v-model="form.nickname" type="nickname"></b-form-input>
+                </b-form-group>
+                <b-form-group id="input-group-4" label="BIRTH :" label-for="input-4">
+                    <b-form-input id="input-4" v-model="form.birth" type="birth"></b-form-input>
+                </b-form-group>
+                <b-form-group label-cols-sm="0" label-align-sm="right" class="mb-0">
+                    <b-form-radio-group class="pt-2" :options="['남', '여']"></b-form-radio-group>
+                </b-form-group>
+            </div>
+            <div>
+              <b-row>
+                  <b-col class="col-6" style="margin:0 auto">
+                      <b-button pill class="w-75" type="new_submit">확인</b-button>
+                  </b-col>
+              </b-row>
+            </div>
+        </form>
+    </div>
+</div>
+</b-container>
+</template>
+
+<!--<template>
 <div>
   <link href="/views/css/login.css" rel="stylesheet">
   <div id="signup">
@@ -27,20 +63,6 @@
                             <b-form-group label-cols-sm="0" label-align-sm="right" class="mb-0">
                                 <b-form-radio-group class="pt-2" :options="['남', '여']"></b-form-radio-group>
                             </b-form-group>
-                            <!-- <div class="rad_style">
-                                <div class="radio" style="margin-right:10px">
-                                    <label>
-                                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-                                        남
-                                    </label>
-                                </div>
-                                <div class="radio">
-                                    <label>
-                                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                                        여
-                                    </label>
-                                </div>
-                            </div> -->
                             <div class="form-group" style="margin-top:30px">
                                 <input type="submit" name="submit" class="btn btn-md" value="Sign up">
                             </div>
@@ -51,25 +73,22 @@
         </div>
     </div>
 </div>
-</template>
+</template>-->
 
 <script>
 export default {
   name: 'signupcomponent',
   data () {
     return {
-      id: '',
-      password: '',
-      birth: ''
+      form: {
+        id: '',
+        password: '',
+        birth: ''
+      }
     }
   }
 }
 </script>
 
 <style>
-/* .rad_style{
-    position: relative;
-    margin: 20px 0px;
-    align-items: center;
-} */
 </style>

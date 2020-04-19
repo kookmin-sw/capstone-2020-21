@@ -1,4 +1,5 @@
 <template>
+<b-container>
 <div id="review-row" class="row justify-content-center align-items-center">
     <div id="review-column" class="col-md-4" style="margin-top:44px">
         <form id="review-form" class="form" action="" method="post">
@@ -21,11 +22,11 @@
                 </b-form-group>
                 <b-form-group id="input-group-2" label="활동장소 :" label-for="input-group-2">
                     <b-form inline>
-                    <label class="col-1 mr-sm-2" for="inline-form-custom-select-pref">시</label>
+                    <label class="col-1" for="inline-form-custom-select-pref">시</label>
                     <b-form-select id="inline-form-custom-select-pref" class="col-3" v-model="form.si" :options="si" required></b-form-select>
-                    <label class="col-1 mr-sm-2" for="inline-form-custom-select-pref">구</label>
+                    <label class="col-1" for="inline-form-custom-select-pref">구</label>
                     <b-form-select id="inline-form-custom-select-pref" class="col-3" v-model="form.gu" :options="gu" required></b-form-select>
-                    <label class="col-1 mr-sm-2" for="inline-form-custom-select-pref">동</label>
+                    <label class="col-1" for="inline-form-custom-select-pref">동</label>
                     <b-form-select id="inline-form-custom-select-pref" class="col-2" v-model="form.dong" :options="dong" required></b-form-select>
                     </b-form>
                 </b-form-group>
@@ -79,6 +80,7 @@
         </form>
     </div>
 </div>
+</b-container>
 </template>
 
 <script>
@@ -131,7 +133,7 @@ width: 100%;
 height: 240px;
 position: relative;
 display: block;
-margin: auto;
+/* margin: auto; */
 margin-bottom: 30px;
 background-size: 100% 100%;
 }

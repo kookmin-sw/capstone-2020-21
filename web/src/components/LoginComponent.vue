@@ -1,4 +1,5 @@
 <template>
+<b-container>
 <div id="login-row" class="row justify-content-center align-items-center">
     <div id="login-column" class="col-md-4" style="margin-top:44px">
         <form id="login-form" class="form" action="" method="post">
@@ -21,6 +22,7 @@
         </form>
     </div>
 </div>
+</b-container>
 </template>
 
 <!-- <template> -->
@@ -70,7 +72,7 @@ export default {
   methods: {
     handleLogin: function () {
       var token = ''
-      axios.post(`${consts.SERVER_BASE_URL}/api/token/`, { username: this.id, password: this.password })
+      axios.post(`${consts.SERVER_BASE_URL}/api/token/`, { username: this.form.id, password: this.form.password })
         .then(response => {
           // TODO: delete console.log .
           console.log(response)
