@@ -44,6 +44,7 @@ export default {
 }
 .left_side{
     display: inline-block;
+    margin-top: 170px;
 }
 .my_closet{
   background-color: #faf5ef;
