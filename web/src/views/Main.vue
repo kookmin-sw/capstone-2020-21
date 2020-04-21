@@ -3,13 +3,13 @@
     <b-row cols=1>
       <b-col cols=12>
         <!-- 날씨 컴포넌트 -->
-        <WeatherComponent />
+        <WeatherComponent class="border mb-3 p-3" :weatherData.sync="weatherProps" />
       </b-col>
     </b-row>
     <b-row cols=1 cols-md=2>
       <b-col cols=12 lg=4>
         <!-- 추천 카테고리 컴포넌트 -->
-        <RecommendedCategoriesComponent class="border" :categories="recommendedCategories"/>
+        <RecommendedCategoriesComponent class="border" :categories="recommendedCategories" />
       </b-col>
       <b-col class="mt-3 mt-lg-0" cols=12 lg=8>
         <!-- 리뷰 컴포넌트 -->
@@ -41,7 +41,13 @@ export default {
       weatherProps: {
         minTemp: 4,
         maxTemp: 22,
-        location: 0
+        location: {
+          id: 0,
+          name: '서울특별시'
+        },
+        humidity: 0,
+        windSpeed: 0,
+        precipitation: 0
       },
       recommendedCategories: [],
       userClothes: [],
@@ -57,6 +63,7 @@ export default {
     var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/'
     url += '?limit=10&max_sensible_temp=' + vm.weatherProps.maxTemp
     url += '&min_sensible_temp=' + vm.weatherProps.minTemp
+    // TODO(mskwon1): decomment this after testing.
     // url += '&review=3'
     // url += '&me=true'
 
@@ -72,6 +79,9 @@ export default {
       .then((response) => {
         vm.recommendedCategories = response.data
       })
+
+    // TODO(mskwon1) : implement current weather fetch code.
+    // url = consts.SERVER_BASE_URL + '/clothes-set-reviews/current_weather/'
   }
 }
 </script>
