@@ -1,13 +1,10 @@
 <template>
 <b-container>
 <div id="review-row" class="row justify-content-center align-items-center">
-    <div id="review-column" class="col-md-4" style="margin-top:44px">
+    <div id="review-column" class="col-md-6" style="margin-top:44px">
         <form id="review-form" class="form" action="" method="post">
             <h3 class="text-center">Review</h3>
-            <div class="col-md-4 closet_set_img"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/logo.png')+ ')' }"></div>
-            <!-- <div class="form-group text-left">
-                <input type="date" name="time" class="date" v-bind:style="{ padding: '10px;' }" style="margin-right:20px"> <input type="time" class="time"> <span> ~ </span><input type="time" class="time">
-            </div> -->
+            <b-img-lazy v-bind="mainProps" :src="getImageUrl()"></b-img-lazy>
             <div>
                 <b-form @submit="onSubmit" @reset="onReset" v-if="show">
                 <b-form-group id="input-group-1" label="활동시간 :" label-for="input-group-1">
@@ -136,14 +133,6 @@ display: block;
 /* margin: auto; */
 margin-bottom: 30px;
 background-size: 100% 100%;
-}
-.date{
-    border-radius: 4px;
-    border-color: rgb(245, 245, 245);
-}
-.time{
-    border-radius: 4px;
-    border-color: rgb(245, 245, 245);
 }
 label {
     display: inline-block;
