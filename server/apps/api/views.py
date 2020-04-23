@@ -29,16 +29,12 @@ from .validations import (
     clothes_set_query_schema, 
     clothes_set_review_query_schema
 )
-<<<<<<< HEAD
 from .weather import (
     get_weather_date, 
     get_weather_between, 
     get_weather_time_date, 
     get_current_weather
 )
-=======
-
->>>>>>> 6f4dc8d66628aebf5a1a1432532a6cd80ee91ae4
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
