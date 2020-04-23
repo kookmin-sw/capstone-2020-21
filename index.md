@@ -104,4 +104,6 @@
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/9LO2N7AenVQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-## 5. 결과 영상
+## 5. 중간평가 영상
+
+<iframe width="560" height="315" src="https://youtu.be/ursh3OyH09s" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
