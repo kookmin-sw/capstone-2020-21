@@ -29,7 +29,16 @@ from .validations import (
     clothes_set_query_schema, 
     clothes_set_review_query_schema
 )
+<<<<<<< HEAD
+from .weather import (
+    get_weather_date, 
+    get_weather_between, 
+    get_weather_time_date, 
+    get_current_weather
+)
+=======
 
+>>>>>>> 6f4dc8d66628aebf5a1a1432532a6cd80ee91ae4
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -575,8 +584,39 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'next': offset + limit_count,
                 'results': final_results,
             }, status=status.HTTP_200_OK)
-        
-        
+
+    @action(detail=False, methods=['get'])
+    def current_weather(self, request, *args, **kwargs):
+        """
+        An endpoint that returns weather data for
+        location based on query parameter and current time
+        """
+        # Get Location.
+        location = request.data['location']
+        weather_data = get_current_weather(location)
+        temperature = float(weather_data['T1H'])
+        max_temp = float(weather_data['MAX'])
+        min_temp = float(weather_data['MIN'])
+        humidity = int(weather_data['REH'])
+        wind_speed = float(weather_data['WSD'])
+        precipitation = float(weather_data['RN1'])
+        sense = float(weather_data['WCI'])
+        max_sense = float(weather_data['WCIMAX'])
+        min_sense = float(weather_data['WCIMIN'])
+
+        # Return response
+        return Response({
+                'temperature': temperature,
+                'min_temperature': min_temp,
+                'max_temperature': max_temp,
+                'chill_temp': sense,
+                'min_chill_temp': min_sense,
+                'max_chill_temp': max_sense,
+                'humidity': humidity,
+                'wind_speed': wind_speed,
+                'precipitation': precipitation,
+            }, status=status.HTTP_200_OK)
+
 class ClothesSetReviewNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSetReview.objects.all()
     serializer_class = ClothesSetReviewReadSerializer  
