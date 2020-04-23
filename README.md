@@ -1,5 +1,7 @@
 # 옷때?(OTTE?)
 #### 팀페이지 주소 : https://kookmin-sw.github.io/capstone-2020-21/
+#### 계획서평가 발표영상 링크 : https://youtu.be/9LO2N7AenVQ
+#### 중간평가 발표영상 링크 : https://youtu.be/ursh3OyH09s
 ## 1. 프로젝트 개요
 
 <center><img src="index.assets/image-20200314162533015.png" alt="image-20200314162533015" height="33%" width="33%" /></center>
@@ -100,8 +102,3 @@
    - Show Clothes Set Reviews written by the user that had the similar weather with today's weather.
    - Relying on 'positive' Clothes Set Reviews written by other users that had the similar weather with today's weather, find which small category of each big categories were the most popular, and show the user's clothes on those categories.
 
-## 4. 소개 영상
-
-영상링크 : https://youtu.be/9LO2N7AenVQ
-
-## 5. 결과 영상
