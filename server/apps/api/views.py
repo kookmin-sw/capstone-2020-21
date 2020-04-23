@@ -588,11 +588,11 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         # Return response
         return Response({
                 'temperature': temperature,
-                'min temperature': min_temp,
-                'max temperature': max_temp,
-                'chill temp': sense,
-                'min chill temp': min_sense,
-                'max chill temp': max_sense,
+                'min_temperature': min_temp,
+                'max_temperature': max_temp,
+                'chill_temp': sense,
+                'min_chill_temp': min_sense,
+                'max_chill_temp': max_sense,
                 'humidity': humidity,
                 'wind_speed': wind_speed,
                 'precipitation': precipitation,
