@@ -22,6 +22,7 @@
             <b-button pill size="sm" variant="info">{{ review.clothes_set.style }}</b-button>
           </b-card-body>
           <b-card-body>
+            <h6>착용 날짜</h6>
             {{ convertDate(review.start_datetime) }} ~ {{ convertDate(review.end_datetime) }}
           </b-card-body>
         </b-card>

@@ -2,7 +2,7 @@
   <b-container>
     <b-row>
       <b-col>
-        <h5 @change=handleLocatrionChange>
+        <h5 style="word-break: keep-all">
           위치 : {{ weatherData.location.name }}
         </h5>
         <b-button class="mb-3" variant="info" size="sm" @click="openLocationModal">
@@ -29,7 +29,7 @@
       </b-col>
       <b-col class="h5" cols=12 md=3 lg=2>
         <b-img src="../assets/rain.png" width="30px"></b-img>
-        {{ weatherData.precipitation }} %
+        {{ weatherData.precipitation }} mm
       </b-col>
     </b-row>
     <b-modal ref="location-modal" title="위치 검색" ok-title="확인" cancel-title="취소">
@@ -90,6 +90,14 @@ export default {
     handleLocationClick: function (event, location) {
       this.weatherData.location.id = location.id
       this.weatherData.location.name = location.location
+
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+
+      this.fetchCurrentWeather(config)
+
       this.$refs['location-modal'].hide()
     },
     handleLocationSearch: function () {
@@ -105,19 +113,35 @@ export default {
           vm.locations = response.data.results
         })
     },
-    handleLocationChange: function () {
-      var token = window.localStorage.getItem('token')
-      var config = {
-        headers: { Authorization: `Bearer ${token}` }
-      }
+    fetchCurrentWeather: function (config) {
       var vm = this
       var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/current_weather/'
-      url += '?search=' + vm.keyword
+      url += '?location=' + this.weatherData.location.id
+
       axios.get(url, config)
         .then((response) => {
-          vm.locations = response.data.results
+          const {
+            min_temperature,
+            max_temperature,
+            humidity,
+            wind_speed,
+            precipitation
+          } = response.data
+
+          vm.weatherData.minTemp = min_temperature
+          vm.weatherData.maxTemp = max_temperature
+          vm.weatherData.humidity = humidity
+          vm.weatherData.windSpeed = wind_speed
+          vm.weatherData.precipitation = precipitation
         })
     }
+  },
+  created: function () {
+    var token = window.localStorage.getItem('token')
+    var config = {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+    this.fetchCurrentWeather(config)
   }
 }
 </script>
