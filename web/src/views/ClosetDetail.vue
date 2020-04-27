@@ -28,6 +28,9 @@ export default {
     MainNavigation,
     ClosetDetailInfoComponent
   },
+  props: [
+    'clothes_id'
+  ],
   data: function () {
     return {
       list: [

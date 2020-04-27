@@ -46,10 +46,11 @@ export default new Router({
     {
       path: '/closet/detail',
       name: 'ClosetDetail',
-      component: ClosetDetail
+      component: ClosetDetail,
+      props: true
     },
     {
-      path: '/main',
+      path: '/mainpage',
       name: 'Main',
       component: Main
     },

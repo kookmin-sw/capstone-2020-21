@@ -118,8 +118,13 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
     # Apply filtering, using other query parameters.
     filter_mappings = {
-        'upper_category': 'upper_category',
-        'lower_category': 'lower_category',
+        'upper_category': 'upper_category__in',
+        'lower_category': 'lower_category__in',
+    }
+    
+    filter_value_transformations = {
+        'upper_category': lambda val: val.split(','),
+        'lower_category': lambda val: val.split(',')
     }
 
     # Use filter validation.
@@ -588,7 +593,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         location based on query parameter and current time
         """
         # Get Location.
-        location = request.data['location']
+        location = request.query_params.get('location')
         weather_data = get_current_weather(location)
         temperature = float(weather_data['T1H'])
         max_temp = float(weather_data['MAX'])
