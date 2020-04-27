@@ -15,7 +15,7 @@
     <b-row v-else>
       <b-col class="mb-2 mt-2" cols=4 v-for="clothe in clothes" :key=clothe.id @click="handleClothesClick(clothe.id)">
         <template v-if="imgOnly">
-          <b-img :src="clothe.image_url" fluid />
+          <b-img :src="clothe.image_url" fluid style="height: 5rem" />
         </template>
         <template v-else>
           <b-card :img-src="clothe.image_url" img-top>
