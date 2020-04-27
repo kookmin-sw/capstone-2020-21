@@ -39,8 +39,8 @@ export default {
   data: function () {
     return {
       weatherProps: {
-        minTemp: 4,
-        maxTemp: 22,
+        minTemp: 0,
+        maxTemp: 0,
         location: {
           id: 0,
           name: '서울특별시'
@@ -50,38 +50,38 @@ export default {
         precipitation: 0
       },
       recommendedCategories: [],
-      userClothes: [],
       userReviews: []
     }
   },
-  created: function () {
-    var token = window.localStorage.getItem('token')
-    var config = {
-      headers: { Authorization: `Bearer ${token}` }
+  watch: {
+    weatherProps: {
+      deep: true,
+      handler () {
+        var token = window.localStorage.getItem('token')
+        var config = {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+        var vm = this
+        var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/'
+        url += '?limit=10&max_sensible_temp=' + vm.weatherProps.maxTemp
+        url += '&min_sensible_temp=' + vm.weatherProps.minTemp
+        url += '&review=3'
+        url += '&me=true'
+
+        axios.get(url, config)
+          .then((response) => {
+            vm.userReviews = response.data.results
+          })
+
+        url = consts.SERVER_BASE_URL + '/clothes/today_category/'
+        url += '?max_sensible_temp=' + vm.weatherProps.maxTemp
+        url += '&min_sensible_temp=' + vm.weatherProps.minTemp
+        axios.get(url, config)
+          .then((response) => {
+            vm.recommendedCategories = response.data
+          })
+      }
     }
-    var vm = this
-    var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/'
-    url += '?limit=10&max_sensible_temp=' + vm.weatherProps.maxTemp
-    url += '&min_sensible_temp=' + vm.weatherProps.minTemp
-    // TODO(mskwon1): decomment this after testing.
-    // url += '&review=3'
-    // url += '&me=true'
-
-    axios.get(url, config)
-      .then((response) => {
-        vm.userReviews = response.data.results
-      })
-
-    url = consts.SERVER_BASE_URL + '/clothes/today_category/'
-    url += '?max_sensible_temp=' + vm.weatherProps.maxTemp
-    url += '&min_sensible_temp=' + vm.weatherProps.minTemp
-    axios.get(url, config)
-      .then((response) => {
-        vm.recommendedCategories = response.data
-      })
-
-    // TODO(mskwon1) : implement current weather fetch code.
-    // url = consts.SERVER_BASE_URL + '/clothes-set-reviews/current_weather/'
   }
 }
 </script>

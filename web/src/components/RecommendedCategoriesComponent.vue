@@ -36,19 +36,6 @@ export default {
       clothes: []
     }
   },
-  created: function () {
-    var token = window.localStorage.getItem('token')
-    var config = {
-      headers: { Authorization: `Bearer ${token}` }
-    }
-    var vm = this
-    var url = consts.SERVER_BASE_URL + '/clothes/?limit=10'
-
-    axios.get(url, config)
-      .then((response) => {
-        vm.clothes = response.data.results
-      })
-  },
   computed: {
     categoryItems: function () {
       var result = []
@@ -58,6 +45,52 @@ export default {
       }
       return result
     }
+  },
+  watch: {
+    categories: {
+      deep: true,
+      handler () {
+        this.fetchClothes()
+      }
+    }
+  },
+  methods: {
+    fetchClothes: function () {
+      // TODO(mskwon1): exception handling when categories don't exist.
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+
+      var targetCategories = []
+      for (var category of Object.keys(this.categories)) {
+        if (this.categories[category] !== '') {
+          targetCategories.push(this.categories[category])
+        }
+      }
+
+      var vm = this
+      var url = consts.SERVER_BASE_URL + '/clothes/?me=True'
+
+      if (targetCategories.length !== 0) {
+        url += '&lower_category='
+
+        for (var i in targetCategories) {
+          url += targetCategories[i]
+          if (parseInt(i) + 1 !== targetCategories.length) {
+            url += ','
+          }
+        }
+      }
+
+      axios.get(url, config)
+        .then((response) => {
+          vm.clothes = response.data.results
+        })
+    }
+  },
+  created: function () {
+    this.fetchClothes()
   }
 }
 </script>
