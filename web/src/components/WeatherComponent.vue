@@ -2,7 +2,7 @@
   <b-container>
     <b-row>
       <b-col>
-        <h5>
+        <h5 @change=handleLocatrionChange>
           위치 : {{ weatherData.location.name }}
         </h5>
         <b-button class="mb-3" variant="info" size="sm" @click="openLocationModal">
@@ -99,6 +99,19 @@ export default {
       }
       var vm = this
       var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/location_search/'
+      url += '?search=' + vm.keyword
+      axios.get(url, config)
+        .then((response) => {
+          vm.locations = response.data.results
+        })
+    },
+    handleLocationChange: function () {
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      var vm = this
+      var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/current_weather/'
       url += '?search=' + vm.keyword
       axios.get(url, config)
         .then((response) => {
