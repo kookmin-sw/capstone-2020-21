@@ -46,7 +46,12 @@ def populate_clothes(number=10):
                 '터틀넥', '후드티',  '니트', '블라우스', '끈나시', '민소매'] 
     }
 
+    users = User.objects.all()
+    
     for i in range(number):
+        user_index = fake.pyint(min_value=0, max_value=len(users)-1)
+        owner = users[user_index]
+            
         upper_category = fake.random_element(elements=category_dict.keys())
         lower_category = fake.random_element(elements=category_dict[upper_category])
         image_url = fake.image_url(width=None, height=None)
@@ -58,7 +63,8 @@ def populate_clothes(number=10):
             lower_category=lower_category, 
             image_url=image_url,
             alias=alias,
-            created_at=created_at
+            created_at=created_at,
+            owner=owner
         )
 
 
