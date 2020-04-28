@@ -8,6 +8,8 @@ from .models import User, Clothes, ClothesSet
 def populate_users(number=10):
     fake = Faker('ko_KR')
 
+    created_users = []
+
     for i in range(number):
         while True:
             username = fake.user_name()
@@ -30,6 +32,10 @@ def populate_users(number=10):
             gender=gender,
             birthday=birthday
         )
+        
+        created_users.append(created)
+        
+    return created_users
 
 
 def populate_clothes(number=10):
@@ -46,7 +52,13 @@ def populate_clothes(number=10):
                 '터틀넥', '후드티',  '니트', '블라우스', '끈나시', '민소매'] 
     }
 
+    created_clothes = []
+    users = User.objects.all()
+    
     for i in range(number):
+        user_index = fake.pyint(min_value=0, max_value=len(users)-1)
+        owner = users[user_index]
+            
         upper_category = fake.random_element(elements=category_dict.keys())
         lower_category = fake.random_element(elements=category_dict[upper_category])
         image_url = fake.image_url(width=None, height=None)
@@ -58,13 +70,19 @@ def populate_clothes(number=10):
             lower_category=lower_category, 
             image_url=image_url,
             alias=alias,
-            created_at=created_at
+            created_at=created_at,
+            owner=owner
         )
+        
+        created_clothes.append(created)
+        
+    return created_clothes
 
 
 def populate_clothes_set(number=10):
     fake = Faker('ko_KR')
 
+    created_clothes_set = []
     users = User.objects.all()
 
     for i in range(number):
@@ -93,10 +111,16 @@ def populate_clothes_set(number=10):
             clothes=clothes,
             owner=owner
         )
+        
+        created_clothes_set.append(created)
+        
+    return created_clothes_set
 
 
 def populate_clothes_set_review(number=10):
     fake = Faker('ko_KR')
+
+    created_reviews = []
 
     users = User.objects.all()
     for i in range(number):
@@ -145,6 +169,10 @@ def populate_clothes_set_review(number=10):
             clothes_set_id=clothes_set_id,
             owner=owner
         )
+        
+        created_reviews.append(created)
+        
+    return created_reviews
 
 
 def populate_database(users=10, clothes=300, clothes_set=50, clothes_set_review=100):

@@ -472,6 +472,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             end_time = int(end.split('T')[1].split(':')[0])
             
             # API 요청하기
+            # TODO: 날씨 데이터 없을때 오류처리.
             all_weather_data = Weather.objects.all()
             weather_data_set = all_weather_data.filter(location_code=location)
             weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_time)
@@ -512,6 +513,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             end_time = int(end.split('T')[1].split(':')[0])
             
             # API 요청하기
+            # TODO: 날씨 데이터 없을때 오류처리.
             all_weather_data = Weather.objects.all()
             weather_data_set = all_weather_data.filter(location_code=location)
             weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_time)
