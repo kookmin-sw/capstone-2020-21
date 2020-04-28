@@ -167,7 +167,7 @@ class UserRetrieveTests(APITestCase):
         self.assertEqual(int(response.data['count']), 1)
 
         # Test detail view.
-        response = self.client.get('/users/1/')
+        response = self.client.get('/users/' + str(self.created_user['id']) + '/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self.created_user)
     
@@ -258,7 +258,8 @@ class UserUpdateTests(APITestCase):
             'birthday': birthday
         }
         
-        response = self.client.put('/users/1/', data, format='json')
+        url = '/users/' + str(self.created_user['id']) + '/'
+        response = self.client.put(url, data, format='json')
         self.assertEqual(response.data['username'], username)
         self.assertEqual(response.data['nickname'], nickname)
         self.assertEqual(response.data['gender'], gender)
@@ -274,8 +275,9 @@ class UserUpdateTests(APITestCase):
             'gender': gender, 
             'birthday': birthday
         }
+        url = '/users/' + str(self.created_user['id']) + '/'
         
-        response = self.client.patch('/users/1/', data, format='json')
+        response = self.client.patch(url, data, format='json')
         self.assertEqual(response.data['username'], self.username)
         self.assertEqual(response.data['nickname'], nickname)
         self.assertEqual(response.data['gender'], gender)
@@ -301,7 +303,9 @@ class UserUpdateTests(APITestCase):
             'username': username,
             'nickname': nickname
         }
-        response = self.client.patch('/users/1/', data, format='json')
+         
+        url = '/users/' + str(self.created_user['id']) + '/'
+        response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(str(response.data['username'][0]), 'user with this username already exists.')
         self.assertEqual(str(response.data['nickname'][0]), 'user with this nickname already exists.')
@@ -323,7 +327,8 @@ class UserUpdateTests(APITestCase):
             'birthday': birthday
         }
         
-        response = self.client.put('/users/1/', data, format='json')
+        url = '/users/' + str(self.created_user['id']) + '/'
+        response = self.client.put(url, data, format='json')
         self.assertEqual(response.data['detail'], 'Authentication credentials were not provided.')
     
     def test_update_invalid_token(self):
