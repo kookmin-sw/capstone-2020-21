@@ -37,6 +37,7 @@ export default {
   },
   created: function () {
     var vm = this
+    // TODO : localStorage에 token이 없을 때 어떻게 처리할 지
     if (window.localStorage.getItem('token')) {
       var token = window.localStorage.getItem('token')
       var config = {
