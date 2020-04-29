@@ -2,7 +2,7 @@
   <b-container>
     <b-row cols="1" cols-md="2">
       <b-col class="mb-5 mb-md-0 pl-4 pr-4" cols="12" md="6">
-        <ImageShowComponent :image="image" @update:image="handleImageUpdate" />
+        <!-- <ImageShowComponent :image="image" @update:image="handleImageUpdate" /> -->
       </b-col>
       <b-col cols="12" md="6">
         <b-row class="mb-3">
@@ -23,14 +23,14 @@
 </template>
 
 <script>
-import ImageShowComponent from '@/components/ImageShowComponent.vue'
+// import ImageShowComponent from '@/components/ImageShowComponent.vue'
 import ImageAnalysisComponent from '@/components/ImageAnalysisComponent.vue'
 import axios from 'axios'
 import consts from '@/consts.js'
 
 export default {
   components: {
-    ImageShowComponent,
+    // ImageShowComponent,
     ImageAnalysisComponent
   },
   data: function () {
