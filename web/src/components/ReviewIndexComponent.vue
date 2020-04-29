@@ -4,7 +4,7 @@
     <b-img blank blank-color="#87b0e6" :style="styles[1]"></b-img>
     <b-img blank blank-color="#d15664" :style="styles[2]"></b-img>
     <b-img blank blank-color="white" :style="styles[3]"></b-img>
-    <p>{{ text }}</p>
+    <p style="word-break: keep-all">{{ text }}</p>
   </div>
 </template>
 
