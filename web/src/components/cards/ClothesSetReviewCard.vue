@@ -13,11 +13,11 @@
         <p class="mb-1 font-weight-bold">후기</p>
         <p class="m-auto w-75"><ReviewIndexComponent :index="review.review" /></p>
         <p class="mb-1 mt-1 font-weight-bold">한줄평</p>
-        <p class="mb-0">{{ review.comment }}</p>
+        <p class="mb-0" style="word-break: keep-all">{{ review.comment }}</p>
       </b-card-body>
     </b-card>
     <template v-slot:overlay>
-      <p class="text-light">
+      <p class="text-light" style="word-break:keep-all">
         <!-- TODO(mskwon1): this should be stirng, not numeric. -->
         {{ review.location }}
         <br>
@@ -26,6 +26,8 @@
       <p class="text-light">
         <b-img src="@/assets/hot.png" width="30px" />
         {{ review.max_temp }} °C
+      </p>
+      <p class="text-light">
         <b-img src="@/assets/cold.png" width="30px" />
         {{ review.min_temp }} °C
       </p>
