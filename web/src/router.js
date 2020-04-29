@@ -4,7 +4,6 @@ import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
 import Home from './views/Home.vue'
 import Closet from './views/Closet.vue'
-import ClosetNew from './views/ClosetNew.vue'
 import Review from './views/Review.vue'
 import ClosetDetail from './views/ClosetDetail.vue'
 import ClosetDetailNew from './views/ClosetDetailNew.vue'
@@ -38,7 +37,7 @@ export default new Router({
     {
       path: '/closet',
       name: 'Closet',
-      component: ClosetNew
+      component: Closet
     },
     {
       path: '/review',
