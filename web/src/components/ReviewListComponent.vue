@@ -13,26 +13,19 @@
       </b-col>
     </b-row>
     <b-row v-else>
-      <b-col class="mb-2 mt-2" cols=12 md=6 lg=4 v-for="review in reviews" :key=review.id>
-        <b-card :img-src="review.clothes_set.image_url" img-top img-height="250px">
-          <b-card-title>
-            {{ review.clothes_set.name }}
-          </b-card-title>
-          <b-card-body>
-            <b-button pill size="sm" variant="info">{{ review.clothes_set.style }}</b-button>
-          </b-card-body>
-          <b-card-body>
-            <h6>착용 날짜</h6>
-            {{ convertDate(review.start_datetime) }} ~ {{ convertDate(review.end_datetime) }}
-          </b-card-body>
-        </b-card>
+      <b-col class="mb-2 mt-2" cols=12 md=6 xl=4 v-for="review in reviews" :key=review.id>
+        <ClothesSetReviewCard :review="review" />
       </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
+import ClothesSetReviewCard from '@/components/cards/ClothesSetReviewCard.vue'
 export default {
+  components: {
+    ClothesSetReviewCard
+  },
   props: [
     'reviews',
     'includeFilters'
