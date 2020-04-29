@@ -46,7 +46,7 @@ export default new Router({
     },
     {
       path: '/closet/detail',
-      name: 'ClosetDetail',
+      name: 'ClosetDetailNew',
       component: ClosetDetailNew,
       props: true
     },

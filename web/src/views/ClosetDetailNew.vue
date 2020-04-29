@@ -1,41 +1,46 @@
 <template>
-  <b-container>
-    <b-row cols="1" cols-md="2">
-      <b-col class="mb-5 mb-md-0 pl-4 pr-4" cols="12" md="6">
-        <!-- <ImageShowComponent :image="image" @update:image="handleImageUpdate" /> -->
-      </b-col>
-      <b-col cols="12" md="6">
-        <b-row class="mb-3">
-          <ImageAnalysisComponent :analysis_props.sync="analysis_props"
-                                    :isDisabled="disableAnalysis" />
+    <b-container>
+        <b-row>
+          <b-col md="6" cols="12" style="text-align:left">
+            <b-button to="/closet">뒤로가기</b-button>
+          </b-col>
+          <b-col md="6" cols="12" style="text-align:right">
+            <b-button @click="deleteClothe">삭제하기</b-button>
+          </b-col>
         </b-row>
         <b-row>
-          <b-col cols="6">
-            <b-button pill class="w-75" @click="handleModify">수정하기</b-button>
-          </b-col>
-          <b-col cols="6">
-            <b-button pill class="w-75" @click="handleRegister">등록하기</b-button>
-          </b-col>
+            <b-col md="6" cols="12">
+              <b-img fluid :src="currentImage"/>
+            </b-col>
+            <b-col md="6" cols="12">
+              <b-row>
+                <ImageAnalysisComponent :analysis_props.sync="analysis_props" :isDisabled="disableAnalysis" />
+              </b-row>
+              <b-row>
+                <b-col cols="6">
+                  <b-button pill class="w-75" @click="handleModify">수정하기</b-button>
+                </b-col>
+                <b-col cols="6">
+                  <b-button pill class="w-75" @click="handleUpdateRegister">확인하기</b-button>
+                </b-col>
+              </b-row>
+            </b-col>
         </b-row>
-      </b-col>
-    </b-row>
-  </b-container>
+    </b-container>
 </template>
 
 <script>
-// import ImageShowComponent from '@/components/ImageShowComponent.vue'
-import ImageAnalysisComponent from '@/components/ImageAnalysisComponent.vue'
 import axios from 'axios'
 import consts from '@/consts.js'
-
+import ImageAnalysisComponent from '@/components/ImageAnalysisComponent.vue'
 export default {
   components: {
-    // ImageShowComponent,
     ImageAnalysisComponent
   },
   data: function () {
     return {
-      image: 'https://bit.ly/3a3Fff0',
+      currentImage: '',
+      clothes: [],
       analysis_props: {
         upper: '',
         lower: '',
@@ -44,55 +49,80 @@ export default {
       disableAnalysis: true
     }
   },
+  props: [
+    'clothes_id'
+  ],
+  created: function () {
+    var vm = this
+    if (!localStorage.getItem('token')) {
+      vm.$router.push('/login')
+      // TODO: 에러메세지 더 좋은걸로 바꾸기.
+      alert('로그인해주세요!')
+    } else {
+      // TODO : localStorage에 token이 없을 때 어떻게 처리할 지
+      if (window.localStorage.getItem('token')) {
+        var token = window.localStorage.getItem('token')
+        var config = {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+        var clothesId = vm.clothes_id
+        axios.get(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`)
+          .then((response) => {
+            vm.clothes = response.data
+            vm.currentImage = vm.clothes.image_url
+            vm.analysis_props.upper = vm.clothes.upper_category
+            vm.analysis_props.lower = vm.clothes.lower_category
+            vm.analysis_props.alias = vm.clothes.alias
+          }).catch((ex) => {
+            // TODO: error handling.
+          })
+      } else {
+        alert('회원가입 해주세요')
+      }
+    }
+  },
   methods: {
-    handleRegister: function () {
+    handleModify: function () {
+      this.disableAnalysis = false
+    },
+    handleUpdateRegister: function () {
+      var vm = this
+      var clothesId = vm.clothes_id
       var token = window.localStorage.getItem('token')
       var config = {
         headers: { Authorization: `Bearer ${token}` }
       }
       var data = {
-        image_url: this.image,
-        upper_category: this.analysis_props.upper,
-        lower_category: this.analysis_props.lower,
-        alias: this.analysis_props.alias
+        image_url: vm.image,
+        upper_category: vm.analysis_props.upper,
+        lower_category: vm.analysis_props.lower,
+        alias: vm.analysis_props.alias
       }
-      axios.post(`${consts.SERVER_BASE_URL}/clothes/`, data, config)
+      axios.patch(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, data, config)
         .then(response => {
           // TODO: delete console.log .
-          console.log(response)
-          this.$router.push('/closet')
+          vm.$router.push('/closet')
         }).catch((ex) => {
           // TODO: handle error.
           console.log(ex)
         })
     },
-    handleModify: function () {
-      this.disableAnalysis = false
-    },
-    handleImageUpdate: function (event) {
-      var imageStr = event.split(',')[1]
+    deleteClothe: function () {
+      var vm = this
+      var clothesId = vm.clothes_id
       var token = window.localStorage.getItem('token')
       var config = {
         headers: { Authorization: `Bearer ${token}` }
       }
-
-      axios.post(`${consts.SERVER_BASE_URL}/clothes/inference/`, { image: imageStr }, config)
+      axios.delete(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, config)
         .then(response => {
-          // TODO: delete console.log .
           console.log(response)
-          this.image = response.data.image_url
-          this.analysis_props.upper = response.data.upper_category
-          this.analysis_props.lower = response.data.lower_category
+          // TODO: delete console.log .
+          vm.$router.push('/closet')
         }).catch((ex) => {
-          // TODO: handle errors.
+          // TODO: handle error.
+          console.log(ex)
         })
-    }
-  },
-  created: function () {
-    if (!localStorage.getItem('token')) {
-      this.$router.push('/login')
-      // TODO: 에러메세지 더 좋은걸로 바꾸기.
-      alert('로그인해주세요!')
     }
   }
 }

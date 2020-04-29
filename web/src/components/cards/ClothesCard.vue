@@ -29,7 +29,7 @@ export default {
   ],
   methods: {
     handleClick: function () {
-      this.$router.push({ name: 'ClosetDetail', params: { clothes_id: this.clothes.id } })
+      this.$router.push({ name: 'ClosetDetailNew', params: { clothes_id: this.clothes.id } })
     },
     handleHover: function (hovered) {
       this.isHovered = hovered
