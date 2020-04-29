@@ -4,8 +4,10 @@ import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
 import Home from './views/Home.vue'
 import Closet from './views/Closet.vue'
+import ClosetNew from './views/ClosetNew.vue'
 import Review from './views/Review.vue'
 import ClosetDetail from './views/ClosetDetail.vue'
+import ClosetDetailNew from './views/ClosetDetailNew.vue'
 import Main from './views/Main.vue'
 import ClosetAddNew from './views/ClosetAddNew.vue'
 import Cody from './views/Cody.vue'
@@ -36,7 +38,7 @@ export default new Router({
     {
       path: '/closet',
       name: 'Closet',
-      component: Closet
+      component: ClosetNew
     },
     {
       path: '/review',
@@ -46,7 +48,7 @@ export default new Router({
     {
       path: '/closet/detail',
       name: 'ClosetDetail',
-      component: ClosetDetail,
+      component: ClosetDetailNew,
       props: true
     },
     {
