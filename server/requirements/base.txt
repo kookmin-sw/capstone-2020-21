@@ -3,6 +3,7 @@ Django==3.0.4
 djangorestframework==3.11.0
 djangorestframework-simplejwt==4.4.0
 django-cors-headers==3.2.1
+django-extensions==2.2.9
 drf-extensions==0.6.0
 drf-url-filters==0.5.1
 factory-boy==2.12.0
@@ -12,4 +13,5 @@ numpy==1.18.2
 opencv-python==4.2.0.32
 python-decouple==3.3
 sagemaker==1.51.4
+schedule==0.6.0
 six==1.14.0
