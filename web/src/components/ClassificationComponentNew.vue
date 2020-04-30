@@ -20,7 +20,12 @@ export default {
   },
   computed: {
     categories: function () {
-      var categoryList = consts.CLOTHES_CATEGORIES.slice(0)
+      const CLOTHES_CATEGORIES = consts.CLOTHES_CATEGORIES
+      /*
+        Workaround for deep copying nested objects
+        ref: https://bit.ly/2y4vJLI
+      */
+      var categoryList = JSON.parse(JSON.stringify(CLOTHES_CATEGORIES))
       for (var i in categoryList) {
         categoryList[i].lower.unshift('전체')
       }
