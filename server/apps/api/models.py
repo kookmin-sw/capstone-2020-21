@@ -67,13 +67,12 @@ class ClothesSetReview(models.Model):
 
 class Weather(models.Model):
     location_code = models.IntegerField()
+    x = models.IntegerField(default=0)
+    y = models.IntegerField(default=0)
     date = models.DateField()
     time = models.IntegerField(choices=TIME_CHOICES)
-    max_temp = models.FloatField()
-    min_temp = models.FloatField()
-    max_sensible_temp = models.FloatField()
-    min_sensible_temp = models.FloatField()
+    temp = models.FloatField()
+    sensible_temp = models.FloatField()
     humidity = models.IntegerField()
     wind_speed = models.FloatField()
     precipitation = models.IntegerField()
-
