@@ -6,8 +6,9 @@ import Home from './views/Home.vue'
 import Closet from './views/Closet.vue'
 import Review from './views/Review.vue'
 import ClosetDetail from './views/ClosetDetail.vue'
+import ClosetDetailNew from './views/ClosetDetailNew.vue'
 import Main from './views/Main.vue'
-import ClosetAdd from './views/ClosetAdd.vue'
+import ClosetAddNew from './views/ClosetAddNew.vue'
 import Cody from './views/Cody.vue'
 import CodyAdd from './views/CodyAdd.vue'
 import CodyDetail from './views/CodyDetail.vue'
@@ -46,17 +47,18 @@ export default new Router({
     {
       path: '/closet/detail',
       name: 'ClosetDetail',
-      component: ClosetDetail
+      component: ClosetDetailNew,
+      props: true
     },
     {
-      path: '/main',
+      path: '/mainpage',
       name: 'Main',
       component: Main
     },
     {
       path: '/closet/add',
       name: 'ClosetAdd',
-      component: ClosetAdd
+      component: ClosetAddNew
     },
     {
       path: '/cody',

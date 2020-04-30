@@ -40,11 +40,13 @@ class ClohtesSetReviewCreateTests(APITestCase):
         populate_clothes(10)
         
         # Create 3 Clothes Set for current user.
-        populate_clothes_set(3)
+        created_clothes_set = populate_clothes_set(3)
 
-        self.clothes_set = 1
+        self.clothes_set = created_clothes_set[0].id
         self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.start_datetime = 'T'.join(self.start_datetime.split(' '))
         self.end_datetime = str(datetime.now())
+        self.end_datetime = 'T'.join(self.end_datetime.split(' '))
         self.location = 1
         self.review = 3
         self.comment = 'test-comment'
@@ -139,14 +141,16 @@ class ClothesSetReviewRetrieveTests(APITestCase):
         populate_clothes(10)
         
         # Create 3 ClothesSets for current user
-        populate_clothes_set(3)
+        created_clothes_set = populate_clothes_set(3)
         
         # Create 3 ClothesSetReviews for current user
-        populate_clothes_set_review(3)
+        self.created_review = populate_clothes_set_review(3)
     
-        self.clothes_set = 1
+        self.clothes_set = created_clothes_set[0].id
         self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.start_datetime = 'T'.join(self.start_datetime.split(' '))
         self.end_datetime = str(datetime.now())
+        self.end_datetime = 'T'.join(self.end_datetime.split(' '))
         self.location = 1
         self.review = 3
         self.comment = 'test-comment'
@@ -155,7 +159,8 @@ class ClothesSetReviewRetrieveTests(APITestCase):
         """
         단일 리뷰 정보 반환 테스트.
         """
-        response = self.client.get('/clothes-set-reviews/1/')
+        url = '/clothes-set-reviews/' + str(self.created_review[0].id) + '/'
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_retrieve_many(self):
@@ -186,11 +191,11 @@ class ClothesSetReviewRetrieveTests(APITestCase):
             image_url='https://www.test_img.com',
             alias='test-alias',
             created_at=timezone.now(),
-            owner_id=2
+            owner_id=created_user.id
         )
         
         # Create one clothes set for new user.
-        ClothesSetFactory.create(
+        new_clothes_set = ClothesSetFactory.create(
             name='test-name', 
             style='화려',
             image_url='https://www.naver.com',
@@ -214,7 +219,7 @@ class ClothesSetReviewRetrieveTests(APITestCase):
             precipitation=4,
             comment=self.comment,
             created_at=timezone.now(),
-            clothes_set_id=self.clothes_set,
+            clothes_set_id=new_clothes_set.id,
             owner=created_user
         )
         
@@ -252,14 +257,16 @@ class ClothesSetReviewUpdateTests(APITestCase):
         populate_clothes(10)
         
         # Create 3 ClothesSets for current user
-        populate_clothes_set(3)
+        created_clothes_set = populate_clothes_set(3)
         
         # Create 1 ClothesSetReviews for current user
-        populate_clothes_set_review(1)
+        self.created_review = populate_clothes_set_review(1)[0]
     
-        self.clothes_set = 1
+        self.clothes_set = created_clothes_set[0].id
         self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.start_datetime = 'T'.join(self.start_datetime.split(' '))
         self.end_datetime = str(datetime.now())
+        self.end_datetime = 'T'.join(self.end_datetime.split(' '))
         self.location = 1
         self.review = 3
         self.comment = 'test-comment'
@@ -276,7 +283,8 @@ class ClothesSetReviewUpdateTests(APITestCase):
             'review': self.review,
             'comment': self.comment
         }
-        response = self.client.put('/clothes-set-reviews/1/', data, format='json')
+        url = '/clothes-set-reviews/' + str(self.created_review.id) + '/'
+        response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_update_patch(self):
@@ -290,7 +298,8 @@ class ClothesSetReviewUpdateTests(APITestCase):
             'location': self.location,
             'review': self.review,
         }
-        response = self.client.put('/clothes-set-reviews/1/', data, format='json')
+        url = '/clothes-set-reviews/' + str(self.created_review.id) + '/'
+        response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_update_error_not_mine(self):
@@ -313,11 +322,11 @@ class ClothesSetReviewUpdateTests(APITestCase):
             image_url='https://www.test_img.com',
             alias='test-alias',
             created_at=timezone.now(),
-            owner_id=2
+            owner_id=created_user.id
         )
         
         # Create one clothes set for new user.
-        ClothesSetFactory.create(
+        new_clothes_set = ClothesSetFactory.create(
             name='test-name', 
             style='화려',
             image_url='https://www.naver.com',
@@ -327,7 +336,7 @@ class ClothesSetReviewUpdateTests(APITestCase):
         )
         
         # Create one clothes set review for new user.
-        ClothesSetReviewFactory.create(
+        new_review = ClothesSetReviewFactory.create(
             start_datetime=self.start_datetime, 
             end_datetime=self.end_datetime, 
             location=self.location,
@@ -341,14 +350,15 @@ class ClothesSetReviewUpdateTests(APITestCase):
             precipitation=4,
             comment=self.comment,
             created_at=timezone.now(),
-            clothes_set_id=4,
+            clothes_set_id=new_clothes_set.id,
             owner=created_user
         )
         
         data = {
             'comment': 'new comment'
         }
-        response = self.client.patch('/clothes-set-reviews/2/', data, format='json')
+        url = '/clothes-set-reviews/' + str(new_review.id) + '/'
+        response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data['error'], 'you are not allowed to access this object')
     
@@ -376,14 +386,16 @@ class ClothesSetReviewDeleteTests(APITestCase):
         populate_clothes(10)
         
         # Create 3 ClothesSets for current user
-        populate_clothes_set(3)
+        created_clothes_set = populate_clothes_set(3)
         
         # Create 1 ClothesSetReviews for current user
-        populate_clothes_set_review(1)
+        self.created_review = populate_clothes_set_review(1)[0]
         
-        self.clothes_set = 1
-        self.start_datetime = datetime.now() - timedelta(hours=12)
-        self.end_datetime = datetime.now()
+        self.clothes_set = created_clothes_set[0].id
+        self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.start_datetime = 'T'.join(self.start_datetime.split(' '))
+        self.end_datetime = str(datetime.now())
+        self.end_datetime = 'T'.join(self.end_datetime.split(' '))
         self.location = 1
         self.review = 3
         self.comment = 'test-comment'
@@ -392,7 +404,8 @@ class ClothesSetReviewDeleteTests(APITestCase):
         """
         정상 삭제 테스트.
         """
-        response = self.client.delete('/clothes-set-reviews/1/')
+        url = '/clothes-set-reviews/' + str(self.created_review.id) + '/'
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
     
     def test_delete_error_not_mine(self):
@@ -415,11 +428,11 @@ class ClothesSetReviewDeleteTests(APITestCase):
             image_url='https://www.test_img.com',
             alias='test-alias',
             created_at=timezone.now(),
-            owner_id=2
+            owner_id=created_user.id
         )
         
         # Create one clothes set for new user.
-        ClothesSetFactory.create(
+        new_clothes_set = ClothesSetFactory.create(
             name='test-name', 
             style='화려',
             image_url='https://www.naver.com',
@@ -429,7 +442,7 @@ class ClothesSetReviewDeleteTests(APITestCase):
         )
         
         # Create one clothes set review for new user.
-        ClothesSetReviewFactory.create(
+        new_review = ClothesSetReviewFactory.create(
             start_datetime=self.start_datetime, 
             end_datetime=self.end_datetime, 
             location=self.location,
@@ -443,11 +456,12 @@ class ClothesSetReviewDeleteTests(APITestCase):
             precipitation=4,
             comment=self.comment,
             created_at=timezone.now(),
-            clothes_set_id=4,
+            clothes_set_id=new_clothes_set.id,
             owner=created_user
         )
         
-        response = self.client.delete('/clothes-set-reviews/2/')
+        url = '/clothes-set-reviews/' + str(new_review.id) + '/'
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
     
 class ClothesSetReviewOtherTests(APITestCase):

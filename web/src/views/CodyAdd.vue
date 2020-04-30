@@ -1,36 +1,32 @@
 <template>
   <div class="closet_add">
     <MainNavigation></MainNavigation>
-    <div class="container_1">
-      <CodyDetailComponent></CodyDetailComponent>
-      <div class="information">
-        <div class="add_container">
-          <div class="list">
-            <a href="">상의 |</a>
-            <a href=""> 바지 |</a>
-            <a href=""> 치마 |</a>
-            <a href=""> 아우터 |</a>
-            <a href=""> 원피스</a>
-          </div>
+    <div class="btn_back">
+        <router-link to="/closet"><b-button class="back">뒤로가기</b-button></router-link>
+    </div>
+    <b-container>
+      <b-row>
+        <b-col class="text-center" md="7">
+          <CodyDetailComponent></CodyDetailComponent>
+        </b-col>
+        <b-col class="text-center" md="4" offset-md="1">
           <router-link to="/closet/add">
             <b-button class="btn_add" size="sm" style="margin-right:10px">옷 등록하기</b-button>
           </router-link>
-
-       </div>
-       <div class="show_clothes">
+          <div class="show_clothes">
          <ClosetComponent :showCloset="false"></ClosetComponent>
-       </div>
-        <ClosetDetailInfoComponent title="코디등록" upper="스타일"  starname="별칭"></ClosetDetailInfoComponent>
-        <b-button size="lg">확인</b-button>
-      </div>
-    </div>
+        </div>
+          <CodyDetailInfoComponent title="코디등록" v-bind:list="list"></CodyDetailInfoComponent>
+        </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
 <script>
 import MainNavigation from '@/components/MainNavigation.vue'
 import ClosetComponent from '@/components/ClosetComponent.vue'
-import ClosetDetailInfoComponent from '@/components/ClosetDetailInfoComponent.vue'
+import CodyDetailInfoComponent from '@/components/CodyDetailInfoComponent.vue'
 import CodyDetailComponent from '@/components/CodyDetailComponent.vue'
 
 export default {
@@ -38,8 +34,13 @@ export default {
   components: {
     ClosetComponent,
     MainNavigation,
-    ClosetDetailInfoComponent,
+    CodyDetailInfoComponent,
     CodyDetailComponent
+  },
+  data: function () {
+    return {
+      list: ['심플', '스트릿', '화려', '데이트', '정장']
+    }
   }
 
 }
@@ -55,12 +56,12 @@ export default {
     margin-right: auto;
     margin-left: auto;
 }
-.container_1{
+.btn_back{
     text-align: left;
-    margin-top: 40px;
-    display: inline-block;
-    width: 100%;
-    height: 100%;
+}
+.back{
+    margin-left: 150px;
+    margin-bottom: 20px;
 }
 .show_clothes{
   overflow: scroll;

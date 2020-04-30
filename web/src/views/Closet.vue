@@ -1,55 +1,88 @@
 <template>
-  <div class="closet">
-    <MainNavigation></MainNavigation>
-    <div class="container">
-      <div class="add_container">
-        <b-button class="btn_add" style="margin-right:10px" href="/closet/add">등록하기</b-button>
-      </div>
-      <div class="row">
-        <ClassificationComponent :inCloset="true"></ClassificationComponent>
-        <div class="col-md-10 my_closet">
-          <ClosetComponent :showCloset="true"></ClosetComponent>
-      </div>
-    </div>
-  </div>
-
-</div>
+    <b-container>
+        <b-row align-h="end" class="mb-3 mr-1">
+            <b-button to="/closet/add">등록하기</b-button>
+        </b-row>
+        <b-row>
+            <b-col md="2" cols="12">
+                <ClassificationComponent :category.sync="currentCategories"/>
+            </b-col>
+            <b-col md="10" cols="12">
+                <b-row>
+                    <b-col v-for="clothe in clothes" :key="clothe.id" md="4" cols="12" class="mb-3">
+                        <ClothesCard :clothes="clothe"/>
+                    </b-col>
+                </b-row>
+            </b-col>
+        </b-row>
+    </b-container>
 </template>
 
 <script>
-import ClosetComponent from '@/components/ClosetComponent.vue'
-import ClassificationComponent from '@/components/ClassificationComponent.vue'
-import MainNavigation from '@/components/MainNavigation.vue'
+import ClassificationComponent from '@/components/ClassificationComponentNew.vue'
+import ClothesCard from '@/components/cards/ClothesCard.vue'
+import axios from 'axios'
+import consts from '@/consts.js'
+
 export default {
-  name: 'Closet',
   components: {
-    ClosetComponent,
     ClassificationComponent,
-    MainNavigation
+    ClothesCard
+  },
+  data: function () {
+    return {
+      currentCategories: { lower: '', upper: '' },
+      clothes: []
+    }
+  },
+  created: function () {
+    var vm = this
+    // TODO : localStorage에 token이 없을 때 어떻게 처리할 지
+    if (window.localStorage.getItem('token')) {
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true`, config)
+        .then((response) => {
+          vm.clothes = response.data.results
+        }).catch((ex) => {
+          // TODO: error handling.
+        })
+    }
+  },
+  watch: {
+    currentCategories: {
+      deep: true,
+      handler () {
+        var vm = this
+        if (window.localStorage.getItem('token')) {
+          var token = window.localStorage.getItem('token')
+          var config = {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+          if (vm.currentCategories.lower === '전체') {
+            axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&upper_category=${vm.currentCategories.upper}`, config)
+              .then((response) => {
+                vm.clothes = response.data.results
+              }).catch((ex) => {
+              // TODO: error handling.
+              })
+          } else {
+            axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&lower_category=${vm.currentCategories.lower}`, config)
+              .then((response) => {
+                vm.clothes = response.data.results
+              }).catch((ex) => {
+              // TODO: error handling.
+              })
+          }
+        }
+      }
+    }
   }
 }
 </script>
-<style scoped>
-.closet {
-    width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-    /* margin-top: 200px; */
-}
-.container_1{
-  /* margin-top: 100px; */
-  text-align: left;
-  margin-left: 50px;
-  margin-right: 50px;
-}
-.add_container{
-  width:100%;
-  text-align:right;
-  margin-bottom: 20px;
-}
-.my_closet{
-  background-color: #faf5ef;
-  border-color: #d3f4ff;
-  border-style: solid;
-}
+
+<style>
+
 </style>

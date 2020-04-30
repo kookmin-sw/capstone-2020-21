@@ -1,68 +1,91 @@
 <template>
-  <div class="main">
-    <MainNavigation/>
-    <div class="container">
-      <div class="add_container">
-        날씨 api 가져오는 부분
-      </div>
-      <div class="row">
-        <div id="filtering" class="container-fluid">
-          <div id="nav filtering">
-            <router-link to="/">최신등록순</router-link> |
-            <router-link to="/">날씨별</router-link> |
-            <router-link to="/">심플</router-link> |
-            <router-link to="/">스트릿</router-link> |
-            <router-link to="/">화려</router-link> |
-            <router-link to="/">데이트</router-link> |
-            <router-link to="/">정장</router-link> |
-          </div>
-        </div>
-        <TextRecommend />
-        <div class="col-md-8">
-          <CodyComponent/>
-        </div>
-      </div>
-    </div>
-  </div>
+  <b-container>
+    <b-row cols=1>
+      <b-col cols=12>
+        <!-- 날씨 컴포넌트 -->
+        <WeatherComponent class="border mb-3 p-3" :weatherData.sync="weatherProps" />
+      </b-col>
+    </b-row>
+    <b-row cols=1 cols-md=2>
+      <b-col cols=12 lg=4>
+        <!-- 추천 카테고리 컴포넌트 -->
+        <RecommendedCategoriesComponent class="border" :categories="recommendedCategories" />
+      </b-col>
+      <b-col class="mt-3 mt-lg-0" cols=12 lg=8>
+        <!-- 리뷰 컴포넌트 -->
+        <h4 class="mt-3 pb-0">유사한 날씨에 작성한 리뷰</h4>
+        <ReviewListComponent :reviews="userReviews"
+                              :maxTemp="weatherProps.maxTemp"
+                              :minTemp="weatherProps.minTemp" />
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
-import MainNavigation from '@/components/MainNavigation.vue'
-import TextRecommend from '@/components/TextRecommend.vue'
-// import MainComponent from '@/components/MainComponent.vue'
-import CodyComponent from '@/components/CodyComponent.vue'
-export default {
-  name: 'main',
-  components: {
-    MainNavigation,
-    TextRecommend,
-    CodyComponent
-  }
+import axios from 'axios'
+import consts from '@/consts.js'
+import WeatherComponent from '@/components/WeatherComponent'
+import RecommendedCategoriesComponent from '@/components/RecommendedCategoriesComponent'
+import ReviewListComponent from '@/components/ReviewListComponent'
 
+export default {
+  name: 'mainPage',
+  components: {
+    WeatherComponent,
+    RecommendedCategoriesComponent,
+    ReviewListComponent
+  },
+  data: function () {
+    return {
+      weatherProps: {
+        minTemp: 0,
+        maxTemp: 0,
+        location: {
+          id: 0,
+          name: '서울특별시'
+        },
+        humidity: 0,
+        windSpeed: 0,
+        precipitation: 0
+      },
+      recommendedCategories: [],
+      userReviews: []
+    }
+  },
+  watch: {
+    weatherProps: {
+      deep: true,
+      handler () {
+        var token = window.localStorage.getItem('token')
+        var config = {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+        var vm = this
+        var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/'
+        url += '?limit=10&max_sensible_temp=' + vm.weatherProps.maxTemp
+        url += '&min_sensible_temp=' + vm.weatherProps.minTemp
+        url += '&review=3'
+        url += '&me=true'
+
+        axios.get(url, config)
+          .then((response) => {
+            vm.userReviews = response.data.results
+          })
+
+        url = consts.SERVER_BASE_URL + '/clothes/today_category/'
+        url += '?max_sensible_temp=' + vm.weatherProps.maxTemp
+        url += '&min_sensible_temp=' + vm.weatherProps.minTemp
+        axios.get(url, config)
+          .then((response) => {
+            vm.recommendedCategories = response.data
+          })
+      }
+    }
+  }
 }
 </script>
-<style scoped>
-#filtering {
-    padding: 0px;
-    margin-bottom: 10px;
-    font-size: small;
-    text-align: left;
-    margin-left: 420px;
-}
-.closet {
-    width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-    /* margin-top: 200px; */
-}
-.container_1{
-  margin-top: 100px;
-  text-align: left;
-  margin-left: 50px;
-}
-.add_container{
-  width:100%;
-  text-align:right;
-  margin-bottom: 20px;
-}
+
+<style>
+
 </style>

@@ -1,4 +1,6 @@
 import datetime
+from dateutil.parser import parse
+from django.db.models import Avg, Max, Min
 from django.utils import timezone
 from filters.mixins import FiltersMixin
 import json
@@ -10,7 +12,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from statistics import mode
 
 from .exceptions import S3FileError
-from .models import Clothes, ClothesSet, ClothesSetReview, User
+from .models import Clothes, ClothesSet, ClothesSetReview, User, Weather
 from .permissions import UserPermissions
 from .serializers import (
     ClothesSerializer,
@@ -27,7 +29,12 @@ from .validations import (
     clothes_set_query_schema, 
     clothes_set_review_query_schema
 )
-from .weather import get_weather_date, get_weather_between, get_weather_time_date
+from .weather import (
+    get_weather_date, 
+    get_weather_between, 
+    get_weather_time_date, 
+    get_current_weather
+)
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -111,8 +118,13 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
     # Apply filtering, using other query parameters.
     filter_mappings = {
-        'upper_category': 'upper_category',
-        'lower_category': 'lower_category',
+        'upper_category': 'upper_category__in',
+        'lower_category': 'lower_category__in',
+    }
+    
+    filter_value_transformations = {
+        'upper_category': lambda val: val.split(','),
+        'lower_category': lambda val: val.split(',')
     }
 
     # Use filter validation.
@@ -177,7 +189,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         """
         An endpoint where the analysis of a clothes is returned
         """
-        image = byte_to_image(request.body)
+        image = byte_to_image(request.data['image'])
         image = remove_background(image)
         image_url = save_image_s3(image)
         
@@ -271,7 +283,7 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         return queryset
     
     def get_serializer_class(self):
-        if self.action == 'create' or 'update':
+        if self.action == 'create' or self.action == 'update':
             return ClothesSetSerializer
         return ClothesSetReadSerializer 
 
@@ -382,7 +394,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         return queryset
 
     def  get_serializer_class(self):
-        if self.action == 'create' or 'update':
+        if self.action == 'create' or self.action == 'update':
             return ClothesSetReviewSerializer
         return ClothesSetReviewReadSerializer
 
@@ -393,11 +405,10 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
 
     # Apply filtering, using other query parameters.
     filter_mappings = {
-        'start_datetime': 'start_datetime',
-        'end_datetime': 'end_datetime',
+        'start_datetime': 'start_datetime__gte',
+        'end_datetime': 'end_datetime__lte',
         'location' : 'location',
-        'max_sensible_temp' : 'max_sensible_temp',
-        'min_sensible_temp ' : 'min_sensible_temp',
+        'review': 'review',
     }
 
     # Use filter validation.
@@ -413,7 +424,27 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'error' : 'token authorization failed ... please log in'
             }, status=status.HTTP_401_UNAUTHORIZED)
             
-        return super().list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+
+        max_temp = request.query_params.get('max_sensible_temp')
+        min_temp = request.query_params.get('min_sensible_temp')
+        
+        if max_temp is not None:
+            max_temp = float(max_temp)
+            queryset = queryset.filter(max_sensible_temp__lte=(max_temp+2), max_sensible_temp__gte=(max_temp-2))
+
+        if min_temp is not None:
+            min_temp = float(min_temp)
+            queryset = queryset.filter(min_sensible_temp__lte=(min_temp+2), min_sensible_temp__gte=(min_temp-2))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        
+        return Response(serializer.data)
     
     def create(self, request, *args, **kwargs):
         if 'clothes_set' in request.data:
@@ -431,21 +462,29 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     "error" : "this is not your clothes set : " + request.data['clothes_set']
                 }, status=status.HTTP_200_OK)
         
-        if set(['clothes_set', 'start_datetime', 'end_datetime', 'location', 'review' ]).issubset(request.data.keys()):
+        if set(['clothes_set', 'start_datetime', 'end_datetime', 'location', 'review']).issubset(request.data.keys()):
             start = request.data['start_datetime']
             end = request.data['end_datetime']
-            location = request.data['location']
-
-            # API 요청하기
-            weather_data = get_weather_between(start, end, location)
+            location = int(request.data['location'])
+            start_date = start.split('T')[0]
+            start_time = int(start.split('T')[1].split(':')[0])
+            end_date = end.split('T')[0]
+            end_time = int(end.split('T')[1].split(':')[0])
             
-            request.data['max_temp'] = float(weather_data['MAX'])
-            request.data['min_temp'] = float(weather_data['MIN'])
-            request.data['max_sensible_temp'] = float(weather_data['WCIMAX'])
-            request.data['min_sensible_temp'] = float(weather_data['WCIMIN'])
-            request.data['humidity'] = int(weather_data['REH'])
-            request.data['wind_speed'] = float(weather_data['WSD'])
-            request.data['precipitation'] = int(weather_data['R06'])
+            # API 요청하기
+            # TODO: 날씨 데이터 없을때 오류처리.
+            all_weather_data = Weather.objects.all()
+            weather_data_set = all_weather_data.filter(location_code=location)
+            weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_time)
+            weather_data_on_end = weather_data_on_start.filter(date__lte=end_date, time__lte=end_time)
+            
+            request.data['max_temp'] = weather_data_on_end.aggregate(Max('temp'))['temp__max']
+            request.data['min_temp'] = weather_data_on_end.aggregate(Min('temp'))['temp__min']
+            request.data['max_sensible_temp'] = weather_data_on_end.aggregate(Max('sensible_temp'))['sensible_temp__max']
+            request.data['min_sensible_temp'] = weather_data_on_end.aggregate(Min('sensible_temp'))['sensible_temp__min']
+            request.data['humidity'] = weather_data_on_end.aggregate(Avg('humidity'))['humidity__avg']
+            request.data['wind_speed'] = weather_data_on_end.aggregate(Avg('wind_speed'))['wind_speed__avg']
+            request.data['precipitation'] = weather_data_on_end.aggregate(Avg('precipitation'))['precipitation__avg']
         
         return super(ClothesSetReviewView, self).create(request, *args, **kwargs)
     
@@ -464,22 +503,29 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
         
-        
-        if set(['clothes_set', 'start_datetime', 'end_datetime', 'location', 'review' ]).issubset(request.data.keys()):
+        if set(['clothes_set', 'start_datetime', 'end_datetime', 'location', 'review']).issubset(request.data.keys()):
             start = request.data['start_datetime']
             end = request.data['end_datetime']
-            location = request.data['location']
-
-            # API 요청하기
-            weather_data = get_weather_between(start, end, location)
+            location = int(request.data['location'])
+            start_date = start.split('T')[0]
+            start_time = int(start.split('T')[1].split(':')[0])
+            end_date = end.split('T')[0]
+            end_time = int(end.split('T')[1].split(':')[0])
             
-            request.data['max_temp'] = float(weather_data['MAX'])
-            request.data['min_temp'] = float(weather_data['MIN'])
-            request.data['max_sensible_temp'] = float(weather_data['WCIMAX'])
-            request.data['min_sensible_temp'] = float(weather_data['WCIMIN'])
-            request.data['humidity'] = int(weather_data['REH'])
-            request.data['wind_speed'] = float(weather_data['WSD'])
-            request.data['precipitation'] = int(weather_data['R06'])
+            # API 요청하기
+            # TODO: 날씨 데이터 없을때 오류처리.
+            all_weather_data = Weather.objects.all()
+            weather_data_set = all_weather_data.filter(location_code=location)
+            weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_time)
+            weather_data_on_end = weather_data_on_start.filter(date__lte=end_date, time__lte=end_time)
+            
+            request.data['max_temp'] = weather_data_on_end.aggregate(Max('temp'))['temp__max']
+            request.data['min_temp'] = weather_data_on_end.aggregate(Min('temp'))['temp__min']
+            request.data['max_sensible_temp'] = weather_data_on_end.aggregate(Max('sensible_temp'))['sensible_temp__max']
+            request.data['min_sensible_temp'] = weather_data_on_end.aggregate(Min('sensible_temp'))['sensible_temp__min']
+            request.data['humidity'] = weather_data_on_end.aggregate(Avg('humidity'))['humidity__avg']
+            request.data['wind_speed'] = weather_data_on_end.aggregate(Avg('wind_speed'))['wind_speed__avg']
+            request.data['precipitation'] = weather_data_on_end.aggregate(Avg('precipitation'))['precipitation__avg']
         
         return super(ClothesSetReviewView, self).update(request, *args, **kwargs)
     
@@ -541,8 +587,39 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'next': offset + limit_count,
                 'results': final_results,
             }, status=status.HTTP_200_OK)
-        
-        
+
+    @action(detail=False, methods=['get'])
+    def current_weather(self, request, *args, **kwargs):
+        """
+        An endpoint that returns weather data for
+        location based on query parameter and current time
+        """
+        # Get Location.
+        location = request.query_params.get('location')
+        weather_data = get_current_weather(location)
+        temperature = float(weather_data['T1H'])
+        max_temp = float(weather_data['MAX'])
+        min_temp = float(weather_data['MIN'])
+        humidity = int(weather_data['REH'])
+        wind_speed = float(weather_data['WSD'])
+        precipitation = float(weather_data['RN1'])
+        sense = float(weather_data['WCI'])
+        max_sense = float(weather_data['WCIMAX'])
+        min_sense = float(weather_data['WCIMIN'])
+
+        # Return response
+        return Response({
+                'temperature': temperature,
+                'min_temperature': min_temp,
+                'max_temperature': max_temp,
+                'chill_temp': sense,
+                'min_chill_temp': min_sense,
+                'max_chill_temp': max_sense,
+                'humidity': humidity,
+                'wind_speed': wind_speed,
+                'precipitation': precipitation,
+            }, status=status.HTTP_200_OK)
+
 class ClothesSetReviewNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSetReview.objects.all()
     serializer_class = ClothesSetReviewReadSerializer  

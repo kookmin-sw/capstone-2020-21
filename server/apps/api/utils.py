@@ -1,3 +1,4 @@
+import base64
 import boto3
 import cv2.cv2 as cv2
 from django.conf import settings
@@ -13,9 +14,10 @@ from .exceptions import S3FileError
 
 def byte_to_image(inp):
     """
-    converts bytes string to image
+    converts base64 string to image
     """
-    nparr = np.fromstring(inp, np.uint8)
+    _bytes = base64.b64decode(inp)
+    nparr = np.fromstring(_bytes, dtype=np.uint8)
     img = cv2.imdecode(nparr, 1)
     
     return img
