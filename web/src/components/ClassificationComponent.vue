@@ -1,6 +1,5 @@
 <template>
-<div class="col-md-2 left_side">
-  <div class="inCloset">
+  <b-container>
     <b-dropdown id="dropdown-dropright"
                 dropright
                 variant="outline-info"
@@ -15,8 +14,7 @@
         {{ detail }}
       </b-dropdown-item>
     </b-dropdown>
-  </div>
-</div>
+  </b-container>
 </template>
 <script>
 export default {
