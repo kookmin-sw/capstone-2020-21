@@ -1,3 +1,4 @@
+import json
 from rest_framework import serializers
 from .models import User, Clothes, ClothesSet, ClothesSetReview
 
@@ -42,6 +43,14 @@ class ClothesSetReviewSerializer(serializers.ModelSerializer):
 
 class ClothesSetReviewReadSerializer(serializers.ModelSerializer):
     clothes_set = ClothesSetReadSerializer()
+    
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        with open('apps/api/locations/data.json') as json_file:
+            json_data = json.load(json_file)
+        ret['location'] = json_data[str(ret['location'])]['full_address']
+        
+        return ret
     
     class Meta:
         model = ClothesSetReview

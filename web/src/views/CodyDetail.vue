@@ -4,15 +4,19 @@
     <div class="btn_back">
         <router-link to="/cody"><b-button class="back">뒤로가기</b-button></router-link>
     </div>
-    <div class="container_1">
-        <CodyDetailComponent></CodyDetailComponent>
-        <div class="information">
+     <b-container>
+      <b-row>
+        <b-col class="text-center" md="7">
+          <CodyDetailComponent></CodyDetailComponent>
+        </b-col>
+        <b-col class="text-center" md="4" offset-md="1">
           <form action="" @submit.prevent="sendPost">
             <ClosetDeletedComponent></ClosetDeletedComponent>
             <CodyDetailInfoComponent title="상세정보" v-bind:list="list"></CodyDetailInfoComponent>
           </form>
-        </div>
-    </div>
+        </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
@@ -54,14 +58,6 @@ export default {
     width: 100%;
     margin-right: auto;
     margin-left: auto;
-}
-.container_1{
-    text-align: left;
-    margin-top: 40px;
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-
 }
 .information{
     text-align: center;
