@@ -10,7 +10,7 @@
         </b-row>
         <b-row>
             <b-col md="6" cols="12">
-              <b-img fluid :src="currentImage"/>
+              <b-img fluid :src="clothes.image_url"/>
             </b-col>
             <b-col md="6" cols="12">
               <b-row>
@@ -39,13 +39,12 @@ export default {
   },
   data: function () {
     return {
-      currentImage: '',
       clothes: {
         alias: '',
         image_url: '',
         lower_category: '',
         upper_category: '',
-        id: '',
+        id: 0,
         owner: ''
       },
       analysis_props: {
@@ -61,22 +60,26 @@ export default {
   ],
   created: function () {
     var vm = this
-    if (!localStorage.getItem('token')) {
-      vm.$router.push('/login')
-      // TODO: 에러메세지 더 좋은걸로 바꾸기.
-      alert('로그인해주세요!')
+    if (vm.clothes_id === undefined) {
+      alert('잘못된 접근입니다!')
+      vm.$router.push('/closet')
     } else {
-      var clothesId = vm.clothes_id
-      axios.get(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`)
-        .then((response) => {
-          vm.clothes = response.data
-          vm.currentImage = vm.clothes.image_url
-          vm.analysis_props.upper = vm.clothes.upper_category
-          vm.analysis_props.lower = vm.clothes.lower_category
-          vm.analysis_props.alias = vm.clothes.alias
-        }).catch((ex) => {
+      if (!localStorage.getItem('token')) {
+        vm.$router.push('/login')
+        // TODO: 에러메세지 더 좋은걸로 바꾸기.
+        alert('로그인해주세요!')
+      } else {
+        var clothesId = vm.clothes_id
+        axios.get(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`)
+          .then((response) => {
+            vm.clothes = response.data
+            vm.analysis_props.upper = vm.clothes.upper_category
+            vm.analysis_props.lower = vm.clothes.lower_category
+            vm.analysis_props.alias = vm.clothes.alias
+          }).catch((ex) => {
           // TODO: error handling.
-        })
+          })
+      }
     }
   },
   methods: {
