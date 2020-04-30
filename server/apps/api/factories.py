@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import make_password
 import factory
 from faker import Faker
 
-from .models import User, Clothes, ClothesSet, ClothesSetReview
+from .models import User, Clothes, ClothesSet, ClothesSetReview, Weather
 
 fake = Faker('ko_KR')
 
@@ -56,4 +56,13 @@ class ClothesSetReviewFactory(factory.DjangoModelFactory):
                                 'precipitation', 'comment', 'created_at'
                                 )
         
+class WeatherFactory(factory.DjangoModelFactory):
+    """
+    location_code, date, time, temp, sensible_temp, humidity, wind_speed, precipitation, x, y
+    """
+    class Meta:
+        model = Weather
+        django_get_or_create = ('location_code', 'date', 'time', 'temp', 'sensible_temp', 'humidity', 
+                                'wind_speed', 'precipitation', 'x', 'y'
+                                )
     
