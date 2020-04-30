@@ -67,6 +67,8 @@ class ClothesSetReview(models.Model):
 
 class Weather(models.Model):
     location_code = models.IntegerField()
+    x = models.IntegerField(default=0)
+    y = models.IntegerField(default=0)
     date = models.DateField()
     time = models.IntegerField(choices=TIME_CHOICES)
     temp = models.FloatField()

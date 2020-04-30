@@ -28,6 +28,8 @@ def get_weather_date(input_date, location):
 
     convert_api_time, convert_api_date = convert_time(api_time, year, month, day)
     convert_api_date = convert_api_date # year_month_day[0] -> 년도 년도 합쳐주기
+    # TODO : print 지우고 commit
+    print(convert_api_date)
 
     url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?"
     key = "serviceKey=" + ServiceKey
@@ -44,6 +46,8 @@ def get_weather_date(input_date, location):
 
     api_url = url + key + numOfRows + typeOfData + date + time + nx + ny
     data = urllib.request.urlopen(api_url).read().decode('utf8')
+    # TODO : print 지우고 commit
+    print(data)
     data_json = json.loads(data)
     # get date and time
     parsed_json = data_json['response']['body']['items']['item']
