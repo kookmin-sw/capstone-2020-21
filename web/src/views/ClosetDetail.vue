@@ -21,7 +21,7 @@
                   <b-button pill class="w-75" @click="handleModify">수정하기</b-button>
                 </b-col>
                 <b-col cols="6">
-                  <b-button pill class="w-75" @click="handleUpdateRegister">확인하기</b-button>
+                  <b-button pill class="w-75" @click="handleUpdate">확인하기</b-button>
                 </b-col>
               </b-row>
             </b-col>
@@ -40,7 +40,14 @@ export default {
   data: function () {
     return {
       currentImage: '',
-      clothes: [],
+      clothes: {
+        alias: '',
+        image_url: '',
+        lower_category: '',
+        upper_category: '',
+        id: '',
+        owner: ''
+      },
       analysis_props: {
         upper: '',
         lower: '',
@@ -59,33 +66,24 @@ export default {
       // TODO: 에러메세지 더 좋은걸로 바꾸기.
       alert('로그인해주세요!')
     } else {
-      // TODO : localStorage에 token이 없을 때 어떻게 처리할 지
-      if (window.localStorage.getItem('token')) {
-        var token = window.localStorage.getItem('token')
-        var config = {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-        var clothesId = vm.clothes_id
-        axios.get(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`)
-          .then((response) => {
-            vm.clothes = response.data
-            vm.currentImage = vm.clothes.image_url
-            vm.analysis_props.upper = vm.clothes.upper_category
-            vm.analysis_props.lower = vm.clothes.lower_category
-            vm.analysis_props.alias = vm.clothes.alias
-          }).catch((ex) => {
-            // TODO: error handling.
-          })
-      } else {
-        alert('회원가입 해주세요')
-      }
+      var clothesId = vm.clothes_id
+      axios.get(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`)
+        .then((response) => {
+          vm.clothes = response.data
+          vm.currentImage = vm.clothes.image_url
+          vm.analysis_props.upper = vm.clothes.upper_category
+          vm.analysis_props.lower = vm.clothes.lower_category
+          vm.analysis_props.alias = vm.clothes.alias
+        }).catch((ex) => {
+          // TODO: error handling.
+        })
     }
   },
   methods: {
     handleModify: function () {
       this.disableAnalysis = false
     },
-    handleUpdateRegister: function () {
+    handleUpdate: function () {
       var vm = this
       var clothesId = vm.clothes_id
       var token = window.localStorage.getItem('token')
@@ -100,8 +98,12 @@ export default {
       }
       axios.patch(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, data, config)
         .then(response => {
-          // TODO: delete console.log .
-          vm.$router.push('/closet')
+          alert('수정되었습니다!')
+          vm.updateInfo = response.data
+          vm.analysis_props.alias = vm.updateInfo.alias
+          vm.analysis_props.upper = vm.updateInfo.upper_category
+          vm.analysis_props.lower = vm.updateInfo.lower_category
+          vm.disableAnalysis = true
         }).catch((ex) => {
           // TODO: handle error.
           console.log(ex)
@@ -116,8 +118,7 @@ export default {
       }
       axios.delete(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, config)
         .then(response => {
-          console.log(response)
-          // TODO: delete console.log .
+          alert('삭제되었습니다!')
           vm.$router.push('/closet')
         }).catch((ex) => {
           // TODO: handle error.
