@@ -99,10 +99,9 @@ export default {
       axios.patch(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, data, config)
         .then(response => {
           alert('수정되었습니다!')
-          vm.updateInfo = response.data
-          vm.analysis_props.alias = vm.updateInfo.alias
-          vm.analysis_props.upper = vm.updateInfo.upper_category
-          vm.analysis_props.lower = vm.updateInfo.lower_category
+          vm.analysis_props.alias = response.data.alias
+          vm.analysis_props.upper = response.data.upper_category
+          vm.analysis_props.lower = response.data.lower_category
           vm.disableAnalysis = true
         }).catch((ex) => {
           // TODO: handle error.
