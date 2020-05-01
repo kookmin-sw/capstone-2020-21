@@ -75,4 +75,4 @@ class Weather(models.Model):
     sensible_temp = models.FloatField()
     humidity = models.IntegerField()
     wind_speed = models.FloatField()
-    precipitation = models.IntegerField()
+    precipitation = models.FloatField()
