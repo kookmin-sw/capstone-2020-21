@@ -14,9 +14,7 @@
       <b-col class="mt-3 mt-lg-0" cols=12 lg=8>
         <!-- 리뷰 컴포넌트 -->
         <h4 class="mt-3 pb-0">유사한 날씨에 작성한 리뷰</h4>
-        <ReviewListComponent :reviews="userReviews"
-                              :maxTemp="weatherProps.maxTemp"
-                              :minTemp="weatherProps.minTemp" />
+        <ReviewListComponent :reviews="userReviews" />
       </b-col>
     </b-row>
   </b-container>
@@ -41,6 +39,8 @@ export default {
       weatherProps: {
         minTemp: 0,
         maxTemp: 0,
+        maxSenseTemp:0,
+        minSenseTemp:0,
         location: {
           id: 0,
           name: '서울특별시'
@@ -63,8 +63,8 @@ export default {
         }
         var vm = this
         var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/'
-        url += '?limit=10&max_sensible_temp=' + vm.weatherProps.maxTemp
-        url += '&min_sensible_temp=' + vm.weatherProps.minTemp
+        url += '?limit=10&max_sensible_temp=' + vm.weatherProps.maxSenseTemp
+        url += '&min_sensible_temp=' + vm.weatherProps.minSenseTemp
         url += '&review=3'
         url += '&me=true'
 
@@ -74,8 +74,8 @@ export default {
           })
 
         url = consts.SERVER_BASE_URL + '/clothes/today_category/'
-        url += '?max_sensible_temp=' + vm.weatherProps.maxTemp
-        url += '&min_sensible_temp=' + vm.weatherProps.minTemp
+        url += '?max_sensible_temp=' + vm.weatherProps.maxSenseTemp
+        url += '&min_sensible_temp=' + vm.weatherProps.minSenseTemp
         axios.get(url, config)
           .then((response) => {
             vm.recommendedCategories = response.data
