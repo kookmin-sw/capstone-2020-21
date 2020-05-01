@@ -1,86 +1,124 @@
 <template>
-  <div class="closet_add">
-    <MainNavigation></MainNavigation>
-    <div class="btn_back">
-        <router-link to="/closet"><b-button class="back">뒤로가기</b-button></router-link>
-    </div>
-    <b-container>
-      <b-row>
-        <b-col class="text-center" md="7">
-          <CodyDetailComponent></CodyDetailComponent>
-        </b-col>
-        <b-col class="text-center" md="4" offset-md="1">
-          <router-link to="/closet/add">
-            <b-button class="btn_add" size="sm" style="margin-right:10px">옷 등록하기</b-button>
-          </router-link>
-          <div class="show_clothes">
-         <ClosetComponent :showCloset="false"></ClosetComponent>
-        </div>
-          <CodyDetailInfoComponent title="코디등록" v-bind:list="list"></CodyDetailInfoComponent>
-        </b-col>
-      </b-row>
-    </b-container>
-  </div>
+  <b-container>
+    <b-row align-h="center">
+      <b-col cols=12 md=8 order-md="1" order="2">
+        <b-row>
+          <b-col cols=12 md=4>
+            <ClassificationComponent :list="categories" />
+          </b-col>
+          <b-col cols=12 md=8>
+            <b-row>
+              <b-col v-for="clothe in clothes" :key="clothe.id" cols=12 md=6 class="mb-3">
+                <ClothesCard class="mb-1" :clothes="clothe">
+                  <template v-slot:additionalButton>
+                    <b-button class="mt-1" variant="info" @click="handleAddClothes(clothe.image_url)">
+                      추가하기
+                    </b-button>
+                  </template>
+                </ClothesCard>
+              </b-col>
+            </b-row>
+          </b-col>
+        </b-row>
+      </b-col>
+      <b-col cols=12 md=4 order-md="2" order="1">
+        <canvas class="border" ref="codyCanvas" />
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
-import MainNavigation from '@/components/MainNavigation.vue'
-import ClosetComponent from '@/components/ClosetComponent.vue'
-import CodyDetailInfoComponent from '@/components/CodyDetailInfoComponent.vue'
-import CodyDetailComponent from '@/components/CodyDetailComponent.vue'
+import axios from 'axios'
+import consts from '@/consts.js'
+import { fabric } from 'fabric'
+import ClothesCard from '@/components/cards/ClothesCard.vue'
+import ClassificationComponent from '@/components/ClassificationComponent.vue'
 
 export default {
-  name: 'ClosetAdd',
+  name: 'CodyAdd',
   components: {
-    ClosetComponent,
-    MainNavigation,
-    CodyDetailInfoComponent,
-    CodyDetailComponent
+    ClothesCard,
+    ClassificationComponent
   },
   data: function () {
     return {
-      list: ['심플', '스트릿', '화려', '데이트', '정장']
+      clothes: [],
+      canvas: undefined
     }
-  }
+  },
+  computed: {
+    categories: function () {
+      const CLOTHES_CATEGORIES = consts.CLOTHES_CATEGORIES
+      /*
+        Workaround for deep copying nested objects
+        ref: https://bit.ly/2y4vJLI
+      */
+      var categoryList = JSON.parse(JSON.stringify(CLOTHES_CATEGORIES))
+      for (var i in categoryList) {
+        categoryList[i].lower.unshift('전체')
+      }
+      return categoryList
+    }
+  },
+  methods: {
+    handleAddClothes: function (url) {
+      var vm = this
+      fabric.Image.fromURL(url, function (img) {
+        img.set({
+          left: 0,
+          top: 0,
+          angle: 0
+        })
 
+        img.perPixelTargetFind = true
+        img.hasControls = img.hasBorders = true
+
+        // img.scale(1)
+
+        vm.canvas.add(img)
+      }, { crossOrigin: 'anonymous' })
+    },
+    handleConvertURL: function () {
+      console.log(this.canvas.toDataURL())
+    }
+  },
+  created: function () {
+    var token = window.localStorage.getItem('token')
+    var config = {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+    var vm = this
+    axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true`, config)
+      .then((response) => {
+        vm.clothes = response.data.results
+      }).catch((ex) => {
+        // TODO: error handling.
+      })
+  },
+  mounted: function () {
+    const ref = this.$refs.codyCanvas
+    console.log(ref.offsetWidth)
+    this.canvas = new fabric.Canvas(ref, {
+      hoverCursor: 'pointer',
+      selection: false,
+      targetFindTolerance: 2
+    })
+
+    this.canvas.setDimensions({ width: 250, height: 500 })
+
+    this.canvas.on({
+      // 'object:moving': function (e) {
+      //   e.target.opacity = 0.5
+      // },
+      'object.modified': function (e) {
+        e.target.opacity = 1
+      }
+    })
+  }
 }
 </script>
 
-<style scoped>
-.list{
-  margin-right: 150px;
-  display: inline-block;
-}
-.closet_add {
-    width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-}
-.btn_back{
-    text-align: left;
-}
-.back{
-    margin-left: 150px;
-    margin-bottom: 20px;
-}
-.show_clothes{
-  overflow: scroll;
-  width: 500px;
-  height: 180px;
-  margin-bottom: 20px;
-}
-.add_container{
-  width:100%;
-  text-align:right;
-  margin-bottom: 20px;
-}
-.information{
-    text-align: center;
-    display: inline-block;
-    position: absolute;
-    top: 50%;
-     margin-top: -200px;
-     width: 500px;
-     height: 500px;
-}
+<style>
+
 </style>
