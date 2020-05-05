@@ -22,16 +22,36 @@
         </b-row>
       </b-col>
       <b-col cols=12 md=4 order-md="2" order="1">
-        <canvas class="border" ref="codyCanvas" />
-        <b-form>
-          <b-form-group label="코디 이름" label-for="cody-name">
-            <b-form-input id="cody-name" v-model="codyName" type="text"></b-form-input>
-          </b-form-group>
-          <b-form-group label="코디 스타일" label-for="cody-style">
-            <b-form-select id="cody-style" v-model="style" :options="styles"></b-form-select>
-          </b-form-group>
-        </b-form>
-        <b-button variant="info" @click="postCody">등록하기</b-button>
+        <b-row>
+          <b-col>
+            <canvas class="border" ref="codyCanvas" />
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col v-for="clothe in includedClothes" :key="clothe.id" class="mb-1" cols=4>
+            <b-img class="mb-1" :src="clothe.url" fluid />
+            <b-button pill size="sm" variant="danger" @click="handleRemoveClothes(clothe.id, clothe.obj)">
+              <b-icon-x/>
+            </b-button>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <b-form>
+              <b-form-group label="코디 이름" label-for="cody-name">
+                <b-form-input id="cody-name" v-model="codyName" type="text"></b-form-input>
+              </b-form-group>
+              <b-form-group label="코디 스타일" label-for="cody-style">
+                <b-form-select id="cody-style" v-model="style" :options="styles"></b-form-select>
+              </b-form-group>
+            </b-form>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <b-button variant="info" @click="postCody">등록하기</b-button>
+          </b-col>
+        </b-row>
       </b-col>
     </b-row>
   </b-container>
@@ -41,12 +61,14 @@
 import axios from 'axios'
 import consts from '@/consts.js'
 import { fabric } from 'fabric'
+import { BIconX } from 'bootstrap-vue'
 import ClothesCard from '@/components/cards/ClothesCard.vue'
 import ClassificationComponent from '@/components/ClassificationComponent.vue'
 
 export default {
   name: 'CodyAdd',
   components: {
+    BIconX,
     ClothesCard,
     ClassificationComponent
   },
@@ -54,10 +76,9 @@ export default {
     return {
       canvas: undefined,
       clothes: [],
-      includedClothes: {},
+      includedClothes: [],
       codyName: '',
-      style: '',
-      currentIndex: 0
+      style: ''
     }
   },
   computed: {
@@ -85,6 +106,15 @@ export default {
   },
   methods: {
     handleAddClothes: function (id, url) {
+      var clotheIds = this.includedClothes.map((clothe) => {
+        return clothe.id
+      })
+
+      if (clotheIds.includes(id)) {
+        alert('이미 추가된 옷입니다!')
+        return
+      }
+
       var vm = this
       fabric.Image.fromURL(url, function (img) {
         img.set({
@@ -99,13 +129,14 @@ export default {
         // TODO(mskwon1): change size of image to fit in canvas
 
         vm.canvas.add(img)
+        vm.includedClothes.push({ id: id, obj: img, url: url })
       }, { crossOrigin: 'anonymous' })
-
-      vm.includedClothes[id] = this.currentIndex
-      this.currentIndex += 1
     },
-    handleConvertURL: function () {
-      console.log(this.canvas.toDataURL())
+    handleRemoveClothes: function (id, obj) {
+      this.canvas.remove(obj)
+      this.includedClothes = this.includedClothes.filter((clothe) => {
+        return clothe.id !== id
+      })
     },
     postCody: function () {
       var token = window.localStorage.getItem('token')
@@ -113,8 +144,12 @@ export default {
         headers: { Authorization: `Bearer ${token}` }
       }
 
+      var clothes = this.includedClothes.map((clothe) => {
+        return clothe.id
+      })
+
       var data = {
-        clothes: Object.keys(this.includedClothes),
+        clothes: clothes,
         name: this.codyName,
         style: this.style,
         image: this.canvas.toDataURL().split(',')[1]
