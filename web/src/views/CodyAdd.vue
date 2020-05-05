@@ -11,7 +11,7 @@
               <b-col v-for="clothe in clothes" :key="clothe.id" cols=12 md=6 class="mb-3">
                 <ClothesCard class="mb-1" :clothes="clothe">
                   <template v-slot:additionalButton>
-                    <b-button class="mt-1" variant="info" @click="handleAddClothes(clothe.image_url)">
+                    <b-button class="mt-1" variant="info" @click="handleAddClothes(clothe.id, clothe.image_url)">
                       추가하기
                     </b-button>
                   </template>
@@ -43,8 +43,9 @@ export default {
   },
   data: function () {
     return {
+      canvas: undefined,
       clothes: [],
-      canvas: undefined
+      includedClothes: []
     }
   },
   computed: {
@@ -62,7 +63,7 @@ export default {
     }
   },
   methods: {
-    handleAddClothes: function (url) {
+    handleAddClothes: function (id, url) {
       var vm = this
       fabric.Image.fromURL(url, function (img) {
         img.set({
@@ -74,10 +75,12 @@ export default {
         img.perPixelTargetFind = true
         img.hasControls = img.hasBorders = true
 
-        // img.scale(1)
+        // TODO(mskwon1): change size of image to fit in canvas
 
         vm.canvas.add(img)
       }, { crossOrigin: 'anonymous' })
+
+      vm.includedClothes.push(id)
     },
     handleConvertURL: function () {
       console.log(this.canvas.toDataURL())
