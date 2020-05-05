@@ -1,7 +1,7 @@
 <template>
   <b-overlay :show="isLoading">
     <b-container>
-      <b-alert id="alert" v-model="showAlert" variant="danger" dismissible>
+      <b-alert id="alert" v-model="showAlert" variant="danger" dismissible style="word-break: keep-all">
         {{ alertMessage }}
       </b-alert>
       <b-row align-h="center">
