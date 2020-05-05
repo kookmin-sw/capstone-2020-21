@@ -11,13 +11,13 @@
       </b-col>
     </b-row>
     <b-row cols=12 align-h="center" align-v="center" align-content="center">
-      <b-col class="h5 text-right" cols=6 md=6>
+      <b-col class="h5 text-md-right" cols=12 md=6>
         <b-img src="../assets/hot.png" width="30px"></b-img>
-        {{ weatherData.maxTemp }}°C
+        {{ weatherData.maxTemp }} / {{ weatherData.maxSenseTemp }} °C
       </b-col>
-      <b-col class="h5 text-left" cols=6 md=6>
+      <b-col class="h5 text-md-left" cols=12 md=6>
         <b-img src="../assets/cold.png" width="30px"></b-img>
-        {{ weatherData.minTemp }}°C
+        {{ weatherData.minTemp }} / {{ weatherData.minSenseTemp }} °C
       </b-col>
       <b-col class="h5" cols=12 md=3 lg=2>
         <b-img src="../assets/humidity.png" width="30px"></b-img>
@@ -123,6 +123,8 @@ export default {
           const {
             min_temperature,
             max_temperature,
+            max_chill_temp,
+            min_chill_temp,
             humidity,
             wind_speed,
             precipitation
@@ -130,6 +132,8 @@ export default {
 
           vm.weatherData.minTemp = min_temperature
           vm.weatherData.maxTemp = max_temperature
+          vm.weatherData.maxSenseTemp = max_chill_temp.toFixed(1)
+          vm.weatherData.minSenseTemp = min_chill_temp.toFixed(1)
           vm.weatherData.humidity = humidity
           vm.weatherData.windSpeed = wind_speed
           vm.weatherData.precipitation = precipitation

@@ -5,7 +5,8 @@
         </b-row>
         <b-row>
             <b-col md="2" cols="12">
-                <ClassificationComponent :category.sync="currentCategories"/>
+                <ClassificationComponent :list="categories"
+                                          @chooseCategory="handleLowerClick"/>
             </b-col>
             <b-col md="10" cols="12">
                 <b-row>
@@ -19,7 +20,7 @@
 </template>
 
 <script>
-import ClassificationComponent from '@/components/ClassificationComponentNew.vue'
+import ClassificationComponent from '@/components/ClassificationComponent.vue'
 import ClothesCard from '@/components/cards/ClothesCard.vue'
 import axios from 'axios'
 import consts from '@/consts.js'
@@ -33,6 +34,26 @@ export default {
     return {
       currentCategories: { lower: '', upper: '' },
       clothes: []
+    }
+  },
+  computed: {
+    categories: function () {
+      const CLOTHES_CATEGORIES = consts.CLOTHES_CATEGORIES
+      /*
+        Workaround for deep copying nested objects
+        ref: https://bit.ly/2y4vJLI
+      */
+      var categoryList = JSON.parse(JSON.stringify(CLOTHES_CATEGORIES))
+      for (var i in categoryList) {
+        categoryList[i].lower.unshift('전체')
+      }
+      return categoryList
+    }
+  },
+  methods: {
+    handleLowerClick: function (upper, lower) {
+      this.currentCategories.lower = lower
+      this.currentCategories.upper = upper
     }
   },
   created: function () {

@@ -13,7 +13,7 @@
       </b-col>
     </b-row>
     <b-row v-else>
-      <b-col class="mb-2 mt-2" cols=12 md=6 xl=4 v-for="review in reviews" :key=review.id>
+      <b-col class="mb-2 mt-2" cols=12 md=6 v-for="review in reviews" :key=review.id>
         <ClothesSetReviewCard :review="review" />
       </b-col>
     </b-row>

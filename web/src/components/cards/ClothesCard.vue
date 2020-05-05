@@ -13,6 +13,7 @@
       <b-button class="mt-1" variant="info" @click="handleClick">
         상세보기
       </b-button>
+      <slot name="additionalButton"></slot>
     </template>
   </b-overlay>
 </template>

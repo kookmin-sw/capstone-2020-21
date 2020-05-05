@@ -1,3 +1,5 @@
+import base64
+
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from rest_framework import status
@@ -42,7 +44,8 @@ class ClohtesSetCreateTests(APITestCase):
 
         self.name = 'test-name'
         self.style = '화려'
-        self.image_url = 'https://www.naver.com'
+        with open("temp/sample_image.png", 'rb') as image:
+            self.image = base64.b64encode(image.read())
     
     def test_create(self):
         """
@@ -52,14 +55,14 @@ class ClohtesSetCreateTests(APITestCase):
             'clothes': self.clothes,
             'name': self.name,
             'style': self.style,
-            'image_url': self.image_url
+            'image': self.image
         }
         response = self.client.post('/clothes-sets/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['clothes'], self.clothes)
         self.assertEqual(response.data['name'], self.name)
         self.assertEqual(response.data['style'], self.style)
-        self.assertEqual(response.data['image_url'], self.image_url)
+        self.assertContains(response, 'image_url', status_code=201)
     
     def test_create_required(self):
         """
@@ -67,12 +70,12 @@ class ClohtesSetCreateTests(APITestCase):
         """
         data = {
             'clothes': self.clothes,
-            'image_url': self.image_url
+            'image': self.image
         }
         response = self.client.post('/clothes-sets/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['clothes'], self.clothes)
-        self.assertEqual(response.data['image_url'], self.image_url)
+        self.assertContains(response, 'image_url', status_code=201)
     
     def test_create_error_no_required(self):
         """
@@ -81,8 +84,7 @@ class ClohtesSetCreateTests(APITestCase):
         data = {}
         response = self.client.post('/clothes-sets/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['clothes'][0], 'This field is required.')
-        self.assertEqual(response.data['image_url'][0], 'This field is required.')
+        self.assertEqual(response.data['error'], 'image field is required')
     
     def test_create_error_authentication(self):
         """
@@ -221,6 +223,8 @@ class ClothesSetUpdateTests(APITestCase):
                 break
         self.name = 'test-name'
         self.style = '화려'
+        with open("temp/sample_image.png", 'rb') as image:
+            self.image = base64.b64encode(image.read())
         self.image_url = 'https://www.naver.com'
     
     def test_update_put(self):
@@ -231,7 +235,7 @@ class ClothesSetUpdateTests(APITestCase):
             'clothes': self.clothes,
             'name': self.name,
             'style': self.style,
-            'image_url': self.image_url
+            'image': self.image
         }
         url = '/clothes-sets/' + str(self.created_clothes_set.id) + '/'
         response = self.client.put(url, data, format='json')
@@ -239,7 +243,7 @@ class ClothesSetUpdateTests(APITestCase):
         self.assertEqual(response.data['clothes'], self.clothes)
         self.assertEqual(response.data['name'], self.name)
         self.assertEqual(response.data['style'], self.style)
-        self.assertEqual(response.data['image_url'], self.image_url)
+        self.assertContains(response, 'image_url', status_code=200)
     
     def test_update_patch(self):
         """

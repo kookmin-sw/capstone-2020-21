@@ -1,92 +1,136 @@
 <template>
-  <div class="closet_detail">
-    <MainNavigation></MainNavigation>
-    <div class="btn_back">
-        <router-link to="/closet"><b-button class="back">뒤로가기</b-button></router-link>
-    </div>
     <b-container>
-      <b-row>
-        <b-col class="text-center" md="7">
-          <ClosetDetailComponent></ClosetDetailComponent>
-        </b-col>
-        <b-col class="text-center" md="4" offset-md="1">
-          <ClosetDeletedComponent></ClosetDeletedComponent>
-          <ClosetDetailInfoComponent title="상세정보" v-bind:list="list"></ClosetDetailInfoComponent>
-        </b-col>
-      </b-row>
+        <b-row>
+          <b-col md="6" cols="12" style="text-align:left">
+            <b-button to="/closet">뒤로가기</b-button>
+          </b-col>
+          <b-col md="6" cols="12" style="text-align:right">
+            <b-button @click="deleteClothe">삭제하기</b-button>
+          </b-col>
+        </b-row>
+        <b-row>
+            <b-col md="6" cols="12">
+              <b-img fluid :src="clothes.image_url"/>
+            </b-col>
+            <b-col md="6" cols="12">
+              <b-row>
+                <ImageAnalysisComponent :analysis_props.sync="analysis_props" :isDisabled="disableAnalysis" />
+              </b-row>
+              <b-row>
+                <b-col cols="6">
+                  <b-button pill class="w-75" @click="handleModify">수정하기</b-button>
+                </b-col>
+                <b-col cols="6">
+                  <b-button pill class="w-75" @click="handleUpdate">확인하기</b-button>
+                </b-col>
+              </b-row>
+            </b-col>
+        </b-row>
     </b-container>
-  </div>
 </template>
 
 <script>
-import { bus } from '../main'
-import ClosetDetailComponent from '@/components/ClosetDetailComponent.vue'
-import ClosetDeletedComponent from '@/components/ClosetDeletedComponent.vue'
-import MainNavigation from '@/components/MainNavigation.vue'
-import ClosetDetailInfoComponent from '@/components/ClosetDetailInfoComponent.vue'
+import axios from 'axios'
+import consts from '@/consts.js'
+import ImageAnalysisComponent from '@/components/ImageAnalysisComponent.vue'
 export default {
-  name: 'ClosetDetail',
   components: {
-    ClosetDetailComponent,
-    ClosetDeletedComponent,
-    MainNavigation,
-    ClosetDetailInfoComponent
+    ImageAnalysisComponent
+  },
+  data: function () {
+    return {
+      clothes: {
+        alias: '',
+        image_url: '',
+        lower_category: '',
+        upper_category: '',
+        id: 0,
+        owner: ''
+      },
+      analysis_props: {
+        upper: '',
+        lower: '',
+        alias: ''
+      },
+      disableAnalysis: true
+    }
   },
   props: [
     'clothes_id'
   ],
-  data: function () {
-    return {
-      list: [
-        {
-          name: '상의',
-          details: ['후드티', '반팔티셔츠', '긴팔티셔츠', '반팔셔츠', '긴팔셔츠', '맨투맨', '터틀넥', '니트', '블라우스', '끈나시', '민소매']
-        },
-        {
-          name: '바지',
-          details: ['반바지', '핫팬츠', '슬랙스', '청바지', '골덴바지', '트레이닝바지']
-        },
-        {
-          name: '치마',
-          details: ['미니스커트', '롱스커트']
-        },
-        {
-          name: '아우터',
-          details: ['블레이져', '숏패딩', '조끼패딩', '롱패딩', '야구점퍼', '항공점퍼', '바람막이', '야상', '무스탕', '코트', '트랙탑', '가죽자켓', '청자켓', '가디건']
-        }
-      ]
+  created: function () {
+    var vm = this
+    if (vm.clothes_id === undefined) {
+      alert('잘못된 접근입니다!')
+      vm.$router.push('/closet')
+    } else {
+      if (!localStorage.getItem('token')) {
+        vm.$router.push('/login')
+        // TODO: 에러메세지 더 좋은걸로 바꾸기.
+        alert('로그인해주세요!')
+      } else {
+        var clothesId = vm.clothes_id
+        axios.get(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`)
+          .then((response) => {
+            vm.clothes = response.data
+            vm.analysis_props.upper = vm.clothes.upper_category
+            vm.analysis_props.lower = vm.clothes.lower_category
+            vm.analysis_props.alias = vm.clothes.alias
+          }).catch((ex) => {
+          // TODO: error handling.
+          })
+      }
     }
   },
-  created () {
-    bus.$on('contextChanged', (data) => {
-      console.log(data)
-      this.context = data
-    })
+  methods: {
+    handleModify: function () {
+      this.disableAnalysis = false
+    },
+    handleUpdate: function () {
+      var vm = this
+      var clothesId = vm.clothes_id
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      var data = {
+        image_url: vm.image,
+        upper_category: vm.analysis_props.upper,
+        lower_category: vm.analysis_props.lower,
+        alias: vm.analysis_props.alias
+      }
+      axios.patch(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, data, config)
+        .then(response => {
+          alert('수정되었습니다!')
+          vm.analysis_props.alias = response.data.alias
+          vm.analysis_props.upper = response.data.upper_category
+          vm.analysis_props.lower = response.data.lower_category
+          vm.disableAnalysis = true
+        }).catch((ex) => {
+          // TODO: handle error.
+          console.log(ex)
+        })
+    },
+    deleteClothe: function () {
+      var vm = this
+      var clothesId = vm.clothes_id
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      axios.delete(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, config)
+        .then(response => {
+          alert('삭제되었습니다!')
+          vm.$router.push('/closet')
+        }).catch((ex) => {
+          // TODO: handle error.
+          console.log(ex)
+        })
+    }
   }
 }
 </script>
 
-<style scoped>
-.closet_detail{
-    width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-}
-.information{
-    text-align: center;
-    display: inline-block;
-    position: absolute;
-    top: 50%;
-    margin-top: -200px;
-    width: 500px;
-    height: 300px;
+<style>
 
-}
-.btn_back{
-    text-align: left;
-}
-.back{
-    margin-left: 150px;
-    margin-bottom: 20px;
-}
 </style>

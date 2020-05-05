@@ -8,7 +8,8 @@ from apps.api.factories import (
     UserFactory,
     ClothesFactory,
     ClothesSetFactory,
-    ClothesSetReviewFactory
+    ClothesSetReviewFactory,
+    WeatherFactory
 )
 from apps.api.populate import (
     populate_clothes,
@@ -43,13 +44,40 @@ class ClohtesSetReviewCreateTests(APITestCase):
         created_clothes_set = populate_clothes_set(3)
 
         self.clothes_set = created_clothes_set[0].id
-        self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.start_datetime = str(datetime(1996,1,14,12,0))
         self.start_datetime = 'T'.join(self.start_datetime.split(' '))
-        self.end_datetime = str(datetime.now())
+        self.end_datetime = str(datetime(1996,1,14,21,0))
         self.end_datetime = 'T'.join(self.end_datetime.split(' '))
         self.location = 1
         self.review = 3
         self.comment = 'test-comment'
+        
+        # location_code, date, time, temp, sensible_temp, humidity, wind_speed, precipitation, x, y
+        WeatherFactory.create(
+            location_code=self.location,
+            date='1996-01-14',
+            time=14,
+            temp=20,
+            sensible_temp=20,
+            humidity=30,
+            wind_speed=1,
+            precipitation=0,
+            x=0,
+            y=0
+        )
+        
+        WeatherFactory.create(
+            location_code=self.location,
+            date='1996-01-14',
+            time=17,
+            temp=10,
+            sensible_temp=10,
+            humidity=50,
+            wind_speed=3,
+            precipitation=5,
+            x=0,
+            y=0
+        )
     
     def test_create(self):
         """
@@ -147,9 +175,9 @@ class ClothesSetReviewRetrieveTests(APITestCase):
         self.created_review = populate_clothes_set_review(3)
     
         self.clothes_set = created_clothes_set[0].id
-        self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.start_datetime = str(datetime(1996,1,14,12,0))
         self.start_datetime = 'T'.join(self.start_datetime.split(' '))
-        self.end_datetime = str(datetime.now())
+        self.end_datetime = str(datetime(1996,1,14,21,0))
         self.end_datetime = 'T'.join(self.end_datetime.split(' '))
         self.location = 1
         self.review = 3
@@ -263,13 +291,39 @@ class ClothesSetReviewUpdateTests(APITestCase):
         self.created_review = populate_clothes_set_review(1)[0]
     
         self.clothes_set = created_clothes_set[0].id
-        self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.start_datetime = str(datetime(1996,1,14,12,0))
         self.start_datetime = 'T'.join(self.start_datetime.split(' '))
-        self.end_datetime = str(datetime.now())
+        self.end_datetime = str(datetime(1996,1,14,21,0))
         self.end_datetime = 'T'.join(self.end_datetime.split(' '))
         self.location = 1
         self.review = 3
         self.comment = 'test-comment'
+        
+        WeatherFactory.create(
+            location_code=self.location,
+            date='1996-01-14',
+            time=14,
+            temp=20,
+            sensible_temp=20,
+            humidity=30,
+            wind_speed=1,
+            precipitation=0,
+            x=0,
+            y=0
+        )
+        
+        WeatherFactory.create(
+            location_code=self.location,
+            date='1996-01-14',
+            time=17,
+            temp=10,
+            sensible_temp=10,
+            humidity=50,
+            wind_speed=3,
+            precipitation=5,
+            x=0,
+            y=0
+        )
     
     def test_update_put(self):
         """
@@ -392,9 +446,9 @@ class ClothesSetReviewDeleteTests(APITestCase):
         self.created_review = populate_clothes_set_review(1)[0]
         
         self.clothes_set = created_clothes_set[0].id
-        self.start_datetime = str(datetime.now() - timedelta(hours=12))
+        self.start_datetime = str(datetime(1996,1,14,12,0))
         self.start_datetime = 'T'.join(self.start_datetime.split(' '))
-        self.end_datetime = str(datetime.now())
+        self.end_datetime = str(datetime(1996,1,14,21,0))
         self.end_datetime = 'T'.join(self.end_datetime.split(' '))
         self.location = 1
         self.review = 3
