@@ -1,63 +1,65 @@
 <template>
-  <b-container>
-    <b-alert v-model="showAlert" variant="danger" dismissible>
-      {{ alertMessage }}
-    </b-alert>
-    <b-row align-h="center">
-      <b-col cols=12 md=8 order-md="1" order="2">
-        <b-row>
-          <b-col cols=12 md=4>
-            <ClassificationComponent :list="categories" />
-          </b-col>
-          <b-col cols=12 md=8>
-            <b-row>
-              <b-col v-for="clothe in clothes" :key="clothe.id" cols=12 lg=6 class="mb-3">
-                <ClothesCard class="mb-1" :clothes="clothe">
-                  <template v-slot:additionalButton>
-                    <b-button class="mt-1" variant="info" @click="handleAddClothes(clothe.id, clothe.image_url)">
-                      추가하기
-                    </b-button>
-                  </template>
-                </ClothesCard>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
-      </b-col>
-      <b-col cols=12 md=4 order-md="2" order="1">
-        <b-row>
-          <b-col>
-            <canvas class="border" ref="codyCanvas" />
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col v-for="clothe in includedClothes" :key="clothe.id" class="mb-1" cols=4>
-            <b-img class="mb-1" :src="clothe.url" fluid />
-            <b-button pill size="sm" variant="danger" @click="handleRemoveClothes(clothe.id, clothe.obj)">
-              <b-icon-x/>
-            </b-button>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col>
-            <b-form>
-              <b-form-group label="코디 이름" label-for="cody-name">
-                <b-form-input id="cody-name" v-model="codyName" type="text"></b-form-input>
-              </b-form-group>
-              <b-form-group label="코디 스타일" label-for="cody-style">
-                <b-form-select id="cody-style" v-model="style" :options="styles"></b-form-select>
-              </b-form-group>
-            </b-form>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col>
-            <b-button variant="info" @click="postCody">등록하기</b-button>
-          </b-col>
-        </b-row>
-      </b-col>
-    </b-row>
-  </b-container>
+  <b-overlay :show="isLoading">
+    <b-container>
+      <b-alert id="alert" v-model="showAlert" variant="danger" dismissible>
+        {{ alertMessage }}
+      </b-alert>
+      <b-row align-h="center">
+        <b-col cols=12 md=8 order-md="1" order="2">
+          <b-row>
+            <b-col cols=12 md=4>
+              <ClassificationComponent :list="categories" />
+            </b-col>
+            <b-col cols=12 md=8>
+              <b-row>
+                <b-col v-for="clothe in clothes" :key="clothe.id" cols=12 lg=6 class="mb-3">
+                  <ClothesCard class="mb-1" :clothes="clothe">
+                    <template v-slot:additionalButton>
+                      <b-button class="mt-1" variant="info" @click="handleAddClothes(clothe.id, clothe.image_url)">
+                        추가하기
+                      </b-button>
+                    </template>
+                  </ClothesCard>
+                </b-col>
+              </b-row>
+            </b-col>
+          </b-row>
+        </b-col>
+        <b-col cols=12 md=4 order-md="2" order="1">
+          <b-row>
+            <b-col>
+              <canvas class="border" ref="codyCanvas" />
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col v-for="clothe in includedClothes" :key="clothe.id" class="mb-1" cols=4>
+              <b-img class="mb-1" :src="clothe.url" fluid />
+              <b-button pill size="sm" variant="danger" @click="handleRemoveClothes(clothe.id, clothe.obj)">
+                <b-icon-x/>
+              </b-button>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col>
+              <b-form>
+                <b-form-group label="코디 이름" label-for="cody-name">
+                  <b-form-input id="cody-name" v-model="codyName" type="text"></b-form-input>
+                </b-form-group>
+                <b-form-group label="코디 스타일" label-for="cody-style">
+                  <b-form-select id="cody-style" v-model="style" :options="styles"></b-form-select>
+                </b-form-group>
+              </b-form>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col>
+              <b-button variant="info" @click="postCody">등록하기</b-button>
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row>
+    </b-container>
+  </b-overlay>
 </template>
 
 <script>
@@ -83,7 +85,8 @@ export default {
       codyName: '',
       style: '',
       showAlert: false,
-      alertMessage: ''
+      alertMessage: '',
+      isLoading: false
     }
   },
   computed: {
@@ -118,6 +121,7 @@ export default {
       if (clotheIds.includes(id)) {
         this.alertMessage = '이미 추가된 옷입니다.'
         this.showAlert = true
+        window.scrollTo(0, 0)
         return
       }
 
@@ -145,6 +149,7 @@ export default {
       })
     },
     postCody: function () {
+      this.isLoading = true
       var token = window.localStorage.getItem('token')
       var config = {
         headers: { Authorization: `Bearer ${token}` }
@@ -163,11 +168,13 @@ export default {
 
       axios.post(`${consts.SERVER_BASE_URL}/clothes-sets/`, data, config)
         .then((response) => {
-          console.log(response)
           alert('성공적으로 등록되었습니다!')
           this.$router.push({ name: 'Cody' })
         }).catch((ex) => {
-          // TODO: error handling.
+          this.isLoading = false
+          this.alertMessage = '요청이 잘못되었습니다. 입력내용을 확인해주세요!'
+          this.showAlert = true
+          window.scrollTo(0, 0)
         })
     }
   },
