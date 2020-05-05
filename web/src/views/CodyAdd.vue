@@ -1,5 +1,8 @@
 <template>
   <b-container>
+    <b-alert v-model="showAlert" variant="danger" dismissible>
+      {{ alertMessage }}
+    </b-alert>
     <b-row align-h="center">
       <b-col cols=12 md=8 order-md="1" order="2">
         <b-row>
@@ -78,7 +81,9 @@ export default {
       clothes: [],
       includedClothes: [],
       codyName: '',
-      style: ''
+      style: '',
+      showAlert: false,
+      alertMessage: ''
     }
   },
   computed: {
@@ -111,7 +116,8 @@ export default {
       })
 
       if (clotheIds.includes(id)) {
-        alert('이미 추가된 옷입니다!')
+        this.alertMessage = '이미 추가된 옷입니다.'
+        this.showAlert = true
         return
       }
 
