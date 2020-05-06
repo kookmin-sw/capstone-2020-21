@@ -8,7 +8,7 @@
         <b-col cols=12 md=8 order-md="1" order="2">
           <b-row>
             <b-col cols=12 md=4>
-              <ClassificationComponent :list="categories" />
+              <ClassificationComponent :list="categories" @chooseCategory="handleChooseCategory" />
             </b-col>
             <b-col cols=12 md=8>
               <b-row>
@@ -86,7 +86,8 @@ export default {
       style: '',
       showAlert: false,
       alertMessage: '',
-      isLoading: false
+      isLoading: false,
+      currentCategories: { lower: '', upper: '' }
     }
   },
   computed: {
@@ -126,6 +127,10 @@ export default {
       }
 
       var vm = this
+
+      // Workaround for caching issue.
+      // https://bit.ly/2YGaTNs
+      url += '?please=work'
       fabric.Image.fromURL(url, function (img) {
         img.set({
           left: 0,
@@ -147,6 +152,10 @@ export default {
       this.includedClothes = this.includedClothes.filter((clothe) => {
         return clothe.id !== id
       })
+    },
+    handleChooseCategory: function (upper, lower) {
+      this.currentCategories.upper = upper
+      this.currentCategories.lower = lower
     },
     postCody: function () {
       this.isLoading = true
@@ -176,6 +185,35 @@ export default {
           this.showAlert = true
           window.scrollTo(0, 0)
         })
+    }
+  },
+  watch: {
+    currentCategories: {
+      deep: true,
+      handler () {
+        var vm = this
+        if (window.localStorage.getItem('token')) {
+          var token = window.localStorage.getItem('token')
+          var config = {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+          if (vm.currentCategories.lower === '전체') {
+            axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&upper_category=${vm.currentCategories.upper}`, config)
+              .then((response) => {
+                vm.clothes = response.data.results
+              }).catch((ex) => {
+              // TODO: error handling.
+              })
+          } else {
+            axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&lower_category=${vm.currentCategories.lower}`, config)
+              .then((response) => {
+                vm.clothes = response.data.results
+              }).catch((ex) => {
+              // TODO: error handling.
+              })
+          }
+        }
+      }
     }
   },
   created: function () {
