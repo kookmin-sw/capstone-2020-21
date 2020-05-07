@@ -46,9 +46,12 @@ def get_weather_date(input_date, location):
 
     api_url = url + key + numOfRows + typeOfData + date + time + nx + ny
     data = urllib.request.urlopen(api_url).read().decode('utf8')
-    # TODO : print 지우고 commit
-    print(data)
-    data_json = json.loads(data)
+    # TODO: try-except문 지우기
+    try:
+        data_json = json.loads(data)
+    except json.decoder.JSONDecodeError:
+        print(data)
+
     # get date and time
     parsed_json = data_json['response']['body']['items']['item']
 
