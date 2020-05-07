@@ -120,12 +120,12 @@ def execute_inference(image):
     return result    
 
 
-def save_image_s3(image):
+def save_image_s3(image, prefix):
     """
     Receives image and saves it to s3 bucket,
     returns the url of an uplodaed image.
     """
-    TEMP_IMAGE_NAME = 'temp/clothes_' + str(int(round(time.time()*1000))) + '.png'
+    TEMP_IMAGE_NAME = 'temp/' + prefix + '_' + str(int(round(time.time()*1000))) + '.png'
     BUCKET_NAME = 'otte-bucket'
     REGION_NAME = 'ap-northeast-2'
     
@@ -134,15 +134,15 @@ def save_image_s3(image):
     s3 = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                       aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
     
-    s3.upload_file(TEMP_IMAGE_NAME, BUCKET_NAME, 'clothes/'+TEMP_IMAGE_NAME, ExtraArgs={'ACL':'public-read'})
+    s3.upload_file(TEMP_IMAGE_NAME, BUCKET_NAME, prefix + '/' + TEMP_IMAGE_NAME, ExtraArgs={'ACL':'public-read'})
     
-    url = 'https://' + BUCKET_NAME + '.s3.ap-northeast-2.amazonaws.com/clothes/' + TEMP_IMAGE_NAME
+    url = 'https://' + BUCKET_NAME + '.s3.ap-northeast-2.amazonaws.com/' + prefix + '/' + TEMP_IMAGE_NAME
 
     os.remove(TEMP_IMAGE_NAME)
 
     return url
 
-def move_image_to_saved(image_url):
+def move_image_to_saved(image_url, prefix):
     """
     moves image_url from temp to save on s3 bucket
     """
@@ -150,8 +150,8 @@ def move_image_to_saved(image_url):
     
     BUCKET_NAME = parts[2].split('.')[0]
     IMAGE_NAME = parts[-1]
-    OBJECT_NAME = 'clothes/temp/' + IMAGE_NAME
-    KEY_NAME = 'clothes/saved/' + IMAGE_NAME
+    OBJECT_NAME = prefix + '/temp/' + IMAGE_NAME
+    KEY_NAME = prefix + '/saved/' + IMAGE_NAME
     
     COPY_SOURCE = {
         'Bucket': BUCKET_NAME,

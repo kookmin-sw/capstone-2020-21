@@ -25,11 +25,11 @@
       </p>
       <p class="text-light">
         <b-img src="@/assets/hot.png" width="30px" />
-        {{ review.max_temp }} °C
+        {{ review.max_temp }} / {{ review.max_sensible_temp }} °C
       </p>
       <p class="text-light">
         <b-img src="@/assets/cold.png" width="30px" />
-        {{ review.min_temp }} °C
+        {{ review.min_temp }} / {{ review.min_sensible_temp }} °C
       </p>
       <p class="text-light">
         <b-img src="@/assets/humidity.png" width="30px" />
