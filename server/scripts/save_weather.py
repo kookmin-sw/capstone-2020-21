@@ -10,6 +10,7 @@ from apps.api.weather import *
 from apps.api.models import Weather
 
 def run():
+
     now = datetime.datetime.now()
     now = now.strftime('%Y-%m-%d %H:%M:%S')
     # TODO : print 지우고 commit
@@ -29,6 +30,8 @@ def run():
     with open('apps/api/locations/data.json') as json_file:
         json_data = json.load(json_file)
 
+    err_location_code = []
+
     for location in range(3780):
         new_x = int((json_data[str(location)]['x']))
         new_y = int((json_data[str(location)]['y']))
@@ -46,15 +49,32 @@ def run():
 
         # TODO : print 지우고 commit
         print("new x: ", new_x, " y : ", new_y)
+        
+        try:
+            response = get_weather_date(now, str(location))
 
-        response = get_weather_date(now, str(location))
+            # WCI 체감온도 T3H 기온 WSD 풍속 REH 습도 R06 강수량
+            Weather.objects.create(location_code=location, date=now[0:10], time=conv_time[0:2], x=new_x, y=new_y,
+                                    temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'], 
+                                    wind_speed=response['WSD'], precipitation=response['R06'])
+        
+        except KeyError:
+            err_location_code.append(location)
 
-        # WCI 체감온도 T3H 기온 WSD 풍속 REH 습도 R06 강수량
-        Weather.objects.create(location_code=location, date=now[0:10], time=conv_time[0:2], x=new_x, y=new_y,
-                                temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'], 
-                                wind_speed=response['WSD'], precipitation=response['R06'])
-                            
-                            
+    while err_location_code != 0:
+        time.sleep(600)
+        for location in err_location_code:
+            try:
+                response = get_weather_date(now, str(err_location_code[location]))
+
+                # WCI 체감온도 T3H 기온 WSD 풍속 REH 습도 R06 강수량
+                Weather.objects.create(location_code=err_location_code[location], date=now[0:10], time=conv_time[0:2], x=new_x, y=new_y,
+                                        temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'], 
+                                        wind_speed=response['WSD'], precipitation=response['R06'])
+                del err_location_code[location]
+
+            except KeyError:
+                continue                 
 
 # basetime 30분 뒤 마다 basetime에 대한 날씨정보를 저장
 schedule.every().day.at("02:30").do(run)
