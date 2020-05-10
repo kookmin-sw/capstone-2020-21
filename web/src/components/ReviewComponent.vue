@@ -1,151 +1,223 @@
 <template>
 <b-container>
-<div id="review-row" class="row justify-content-center align-items-center">
-    <div id="review-column" class="col-md-6" style="margin-top:44px">
+    <b-row class="row justify-content-center align-items-center">
+        <b-col cols="7">
         <form id="review-form" class="form" action="" method="post">
-            <h3 class="text-center">Review</h3>
-            <b-img-lazy v-bind="mainProps" :src="getImageUrl()"></b-img-lazy>
-            <div>
-                <b-form @submit="onSubmit" @reset="onReset" v-if="show">
-                <b-form-group id="input-group-1" label="활동시간 :" label-for="input-group-1">
-                    <b-row>
-                    <b-col md="auto">
-                    <b-calendar v-model="form.date" @context="onContextdate" locale="en-US"></b-calendar>
+            <h3 class="text-center text-top">Review</h3>
+            <b-img fluid :src="imageURL"/>
+                <b-form-group label="활동장소 :" lable-for="input-1" class="text-left text-top">
+                  <b-row id="input-1">
+                  <b-col md="auto" style="margin:0 auto">
+                    <h5 style="word-break: keep-all">
+                      위치 : {{ locationData.location.name }}
+                    </h5>
+                  </b-col>
+                  <b-col md="auto">
+                    <b-button class="mb-3" variant="info" size="sm" @click="openLocationModal">
+                      <b-icon-arrow-clockwise/> 바꾸기
+                    </b-button>
+                  </b-col>
+                  </b-row>
+                </b-form-group>
+                <b-form-group label="활동기간 :" label-for="input-2" class="text-left text-top">
+                    <b-row id="input-2">
+                    <b-col md="auto" style="margin:0 auto">
+                    <b-calendar :min="min" :max="max" v-model="form.start_date" locale="en-US"></b-calendar>
                     </b-col>
-                    <b-col md="auto">
-                    <b-time v-model="form.time" locale="en" @context="onContexttime"></b-time>
+                    <b-col md="auto" style="margin:0 auto">
+                    <b-calendar :min="min" :max="max" v-model="form.end_date" locale="en-US"></b-calendar>
                     </b-col>
                     </b-row>
                 </b-form-group>
-                <b-form-group id="input-group-2" label="활동장소 :" label-for="input-group-2">
-                    <b-form inline>
-                    <label class="col-1" for="inline-form-custom-select-pref">시</label>
-                    <b-form-select id="inline-form-custom-select-pref" class="col-3" v-model="form.si" :options="si" required></b-form-select>
-                    <label class="col-1" for="inline-form-custom-select-pref">구</label>
-                    <b-form-select id="inline-form-custom-select-pref" class="col-3" v-model="form.gu" :options="gu" required></b-form-select>
-                    <label class="col-1" for="inline-form-custom-select-pref">동</label>
-                    <b-form-select id="inline-form-custom-select-pref" class="col-2" v-model="form.dong" :options="dong" required></b-form-select>
-                    </b-form>
+                <b-form-group label="활동시간 :" label-for="input-3" class="text-left text-top">
+                  <b-row id="input-3">
+                  <b-col md="auto" style="margin:0 auto">
+                  <b-time v-model="form.start_time" locale="en"></b-time>
+                  </b-col>
+                  <b-col md="auto" style="margin:0 auto">
+                  <b-time v-model="form.end_time" locale="en"></b-time>
+                  </b-col>
+                  </b-row>
                 </b-form-group>
-                <b-form-group id="input-group-3" label="만족도 :" label-for="input-3">
-                    <b-form-input id="range-1" v-model="form.range" type="range" min="1" max="5"></b-form-input>
+                <b-form-group label="만족도 :" label-for="input-4" class="text-left text-top">
+                    <b-form-input id="input-4" v-model="form.range" type="range" min="1" max="5"></b-form-input>
                     <b-row>
                     <b-col class="col-2 text-left">1</b-col>
-                    <b-col class="col-3">2</b-col>
+                    <b-col class="col-3 text-center">2</b-col>
                     <b-col class="col-2 text-center">3</b-col>
-                    <b-col class="col-3">4</b-col>
+                    <b-col class="col-3 text-center">4</b-col>
                     <b-col class="col-2 text-right">5</b-col>
                     </b-row>
                     <b-row>
                     <b-col class="col-4 text-left">추웠다</b-col>
-                    <b-col class="col-4">적당했다</b-col>
+                    <b-col class="col-4 text-center">적당했다</b-col>
                     <b-col class="col-4 text-right">더웠다</b-col>
                     </b-row>
                 </b-form-group>
-                <b-form-group id="input-group-4" label="한줄평 :" label-for="input-4">
-                    <b-form-input id="input-2" v-model="form.comment" type="comment"></b-form-input>
+                <b-form-group label="한줄평 :" label-for="input-5" class="text-left text-top">
+                    <b-form-input id="input-5" v-model="form.comment"></b-form-input>
                 </b-form-group>
-                <!-- <b-row>
-                    <b-col md="auto">
-                    <b-form-group id="input-group-3" label="시:" label-for="input-3" for="inline-form-custom-select-pref">
-                        <b-form-select id="input-3" v-model="form.si" :options="si" required></b-form-select>
-                    </b-form-group>
-                    </b-col>
-                    <b-col md="auto">
-                    <b-form-group id="input-group-4" label="구:" label-for="input-4">
-                        <b-form-select id="input-4" v-model="form.gu" :options="gu" required></b-form-select>
-                    </b-form-group>
-                    </b-col>
-                    <b-col md="auto">
-                    <b-form-group id="input-group-5" label="동:" label-for="input-5">
-                        <b-form-select id="input-5" v-model="form.dong" :options="dong" required></b-form-select>
-                    </b-form-group>
-                    </b-col>
-                </b-row> -->
-                </b-form>
-            </div>
-            <div>
+
+                <b-modal ref="location-modal" title="위치 검색" ok-title="확인" cancel-title="취소">
+                  <b-container>
+                    <b-row class="mb-3" no-gutters>
+                      <b-col cols=10>
+                        <b-input v-model="keyword" type="search" placeholder="도/시를 입력해주세요"/>
+                      </b-col>
+                      <b-col cols=2>
+                        <b-button @click="handleLocationSearch">
+                          <b-icon-search/>
+                        </b-button>
+                      </b-col>
+                    </b-row>
+                    <b-row>
+                      <b-col>
+                        <b-list-group>
+                          <b-list-group-item
+                            class="w-100"
+                            href="#"
+                            v-for="location of locations"
+                            :key="location.id"
+                            @click="handleLocationClick($event, location)">
+                            {{ location.location }}
+                          </b-list-group-item>
+                        </b-list-group>
+                      </b-col>
+                    </b-row>
+                  </b-container>
+                </b-modal>
                 <b-row>
-                    <b-col class="col-6">
-                        <b-button pill class="w-75" type="new_submit">새 리뷰 작성하기</b-button>
-                    </b-col>
-                    <b-col class="col-6">
-                        <b-button pill class="w-75" type="submit">확인</b-button>
-                    </b-col>
+                  <b-col class="col-6" style="margin:0 auto">
+                      <b-button pill class="w-75" @click="submit">등록하기</b-button>
+                  </b-col>
                 </b-row>
-            </div>
         </form>
-    </div>
-</div>
+    </b-col>
+</b-row>
 </b-container>
 </template>
 
 <script>
+import consts from '@/consts.js'
+import axios from 'axios'
+import { BIconArrowClockwise, BIconSearch } from 'bootstrap-vue'
+
 export default {
   name: 'reviewcomponent',
-  data () {
+  components: {
+    BIconArrowClockwise,
+    BIconSearch
+  },
+  data: function () {
     return {
       form: {
-        date: '',
-        time: '',
+        start_date: '',
+        end_date: '',
+        start_time: '',
+        end_time: '',
         comment: '',
         range: ''
       },
-      si: ['서울특별시', '양주시', '고양시'],
-      gu: ['성북구', '종로구', '강북구'],
-      dong: ['정릉동', '돈암1동'],
-      show: true
+      imageURL: '',
+      'locations': [],
+      'keyword': '',
+      min: '',
+      max: ''
     }
   },
+  props: [
+    'clothes_sets_id',
+    'locationData'
+  ],
   methods: {
-    onContextdate (ctx) {
-      this.context = ctx
+    getImageId: function () {
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      var url = consts.SERVER_BASE_URL + '/clothes-sets/'
+      url += this.clothes_sets_id + '/'
+      axios.get(url, config)
+        .then(response => {
+          console.log(response)
+          this.imageURL = response.data.image_url
+        })
     },
-    onContexttime (ctx) {
-      this.context = ctx
+    setDate: function () {
+      const now = new Date()
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+      const minDate = new Date(today)
+      minDate.setDate(minDate.getDate() - 7)
+
+      const maxDate = new Date(today)
+      maxDate.setDate(maxDate.getDate())
+
+      this.min = minDate
+      this.max = maxDate
     },
-    onSubmit (evt) {
-      evt.preventDefault()
+    submit: function () {
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      var data = {
+        clothes_set: Number(this.clothes_sets_id),
+        start_datetime: this.form.start_date + 'T' + this.form.start_time,
+        end_datetime: this.form.end_date + 'T' + this.form.end_time,
+        location: Number(this.locationData.location.id),
+        review: Number(this.form.range),
+        comment: this.form.comment
+      }
+      console.log(data)
+      axios.post(`${consts.SERVER_BASE_URL}/clothes-set-reviews/`, data, config)
+        .then(response => {
+          console.log(response)
+          this.$router.replace('/cody/')
+        })
     },
-    onReset (evt) {
-      evt.preventDefault()
-      // Reset our form values
-      this.form.comment = ''
-      // Trick to reset/clear native browser form validation state
-      this.show = false
-      this.$nextTick(() => {
-        this.show = true
-      })
+    openLocationModal: function () {
+      // TODO(mskwon1): implement this.
+      this.$refs['location-modal'].show()
+    },
+    handleLocationClick: function (event, location) {
+      this.locationData.location.id = location.id
+      this.locationData.location.name = location.location
+
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+
+      this.$refs['location-modal'].hide()
+    },
+    handleLocationSearch: function () {
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      var vm = this
+      var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/location_search/'
+      url += '?search=' + vm.keyword
+      axios.get(url, config)
+        .then((response) => {
+          vm.locations = response.data.results
+        })
     }
+  },
+  created: function () {
+    this.getImageId()
+    this.setDate()
   }
 }
 </script>
 
 <style scoped>
   @import url("../css/login.css ");
-.closet_set_img {
-background-position: center;
-background-repeat: no-repeat;
-width: 100%;
-height: 240px;
-position: relative;
-display: block;
-/* margin: auto; */
-margin-bottom: 30px;
-background-size: 100% 100%;
-}
-label {
-    display: inline-block;
-    margin-bottom: .5rem;
-    text-align: left;
-}
 h3{
     padding-bottom: 20px;
 }
-.review-form{
-    padding-top: 50px;
-}
-.text-left {
-    text-align: left;
+.text-top{
+    padding-top: 30px;
 }
 </style>

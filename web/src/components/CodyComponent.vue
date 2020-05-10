@@ -13,30 +13,6 @@
         </div>
       </div>
     </div>
-    <div class="col-md-6 cody_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
-      <div class="box">
-        <div class="txt">
-          <router-link to="/cody/detail">
-            <b-button class="btn_add" size="sm" style="margin-right:20px">상세보기</b-button>
-          </router-link>
-          <router-link to="/review">
-            <b-button class="btn_add" size="sm">리뷰보기</b-button>
-          </router-link>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6 cody_item"  v-bind:style="{ backgroundImage: 'url(' +require('../assets/hh.png')+ ')' }" >
-      <div class="box">
-        <div class="txt">
-          <router-link to="/cody/detail">
-            <b-button class="btn_add" size="sm" style="margin-right:20px">상세보기</b-button>
-          </router-link>
-          <router-link to="/review">
-            <b-button class="btn_add" size="sm">리뷰보기</b-button>
-          </router-link>
-        </div>
-      </div>
-    </div>
 
   </div>
 </div>
