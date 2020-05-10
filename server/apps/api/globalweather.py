@@ -1,24 +1,30 @@
 import datetime
 from django.conf import settings
 import json
+import requests
 import math
 import urllib
 import pprint
 from urllib.request import urlopen
 
 
-ServiceKey = settings.GLOBAL_WEATHER_API_KEY
-
+# ServiceKey = settings.GLOBAL_WEATHER_API_KEY
+ServiceKey = "9aac94e3a47a4598910ea72abbf18e37"
 def find_city_id(city_name):
-    with open('apps/api/locations/cities.list.json') as json_file:
-    json_data = json.load(json_file)
+    with open('locations/cities_20000.json', 'rt', encoding='UTF8') as json_file:
+        json_data = json.load(json_file)
+
     city_id = 0
 
     for i in json_data:
-        if i['name'] = city_name:
-            city_id = i['id']
-        break
+        print(i['city_name'])
+        if i['city_name'] == city_name:
+            city_id = i['city_id']
+            break
+        
+
     print(city_id)
+
     return city_id
 
 
@@ -27,24 +33,23 @@ def get_weather_date(forecast_date, city_name):
      16일 이내 날짜와 도시를 입력받아 날씨정보를 반환한다.
      예시 input_date : 2020-03-31, city_name : "city_name" location index
     """
-    with open('apps/api/locations/cities.list.json') as json_file:
-        json_data = json.load(json_file)
-
     url = "https://api.weatherbit.io/v2.0/forecast/daily?"
-    city_id = "city_id=" + find_city_id(city_name)
+    city_id = "city_id=" + str(find_city_id(city_name))
     key = "&key=" + ServiceKey
 
     api_url = url + city_id + key
+    print("city_name : " + city_name + " city_id : " + city_id )
+    print(api_url)
+    # weather_response = requests.get(api_url)
+    # jsoned = weather_response.json()
     data = urllib.request.urlopen(api_url).read().decode('utf8')
-    try :  
-        data_json = json.loads(data)
-        print(data_json)
-    # get date and time
-    
+    data_json = json.loads(data)
+    print(data_json)
+
     parsed_json = data_json['data']
-    print(prased_json)
+    print(parsed_json)
     passing_data = {}
-    
+
     for i in parsed_json:
         if i['datetime'] == forecast_date:
             passing_data['WSD'] = i['wind_spd']
@@ -61,7 +66,7 @@ def get_weather_date(forecast_date, city_name):
     v = passing_data['WSD']
     t = float(t)
     v = float(v)
-    
+
     # 체감 온도 계산
     wci = getWCI(t, v)
     wci = round(wci, 2)
@@ -81,7 +86,10 @@ def get_weather_date(forecast_date, city_name):
     passing_data['WCIMAX'] = wci_high # maximum chill temp
     passing_data['WCIMIN'] = wci_low # minium chill temp
 
+    print(passing_data)
+
     return passing_data
+
 
 # 체감 온도 구하기
 def getWCI(temperature, wind_velocity): 
