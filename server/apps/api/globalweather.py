@@ -1,32 +1,21 @@
 import datetime
 from django.conf import settings
 import json
-import requests
 import math
 import urllib
 import pprint
 from urllib.request import urlopen
 
-
-# ServiceKey = settings.GLOBAL_WEATHER_API_KEY
-ServiceKey = "9aac94e3a47a4598910ea72abbf18e37"
+ServiceKey = settings.GLOBAL_WEATHER_API_KEY
 def find_city_id(city_name):
     with open('locations/cities_20000.json', 'rt', encoding='UTF8') as json_file:
         json_data = json.load(json_file)
-
     city_id = 0
-
     for i in json_data:
-        print(i['city_name'])
         if i['city_name'] == city_name:
             city_id = i['city_id']
             break
-        
-
-    print(city_id)
-
     return city_id
-
 
 def get_weather_date(forecast_date, city_name): 
     """
@@ -38,16 +27,9 @@ def get_weather_date(forecast_date, city_name):
     key = "&key=" + ServiceKey
 
     api_url = url + city_id + key
-    print("city_name : " + city_name + " city_id : " + city_id )
-    print(api_url)
-    # weather_response = requests.get(api_url)
-    # jsoned = weather_response.json()
     data = urllib.request.urlopen(api_url).read().decode('utf8')
     data_json = json.loads(data)
-    print(data_json)
-
     parsed_json = data_json['data']
-    print(parsed_json)
     passing_data = {}
 
     for i in parsed_json:
@@ -59,8 +41,6 @@ def get_weather_date(forecast_date, city_name):
             passing_data['REH'] = i['rh']
             passing_data['POP'] = i['pop']
             passing_data['PRE'] = i['precip']
-
-    print(passing_data)
 
     t = passing_data['TEMP']
     v = passing_data['WSD']
@@ -81,15 +61,11 @@ def get_weather_date(forecast_date, city_name):
     wci_low = getWCI(t_min, v)
     wci_low = round(wci, 2)
 
-
     passing_data['WCI'] = wci # current wind chill temp
     passing_data['WCIMAX'] = wci_high # maximum chill temp
     passing_data['WCIMIN'] = wci_low # minium chill temp
 
-    print(passing_data)
-
     return passing_data
-
 
 # 체감 온도 구하기
 def getWCI(temperature, wind_velocity): 
@@ -98,5 +74,4 @@ def getWCI(temperature, wind_velocity):
      예시 : 12, 9.5
     """
     WCI = 13.12 + 0.6215 * temperature - 11.37 * math.pow(wind_velocity, 0.16) + 0.3965 * temperature * math.pow(wind_velocity, 0.16)
- 
     return WCI
