@@ -29,16 +29,12 @@ from .validations import (
     clothes_set_query_schema, 
     clothes_set_review_query_schema
 )
-<<<<<<< HEAD
 from .weather import (
     get_weather_date, 
     get_weather_between, 
     get_weather_time_date, 
     get_current_weather
 )
-=======
-
->>>>>>> 6f4dc8d66628aebf5a1a1432532a6cd80ee91ae4
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -122,8 +118,13 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
     # Apply filtering, using other query parameters.
     filter_mappings = {
-        'upper_category': 'upper_category',
-        'lower_category': 'lower_category',
+        'upper_category': 'upper_category__in',
+        'lower_category': 'lower_category__in',
+    }
+    
+    filter_value_transformations = {
+        'upper_category': lambda val: val.split(','),
+        'lower_category': lambda val: val.split(',')
     }
 
     # Use filter validation.
@@ -148,7 +149,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         if 'image_url' in request.data.keys():
             image_url = request.data['image_url']
             try:
-                request.data['image_url']  = move_image_to_saved(image_url)
+                request.data['image_url']  = move_image_to_saved(image_url, 'clothes')
             except S3FileError:
                 return Response({
                     'error': 'image does not exist ... plesase try again'
@@ -189,16 +190,17 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         An endpoint where the analysis of a clothes is returned
         """
         image = byte_to_image(request.data['image'])
-        image = remove_background(image)
-        image_url = save_image_s3(image)
-        
         image_tensor = image_to_tensor(image)
         inference_result = execute_inference(image_tensor)
         upper, lower = get_categories_from_predictions(inference_result)
         
+        image = remove_background(image)
+        image_url = save_image_s3(image, 'clothes')
+        
         return Response({'image_url': image_url, 
                          'upper_category':upper, 
                          'lower_category':lower}, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['get'])
     def today_category(self, request, *args, **kwargs):
         """
@@ -330,6 +332,18 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
                         "error" : "this is not your clothes : " + clothes_id
                     }, status=status.HTTP_200_OK)
         
+        if 'image' in request.data.keys():
+            image = byte_to_image(request.data['image'])
+            temp_url = save_image_s3(image, 'clothes-sets')
+            image_url = move_image_to_saved(temp_url, 'clothes-sets')
+            
+            request.data['image_url'] = image_url
+        
+        else:
+            return Response({
+                "error": 'image field is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
         return super().create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
@@ -344,6 +358,13 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        if 'image' in request.data.keys():
+            image = byte_to_image(request.data['image'])
+            temp_url = save_image_s3(image, 'clothes-sets')
+            image_url = move_image_to_saved(temp_url, 'clothes-sets')
+            
+            request.data['image_url'] = image_url
             
         return super().update(request, *args, **kwargs)
     
@@ -471,15 +492,16 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             end_time = int(end.split('T')[1].split(':')[0])
             
             # API 요청하기
+            # TODO: 날씨 데이터 없을때 오류처리.
             all_weather_data = Weather.objects.all()
             weather_data_set = all_weather_data.filter(location_code=location)
             weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_time)
             weather_data_on_end = weather_data_on_start.filter(date__lte=end_date, time__lte=end_time)
             
-            request.data['max_temp'] = weather_data_on_end.aggregate(Max('max_temp'))['max_temp__max']
-            request.data['min_temp'] = weather_data_on_end.aggregate(Min('min_temp'))['min_temp__min']
-            request.data['max_sensible_temp'] = weather_data_on_end.aggregate(Max('max_sensible_temp'))['max_sensible_temp__max']
-            request.data['min_sensible_temp'] = weather_data_on_end.aggregate(Min('min_sensible_temp'))['min_sensible_temp__min']
+            request.data['max_temp'] = weather_data_on_end.aggregate(Max('temp'))['temp__max']
+            request.data['min_temp'] = weather_data_on_end.aggregate(Min('temp'))['temp__min']
+            request.data['max_sensible_temp'] = weather_data_on_end.aggregate(Max('sensible_temp'))['sensible_temp__max']
+            request.data['min_sensible_temp'] = weather_data_on_end.aggregate(Min('sensible_temp'))['sensible_temp__min']
             request.data['humidity'] = weather_data_on_end.aggregate(Avg('humidity'))['humidity__avg']
             request.data['wind_speed'] = weather_data_on_end.aggregate(Avg('wind_speed'))['wind_speed__avg']
             request.data['precipitation'] = weather_data_on_end.aggregate(Avg('precipitation'))['precipitation__avg']
@@ -511,15 +533,16 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             end_time = int(end.split('T')[1].split(':')[0])
             
             # API 요청하기
+            # TODO: 날씨 데이터 없을때 오류처리.
             all_weather_data = Weather.objects.all()
             weather_data_set = all_weather_data.filter(location_code=location)
             weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_time)
             weather_data_on_end = weather_data_on_start.filter(date__lte=end_date, time__lte=end_time)
             
-            request.data['max_temp'] = weather_data_on_end.aggregate(Max('max_temp'))['max_temp__max']
-            request.data['min_temp'] = weather_data_on_end.aggregate(Min('min_temp'))['min_temp__min']
-            request.data['max_sensible_temp'] = weather_data_on_end.aggregate(Max('max_sensible_temp'))['max_sensible_temp__max']
-            request.data['min_sensible_temp'] = weather_data_on_end.aggregate(Min('min_sensible_temp'))['min_sensible_temp__min']
+            request.data['max_temp'] = weather_data_on_end.aggregate(Max('temp'))['temp__max']
+            request.data['min_temp'] = weather_data_on_end.aggregate(Min('temp'))['temp__min']
+            request.data['max_sensible_temp'] = weather_data_on_end.aggregate(Max('sensible_temp'))['sensible_temp__max']
+            request.data['min_sensible_temp'] = weather_data_on_end.aggregate(Min('sensible_temp'))['sensible_temp__min']
             request.data['humidity'] = weather_data_on_end.aggregate(Avg('humidity'))['humidity__avg']
             request.data['wind_speed'] = weather_data_on_end.aggregate(Avg('wind_speed'))['wind_speed__avg']
             request.data['precipitation'] = weather_data_on_end.aggregate(Avg('precipitation'))['precipitation__avg']
@@ -592,7 +615,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         location based on query parameter and current time
         """
         # Get Location.
-        location = request.data['location']
+        location = request.query_params.get('location')
         weather_data = get_current_weather(location)
         temperature = float(weather_data['T1H'])
         max_temp = float(weather_data['MAX'])

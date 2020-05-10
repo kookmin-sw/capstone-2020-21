@@ -1,3 +1,5 @@
+import base64
+
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from rest_framework import status
@@ -31,12 +33,19 @@ class ClohtesSetCreateTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         
         # Create 10 Clothes for current user
-        populate_clothes(10)
+        created_clothes = populate_clothes(10)
     
-        self.clothes = [1,2,3,4,5]
+        self.clothes = []
+
+        for clothe in created_clothes:
+            self.clothes.append(clothe.id)
+            if len(self.clothes) == 5:
+                break
+
         self.name = 'test-name'
         self.style = '화려'
-        self.image_url = 'https://www.naver.com'
+        with open("temp/sample_image.png", 'rb') as image:
+            self.image = base64.b64encode(image.read())
     
     def test_create(self):
         """
@@ -46,14 +55,14 @@ class ClohtesSetCreateTests(APITestCase):
             'clothes': self.clothes,
             'name': self.name,
             'style': self.style,
-            'image_url': self.image_url
+            'image': self.image
         }
         response = self.client.post('/clothes-sets/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['clothes'], self.clothes)
         self.assertEqual(response.data['name'], self.name)
         self.assertEqual(response.data['style'], self.style)
-        self.assertEqual(response.data['image_url'], self.image_url)
+        self.assertContains(response, 'image_url', status_code=201)
     
     def test_create_required(self):
         """
@@ -61,12 +70,12 @@ class ClohtesSetCreateTests(APITestCase):
         """
         data = {
             'clothes': self.clothes,
-            'image_url': self.image_url
+            'image': self.image
         }
         response = self.client.post('/clothes-sets/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['clothes'], self.clothes)
-        self.assertEqual(response.data['image_url'], self.image_url)
+        self.assertContains(response, 'image_url', status_code=201)
     
     def test_create_error_no_required(self):
         """
@@ -75,8 +84,7 @@ class ClohtesSetCreateTests(APITestCase):
         data = {}
         response = self.client.post('/clothes-sets/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['clothes'][0], 'This field is required.')
-        self.assertEqual(response.data['image_url'][0], 'This field is required.')
+        self.assertEqual(response.data['error'], 'image field is required')
     
     def test_create_error_authentication(self):
         """
@@ -108,12 +116,17 @@ class ClothesSetRetrieveTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         
         # Create 10 Clothes for current user
-        populate_clothes(10)
+        created_clothes = populate_clothes(10)
         
         # Create 3 ClothesSets for current user
-        populate_clothes_set(3)
+        self.created_clothes_set = populate_clothes_set(3)
     
-        self.clothes = [1,2,3,4,5]
+        self.clothes = []
+        for clothe in created_clothes:
+            self.clothes.append(clothe.id)
+            if len(self.clothes) == 5:
+                break
+
         self.name = 'test-name'
         self.style = '화려'
         self.image_url = 'https://www.naver.com'
@@ -122,7 +135,8 @@ class ClothesSetRetrieveTests(APITestCase):
         """
         단일 코디 정보 반환 테스트.
         """
-        response = self.client.get('/clothes-sets/1/')
+        url = '/clothes-sets/' + str(self.created_clothes_set[0].id) + '/'
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_retrieve_many(self):
@@ -138,7 +152,7 @@ class ClothesSetRetrieveTests(APITestCase):
         내 코디 정보 반환 테스트.
         """
         # Create new user.
-        created_user = UserFactory.create(
+        new_user = UserFactory.create(
             username='test-username-2',
             password=make_password('test-password'),
             nickname='test-nickname-2',
@@ -147,13 +161,13 @@ class ClothesSetRetrieveTests(APITestCase):
         )
         
         # Create one clothes for new user.
-        created_clothes = ClothesFactory.create(
+        new_clothes = ClothesFactory.create(
             upper_category='상의',
             lower_category='반팔티셔츠',
             image_url='https://www.test_img.com',
             alias='test-alias',
             created_at=timezone.now(),
-            owner_id=2
+            owner_id=new_user.id
         )
         
         # Create one clothes set for new user.
@@ -162,8 +176,8 @@ class ClothesSetRetrieveTests(APITestCase):
             style=self.style,
             image_url=self.image_url,
             created_at=timezone.now(),
-            clothes=[created_clothes],
-            owner=created_user
+            clothes=[new_clothes],
+            owner=new_user
         )
         
         # Total Clothe sets : 4.
@@ -197,14 +211,20 @@ class ClothesSetUpdateTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         
         # Create 10 Clothes for current user
-        populate_clothes(10)
+        created_clothes = populate_clothes(10)
         
         # Create 1 ClothesSets for current user
-        populate_clothes_set(1)
-    
-        self.clothes = [1,2,3,4,5]
+        self.created_clothes_set = populate_clothes_set(1)[0]
+        
+        self.clothes = []
+        for clothe in created_clothes:
+            self.clothes.append(clothe.id)
+            if len(self.clothes) == 5:
+                break
         self.name = 'test-name'
         self.style = '화려'
+        with open("temp/sample_image.png", 'rb') as image:
+            self.image = base64.b64encode(image.read())
         self.image_url = 'https://www.naver.com'
     
     def test_update_put(self):
@@ -215,14 +235,15 @@ class ClothesSetUpdateTests(APITestCase):
             'clothes': self.clothes,
             'name': self.name,
             'style': self.style,
-            'image_url': self.image_url
+            'image': self.image
         }
-        response = self.client.put('/clothes-sets/1/', data, format='json')
+        url = '/clothes-sets/' + str(self.created_clothes_set.id) + '/'
+        response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['clothes'], self.clothes)
         self.assertEqual(response.data['name'], self.name)
         self.assertEqual(response.data['style'], self.style)
-        self.assertEqual(response.data['image_url'], self.image_url)
+        self.assertContains(response, 'image_url', status_code=200)
     
     def test_update_patch(self):
         """
@@ -232,7 +253,8 @@ class ClothesSetUpdateTests(APITestCase):
         data = {
             'name': new_name
         }
-        response = self.client.patch('/clothes-sets/1/', data, format='json')
+        url = '/clothes-sets/' + str(self.created_clothes_set.id) + '/'
+        response = self.client.patch(url, data, format='json')
         self.assertEqual(response.data['name'], new_name)
     
     def test_update_error_not_mine(self):
@@ -255,11 +277,11 @@ class ClothesSetUpdateTests(APITestCase):
             image_url='https://www.test_img.com',
             alias='test-alias',
             created_at=timezone.now(),
-            owner_id=2
+            owner_id=created_user.id
         )
         
         # Create one clothes set for new user.
-        ClothesSetFactory.create(
+        new_clothes_set = ClothesSetFactory.create(
             name=self.name, 
             style=self.style,
             image_url=self.image_url,
@@ -271,7 +293,8 @@ class ClothesSetUpdateTests(APITestCase):
         data = {
             'name': 'new_name'
         }
-        response = self.client.patch('/clothes-sets/2/', data, format='json')
+        url = '/clothes-sets/' + str(new_clothes_set.id) + '/'
+        response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data['error'], 'you are not allowed to access this object')
     
@@ -299,13 +322,14 @@ class ClothesSetDeleteTests(APITestCase):
         populate_clothes(10)
         
         # Create 1 ClothesSets for current user
-        populate_clothes_set(1)
+        self.created_clothes_set = populate_clothes_set(1)[0]
     
     def test_delete(self):
         """
         정상 삭제 테스트.
         """
-        response = self.client.delete('/clothes-sets/1/')
+        url = '/clothes-sets/' + str(self.created_clothes_set.id) + '/'
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
     
     def test_delete_error_not_mine(self):
@@ -328,11 +352,11 @@ class ClothesSetDeleteTests(APITestCase):
             image_url='https://www.naver.com',
             alias='test-alias',
             created_at=timezone.now(),
-            owner_id=2
+            owner_id=created_user.id
         )
         
         # Create one clothes set for new user.
-        ClothesSetFactory.create(
+        new_clothes_set = ClothesSetFactory.create(
             name='test-name', 
             style='화려',
             image_url='https://www.naver.com',
@@ -341,6 +365,7 @@ class ClothesSetDeleteTests(APITestCase):
             owner=created_user
         )
         
-        response = self.client.delete('/clothes-sets/2/')
+        url = '/clothes-sets/' + str(new_clothes_set.id) + '/'
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         

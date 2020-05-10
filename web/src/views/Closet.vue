@@ -1,76 +1,109 @@
 <template>
-  <div class="closet">
-    <MainNavigation></MainNavigation>
-    <div class="container">
-      <div class="add_container">
-        <b-button class="btn_add" style="margin-right:10px" to="/closet/add">등록하기</b-button>
-      </div>
-      <div class="row">
-        <ClassificationComponent v-bind:list="list"></ClassificationComponent>
-        <div class="col-md-10 my_closet">
-          <ClosetComponent :showCloset="true"></ClosetComponent>
-        </div>
-      </div>
-    </div>
-  </div>
+    <b-container>
+        <b-row align-h="end" class="mb-3 mr-1">
+            <b-button to="/closet/add">등록하기</b-button>
+        </b-row>
+        <b-row>
+            <b-col md="2" cols="12">
+                <ClassificationComponent :list="categories"
+                                          @chooseCategory="handleLowerClick"/>
+            </b-col>
+            <b-col md="10" cols="12">
+                <b-row>
+                    <b-col v-for="clothe in clothes" :key="clothe.id" md="4" cols="12" class="mb-3">
+                        <ClothesCard :clothes="clothe"/>
+                    </b-col>
+                </b-row>
+            </b-col>
+        </b-row>
+    </b-container>
 </template>
 
 <script>
-import ClosetComponent from '@/components/ClosetComponent.vue'
 import ClassificationComponent from '@/components/ClassificationComponent.vue'
-import MainNavigation from '@/components/MainNavigation.vue'
+import ClothesCard from '@/components/cards/ClothesCard.vue'
+import axios from 'axios'
+import consts from '@/consts.js'
+
 export default {
-  name: 'Closet',
   components: {
-    ClosetComponent,
     ClassificationComponent,
-    MainNavigation
+    ClothesCard
   },
   data: function () {
     return {
-      list: [
-        {
-          name: '상의',
-          details: ['전체', '후드티', '반팔티셔츠', '긴팔티셔츠', '반팔셔츠', '긴팔셔츠', '맨투맨', '터틀넥', '니트', '블라우스', '끈나시', '민소매']
-        },
-        {
-          name: '바지',
-          details: ['전체', '반바지', '핫팬츠', '슬랙스', '청바지', '골덴바지', '트레이닝바지']
-        },
-        {
-          name: '치마',
-          details: ['전체', '미니스커트', '롱스커트']
-        },
-        {
-          name: '아우터',
-          details: ['전체', '블레이져', '숏패딩', '조끼패딩', '롱패딩', '야구점퍼', '항공점퍼', '바람막이', '야상', '무스탕', '코트', '트랙탑', '가죽자켓', '청자켓', '가디건']
+      currentCategories: { lower: '', upper: '' },
+      clothes: []
+    }
+  },
+  computed: {
+    categories: function () {
+      const CLOTHES_CATEGORIES = consts.CLOTHES_CATEGORIES
+      /*
+        Workaround for deep copying nested objects
+        ref: https://bit.ly/2y4vJLI
+      */
+      var categoryList = JSON.parse(JSON.stringify(CLOTHES_CATEGORIES))
+      for (var i in categoryList) {
+        categoryList[i].lower.unshift('전체')
+      }
+      return categoryList
+    }
+  },
+  methods: {
+    handleLowerClick: function (upper, lower) {
+      this.currentCategories.lower = lower
+      this.currentCategories.upper = upper
+    }
+  },
+  created: function () {
+    var vm = this
+    // TODO : localStorage에 token이 없을 때 어떻게 처리할 지
+    if (window.localStorage.getItem('token')) {
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true`, config)
+        .then((response) => {
+          vm.clothes = response.data.results
+        }).catch((ex) => {
+          // TODO: error handling.
+        })
+    }
+  },
+  watch: {
+    currentCategories: {
+      deep: true,
+      handler () {
+        var vm = this
+        if (window.localStorage.getItem('token')) {
+          var token = window.localStorage.getItem('token')
+          var config = {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+          if (vm.currentCategories.lower === '전체') {
+            axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&upper_category=${vm.currentCategories.upper}`, config)
+              .then((response) => {
+                vm.clothes = response.data.results
+              }).catch((ex) => {
+              // TODO: error handling.
+              })
+          } else {
+            axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&lower_category=${vm.currentCategories.lower}`, config)
+              .then((response) => {
+                vm.clothes = response.data.results
+              }).catch((ex) => {
+              // TODO: error handling.
+              })
+          }
         }
-      ]
+      }
     }
   }
 }
 </script>
-<style scoped>
-.closet {
-    width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-    /* margin-top: 200px; */
-}
-.container_1{
-  /* margin-top: 100px; */
-  text-align: left;
-  margin-left: 50px;
-  margin-right: 50px;
-}
-.add_container{
-  width:100%;
-  text-align:right;
-  margin-bottom: 20px;
-}
-.my_closet{
-  background-color: #faf5ef;
-  border-color: #d3f4ff;
-  border-style: solid;
-}
+
+<style>
+
 </style>

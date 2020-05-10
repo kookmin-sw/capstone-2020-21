@@ -120,7 +120,7 @@ class ClohtesCreateTests(APITestCase):
 class ClothesRetrieveTests(APITestCase):
     def setUp(self):
         # Create a user and log in.
-        created_user = UserFactory.create(
+        self.created_user = UserFactory.create(
             username='test-username',
             password=make_password('test-password'),
             nickname='test-nickname',
@@ -136,28 +136,35 @@ class ClothesRetrieveTests(APITestCase):
         access_token = response.data['access']
 
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
+        populate_clothes(9)
         
-        # Create 10 Clothes for test.
-        populate_clothes(10)
+        # Create 1 Clothes for test
+        self.created_clothes = ClothesFactory.create(
+            upper_category='상의',
+            lower_category='반팔티셔츠',
+            image_url='https://www.test_img.com',
+            alias='test-alias',
+            created_at=timezone.now(),
+            owner_id=self.created_user.id
+        )
         
-    def test_retrieve_one(self):
+    def test_retrieve(self):
         """
-        단일 옷 정보 반환 테스트.
+        여러 개 & 단일 옷 정보 반환 테스트.
         """
-        response = self.client.get('/clothes/1/')
+        
+        url = '/clothes/' + str(self.created_clothes.id) + '/'
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-    def test_retrieve_many(self):
-        """
-        여러 개 옷 정보 반환 테스트.
-        """
         response = self.client.get('/clothes/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 10)
         
     def test_retrieve_me(self):
         # Create new user.
-        UserFactory.create(
+        new_user = UserFactory.create(
             username='test-username-2',
             password=make_password('test-password'),
             nickname='test-nickname-2',
@@ -166,13 +173,13 @@ class ClothesRetrieveTests(APITestCase):
         )
         
         # Create one clothes for new user.
-        ClothesFactory.create(
+        new_clothes = ClothesFactory.create(
             upper_category='상의',
             lower_category='반팔티셔츠',
-            image_url='https://www.test_img.com',
+            image_url='https://www.test_img.com/123',
             alias='test-alias',
             created_at=timezone.now(),
-            owner_id=2
+            owner_id=new_user.id
         )
         
         # Total clothes : 11.
@@ -189,7 +196,7 @@ class ClothesRetrieveTests(APITestCase):
 class ClothesUpdateTests(APITestCase):
     def setUp(self):
         # Create a user and log in.
-        created_user = UserFactory.create(
+        self.created_user = UserFactory.create(
             username='test-username',
             password=make_password('test-password'),
             nickname='test-nickname',
@@ -207,7 +214,14 @@ class ClothesUpdateTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         
         # Create 1 Clothes for test.
-        populate_clothes(1)
+        self.created_clothes = ClothesFactory.create(
+            upper_category='상의',
+            lower_category='반팔티셔츠',
+            image_url='https://www.test_img.com',
+            alias='test-alias',
+            created_at=timezone.now(),
+            owner_id=self.created_user.id
+        )
         
         self.upper_category='상의'
         self.lower_category='반팔티셔츠'
@@ -224,7 +238,8 @@ class ClothesUpdateTests(APITestCase):
             'image_url': self.image_url,
             'alias': self.alias,
         }
-        response = self.client.put('/clothes/1/', data, format='json')
+        url = '/clothes/' + str(self.created_clothes.id) + '/'
+        response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['upper_category'], self.upper_category)
         self.assertEqual(response.data['lower_category'], self.lower_category)
@@ -238,7 +253,8 @@ class ClothesUpdateTests(APITestCase):
         data = {
             'alias': self.alias,
         }
-        response = self.client.patch('/clothes/1/', data, format='json')
+        url = '/clothes/' + str(self.created_clothes.id) + '/'
+        response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['alias'], self.alias)
     
@@ -247,7 +263,7 @@ class ClothesUpdateTests(APITestCase):
         오류 - 해당 사용자의 옷이 아닐 시.
         """
         # Create new user.
-        UserFactory.create(
+        new_user = UserFactory.create(
             username='test-username-2',
             password=make_password('test-password'),
             nickname='test-nickname-2',
@@ -256,19 +272,20 @@ class ClothesUpdateTests(APITestCase):
         )
         
         # Create one clothes for new user.
-        ClothesFactory.create(
+        new_clothes = ClothesFactory.create(
             upper_category='상의',
             lower_category='반팔티셔츠',
-            image_url='https://www.test_img.com',
+            image_url='https://www.test_img.com/123',
             alias='test-alias',
             created_at=timezone.now(),
-            owner_id=2
+            owner_id=new_user.id
         )
         
         data = {
             'alias': self.alias,
         }
-        response = self.client.patch('/clothes/2/', data, format='json')
+        url = '/clothes/' + str(new_clothes.id) + '/'
+        response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data['error'], 'you are not allowed to access this object')
         
@@ -276,7 +293,7 @@ class ClothesUpdateTests(APITestCase):
 class ClothesDeleteTests(APITestCase):
     def setUp(self):
         # Create a user and log in.
-        created_user = UserFactory.create(
+        self.created_user = UserFactory.create(
             username='test-username',
             password=make_password('test-password'),
             nickname='test-nickname',
@@ -294,13 +311,21 @@ class ClothesDeleteTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         
         # Create 1 Clothes for test.
-        populate_clothes(1)
+        self.created_clothes = ClothesFactory.create(
+            upper_category='상의',
+            lower_category='반팔티셔츠',
+            image_url='https://www.test_img.com',
+            alias='test-alias',
+            created_at=timezone.now(),
+            owner_id=self.created_user.id
+        )
     
     def test_delete(self):
         """
         정상 삭제 테스트.
         """
-        response = self.client.delete('/clothes/1/')
+        url = '/clothes/' + str(self.created_clothes.id) + '/'
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
     
     def test_delete_error_not_mine(self):
@@ -308,7 +333,7 @@ class ClothesDeleteTests(APITestCase):
         오류 - 해당 사용자의 옷이 아닐 시.
         """
         # Create new user.
-        UserFactory.create(
+        new_user = UserFactory.create(
             username='test-username-2',
             password=make_password('test-password'),
             nickname='test-nickname-2',
@@ -317,16 +342,17 @@ class ClothesDeleteTests(APITestCase):
         )
         
         # Create one clothes for new user.
-        ClothesFactory.create(
+        new_clothes = ClothesFactory.create(
             upper_category='상의',
             lower_category='반팔티셔츠',
             image_url='https://www.naver.com',
             alias='test-alias',
             created_at=timezone.now(),
-            owner_id=2
+            owner_id=new_user.id
         )
         
-        response = self.client.delete('/clothes/2/')
+        url = '/clothes/' + str(new_clothes.id) + '/'
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data['error'], 'you are not allowed to access this object')
     

@@ -28,7 +28,7 @@
       </b-row>
       <b-row no-gutters class="mb-2">
         <b-col align-self="center" cols="4">
-          <label class="mb-0" for="form-lower">별칭</label>
+          <label class="mb-0" for="form-alias">별칭</label>
         </b-col>
         <b-col cols="8">
           <b-form-input type="text"
