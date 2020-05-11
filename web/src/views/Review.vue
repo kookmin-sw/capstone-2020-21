@@ -1,7 +1,7 @@
 <template>
   <b-container>
-    <b-row cols=1>
-      <b-col cols=12>
+    <b-row cols="1">
+      <b-col cols="12">
         <ReviewComponent clothes_sets_id=60 :locationData.sync="locationProps"/>
       </b-col>
     </b-row>

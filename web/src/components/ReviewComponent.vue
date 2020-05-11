@@ -1,99 +1,99 @@
 <template>
 <b-container>
-    <b-row class="row justify-content-center align-items-center">
-        <b-col cols="7">
-        <form id="review-form" class="form" action="" method="post">
-            <h3 class="text-center text-top">Review</h3>
-            <b-img fluid :src="imageURL"/>
-                <b-form-group label="활동장소 :" lable-for="input-1" class="text-left text-top">
-                  <b-row id="input-1">
-                  <b-col md="auto" style="margin:0 auto">
-                    <h5 style="word-break: keep-all">
-                      위치 : {{ locationData.location.name }}
-                    </h5>
-                  </b-col>
-                  <b-col md="auto">
-                    <b-button class="mb-3" variant="info" size="sm" @click="openLocationModal">
-                      <b-icon-arrow-clockwise/> 바꾸기
-                    </b-button>
-                  </b-col>
-                  </b-row>
-                </b-form-group>
-                <b-form-group label="활동기간 :" label-for="input-2" class="text-left text-top">
-                    <b-row id="input-2">
-                    <b-col md="auto" style="margin:0 auto">
-                    <b-calendar :min="min" :max="max" v-model="form.start_date" locale="en-US"></b-calendar>
-                    </b-col>
-                    <b-col md="auto" style="margin:0 auto">
-                    <b-calendar :min="min" :max="max" v-model="form.end_date" locale="en-US"></b-calendar>
-                    </b-col>
-                    </b-row>
-                </b-form-group>
-                <b-form-group label="활동시간 :" label-for="input-3" class="text-left text-top">
-                  <b-row id="input-3">
-                  <b-col md="auto" style="margin:0 auto">
-                  <b-time v-model="form.start_time" locale="en"></b-time>
-                  </b-col>
-                  <b-col md="auto" style="margin:0 auto">
-                  <b-time v-model="form.end_time" locale="en"></b-time>
-                  </b-col>
-                  </b-row>
-                </b-form-group>
-                <b-form-group label="만족도 :" label-for="input-4" class="text-left text-top">
-                    <b-form-input id="input-4" v-model="form.range" type="range" min="1" max="5"></b-form-input>
-                    <b-row>
-                    <b-col class="col-2 text-left">1</b-col>
-                    <b-col class="col-3 text-center">2</b-col>
-                    <b-col class="col-2 text-center">3</b-col>
-                    <b-col class="col-3 text-center">4</b-col>
-                    <b-col class="col-2 text-right">5</b-col>
-                    </b-row>
-                    <b-row>
-                    <b-col class="col-4 text-left">추웠다</b-col>
-                    <b-col class="col-4 text-center">적당했다</b-col>
-                    <b-col class="col-4 text-right">더웠다</b-col>
-                    </b-row>
-                </b-form-group>
-                <b-form-group label="한줄평 :" label-for="input-5" class="text-left text-top">
-                    <b-form-input id="input-5" v-model="form.comment"></b-form-input>
-                </b-form-group>
+  <b-row class="justify-content-center align-items-center">
+    <b-col cols="7">
+      <form id="review-form" class="form" action="" method="post">
+        <h3 class="text-center text-top">Review</h3>
+        <b-img fluid :src="imageURL"/>
+        <b-form-group label="활동장소 :" lable-for="input-1" class="text-left text-top">
+          <b-row id="input-1">
+            <b-col md="auto" style="margin:0 auto">
+              <h5 style="word-break: keep-all">
+                위치 : {{ locationData.location.name }}
+              </h5>
+            </b-col>
+            <b-col md="auto">
+              <b-button class="mb-3" variant="info" size="sm" @click="openLocationModal">
+                <b-icon-arrow-clockwise/> 바꾸기
+              </b-button>
+            </b-col>
+          </b-row>
+        </b-form-group>
+        <b-form-group label="활동기간 :" label-for="input-2" class="text-left text-top">
+          <b-row id="input-2">
+            <b-col md="auto" style="margin:0 auto">
+              <b-calendar :min="min" :max="max" v-model="form.start_date" locale="en-US"></b-calendar>
+            </b-col>
+            <b-col md="auto" style="margin:0 auto">
+              <b-calendar :min="min" :max="max" v-model="form.end_date" locale="en-US"></b-calendar>
+            </b-col>
+          </b-row>
+        </b-form-group>
+        <b-form-group label="활동시간 :" label-for="input-3" class="text-left text-top">
+          <b-row id="input-3">
+            <b-col md="auto" style="margin:0 auto">
+              <b-time v-model="form.start_time" locale="en"></b-time>
+            </b-col>
+            <b-col md="auto" style="margin:0 auto">
+              <b-time v-model="form.end_time" locale="en"></b-time>
+            </b-col>
+          </b-row>
+        </b-form-group>
+        <b-form-group label="만족도 :" label-for="input-4" class="text-left text-top">
+          <b-form-input id="input-4" v-model="form.range" type="range" min="1" max="5"></b-form-input>
+          <b-row>
+            <b-col class="col-2 text-left">1</b-col>
+            <b-col class="col-3 text-center">2</b-col>
+            <b-col class="col-2 text-center">3</b-col>
+            <b-col class="col-3 text-center">4</b-col>
+            <b-col class="col-2 text-right">5</b-col>
+          </b-row>
+          <b-row>
+            <b-col class="col-4 text-left">추웠다</b-col>
+            <b-col class="col-4 text-center">적당했다</b-col>
+            <b-col class="col-4 text-right">더웠다</b-col>
+          </b-row>
+        </b-form-group>
+        <b-form-group label="한줄평 :" label-for="input-5" class="text-left text-top">
+          <b-form-input id="input-5" v-model="form.comment"></b-form-input>
+        </b-form-group>
 
-                <b-modal ref="location-modal" title="위치 검색" ok-title="확인" cancel-title="취소">
-                  <b-container>
-                    <b-row class="mb-3" no-gutters>
-                      <b-col cols=10>
-                        <b-input v-model="keyword" type="search" placeholder="도/시를 입력해주세요"/>
-                      </b-col>
-                      <b-col cols=2>
-                        <b-button @click="handleLocationSearch">
-                          <b-icon-search/>
-                        </b-button>
-                      </b-col>
-                    </b-row>
-                    <b-row>
-                      <b-col>
-                        <b-list-group>
-                          <b-list-group-item
-                            class="w-100"
-                            href="#"
-                            v-for="location of locations"
-                            :key="location.id"
-                            @click="handleLocationClick($event, location)">
-                            {{ location.location }}
-                          </b-list-group-item>
-                        </b-list-group>
-                      </b-col>
-                    </b-row>
-                  </b-container>
-                </b-modal>
-                <b-row>
-                  <b-col class="col-6" style="margin:0 auto">
-                      <b-button pill class="w-75" @click="submit">등록하기</b-button>
-                  </b-col>
-                </b-row>
-        </form>
+        <b-modal ref="location-modal" title="위치 검색" ok-title="확인" cancel-title="취소">
+          <b-container>
+            <b-row class="mb-3" no-gutters>
+              <b-col cols="10">
+                <b-input v-model="keyword" type="search" placeholder="도/시를 입력해주세요"/>
+              </b-col>
+              <b-col cols="2">
+                <b-button @click="handleLocationSearch">
+                  <b-icon-search/>
+                </b-button>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col>
+                <b-list-group>
+                  <b-list-group-item
+                    class="w-100"
+                    href="#"
+                    v-for="location of locations"
+                    :key="location.id"
+                    @click="handleLocationClick($event, location)">
+                    {{ location.location }}
+                  </b-list-group-item>
+                </b-list-group>
+              </b-col>
+            </b-row>
+          </b-container>
+        </b-modal>
+        <b-row>
+          <b-col class="col-6" style="margin:0 auto">
+              <b-button pill class="w-75" @click="submit">등록하기</b-button>
+          </b-col>
+        </b-row>
+      </form>
     </b-col>
-</b-row>
+  </b-row>
 </b-container>
 </template>
 
@@ -173,7 +173,7 @@ export default {
       axios.post(`${consts.SERVER_BASE_URL}/clothes-set-reviews/`, data, config)
         .then(response => {
           console.log(response)
-          this.$router.replace('/cody/')
+          this.$router.push('/cody/')
         })
     },
     openLocationModal: function () {
