@@ -311,7 +311,25 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
                 'error' : 'token authorization failed ... please log in'
             }, status=status.HTTP_401_UNAUTHORIZED)
             
-        return super().list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+        if request.query_params.get('review'):
+            reviews = ClothesSetReview.objects.all()
+            
+            queryset_list = list(queryset)
+            for clothesSet in queryset_list:
+                included_reviews = reviews.filter(clothes_set__id=clothesSet.id)
+                if len(included_reviews) == 0:
+                    queryset = queryset.exclude(id=clothesSet.id)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+            
+        return Response(serializer.data)
+            
     
     def create(self, request, *args, **kwargs):
         if 'clothes' in request.data.keys():
