@@ -62,7 +62,7 @@ export default {
         var config = {
           headers: { Authorization: `Bearer ${token}` }
         }
-        axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/`, config)
+        axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/?me=true`, config)
           .then((response) => {
             vm.clothes_set = response.data.results
             console.log(vm.clothes)
@@ -83,14 +83,21 @@ export default {
             headers: { Authorization: `Bearer ${token}` }
           }
           if (vm.currentCategories.lower === '전체') {
-            axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/?style`, config)
+            axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/?me=true`, config)
+              .then((response) => {
+                vm.clothes_set = response.data.results
+              }).catch((ex) => {
+              // TODO: error handling.
+              })
+          } else if (vm.currentCategories.upper === '스타일') {
+            axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/?me=true&style=${vm.currentCategories.lower}`, config)
               .then((response) => {
                 vm.clothes_set = response.data.results
               }).catch((ex) => {
               // TODO: error handling.
               })
           } else {
-            axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/?style=${vm.currentCategories.lower}`, config)
+            axios.get(`${consts.SERVER_BASE_URL}/clothes-sets-review/?me=true`, config)
               .then((response) => {
                 vm.clothes_set = response.data.results
               }).catch((ex) => {
