@@ -15,6 +15,7 @@
     "axios": "^0.19.2",
     "bootstrap-vue": "^2.11.0",
     "core-js": "^2.6.5",
+    "fabric": "^3.6.3",
     "jquery": "^3.4.1",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",
