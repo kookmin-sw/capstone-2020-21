@@ -77,7 +77,7 @@ def run():
 
 def ago():
     today = datetime.date.today()
-    last_week = today - datetime.timedelta(days=9)
+    last_week = today - datetime.timedelta(days=7)
     data = Weather.objects.filter(date=last_week)
     # TODO(hyobin) : print문 지우기
     print('delete date : ', last_week)
