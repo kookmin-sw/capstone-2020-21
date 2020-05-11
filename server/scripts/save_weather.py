@@ -61,9 +61,9 @@ def run():
         except KeyError:
             err_location_code.append(location)
 
-    while err_location_code != 0:
+    while len(err_location_code) != 0:
         time.sleep(600)
-        for location in err_location_code:
+        for location in range(len(err_location_code)):
             try:
                 response = get_weather_date(now, str(err_location_code[location]))
 
