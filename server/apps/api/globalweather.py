@@ -6,9 +6,8 @@ import urllib
 import pprint
 from urllib.request import urlopen
 
-# ServiceKey = settings.GLOBAL_WEATHER_API_KEY
+ServiceKey = settings.GLOBAL_WEATHER_API_KEY
 
-ServiceKey = "9aac94e3a47a4598910ea72abbf18e37"
 def find_city_id(city_name):
     with open('apps/api/locations/cities_20000.json', 'rt', encoding='UTF8') as json_file:
         json_data = json.load(json_file)
