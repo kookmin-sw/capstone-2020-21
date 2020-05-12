@@ -11,6 +11,7 @@ import ClosetAddNew from './views/ClosetAddNew.vue'
 import Cody from './views/Cody.vue'
 import CodyAdd from './views/CodyAdd.vue'
 import CodyDetail from './views/CodyDetail.vue'
+import CodyDetailNew from './views/CodyDetailNew'
 
 Vue.use(Router)
 
@@ -72,7 +73,7 @@ export default new Router({
     {
       path: '/cody/detail',
       name: 'CodyDetail',
-      component: CodyDetail
+      component: CodyDetailNew
     }
 
   ]
