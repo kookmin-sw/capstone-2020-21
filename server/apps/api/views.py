@@ -149,7 +149,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         if 'image_url' in request.data.keys():
             image_url = request.data['image_url']
             try:
-                request.data['image_url']  = move_image_to_saved(image_url)
+                request.data['image_url']  = move_image_to_saved(image_url, 'clothes')
             except S3FileError:
                 return Response({
                     'error': 'image does not exist ... plesase try again'
@@ -190,16 +190,17 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         An endpoint where the analysis of a clothes is returned
         """
         image = byte_to_image(request.data['image'])
-        image = remove_background(image)
-        image_url = save_image_s3(image)
-        
         image_tensor = image_to_tensor(image)
         inference_result = execute_inference(image_tensor)
         upper, lower = get_categories_from_predictions(inference_result)
         
+        image = remove_background(image)
+        image_url = save_image_s3(image, 'clothes')
+        
         return Response({'image_url': image_url, 
                          'upper_category':upper, 
                          'lower_category':lower}, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['get'])
     def today_category(self, request, *args, **kwargs):
         """
@@ -310,7 +311,25 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
                 'error' : 'token authorization failed ... please log in'
             }, status=status.HTTP_401_UNAUTHORIZED)
             
-        return super().list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+        if request.query_params.get('review'):
+            reviews = ClothesSetReview.objects.all()
+            
+            queryset_list = list(queryset)
+            for clothesSet in queryset_list:
+                included_reviews = reviews.filter(clothes_set__id=clothesSet.id)
+                if len(included_reviews) == 0:
+                    queryset = queryset.exclude(id=clothesSet.id)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+            
+        return Response(serializer.data)
+            
     
     def create(self, request, *args, **kwargs):
         if 'clothes' in request.data.keys():
@@ -331,6 +350,18 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
                         "error" : "this is not your clothes : " + clothes_id
                     }, status=status.HTTP_200_OK)
         
+        if 'image' in request.data.keys():
+            image = byte_to_image(request.data['image'])
+            temp_url = save_image_s3(image, 'clothes-sets')
+            image_url = move_image_to_saved(temp_url, 'clothes-sets')
+            
+            request.data['image_url'] = image_url
+        
+        else:
+            return Response({
+                "error": 'image field is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
         return super().create(request, *args, **kwargs)
     
     def perform_create(self, serializer):
@@ -345,6 +376,13 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
+            
+        if 'image' in request.data.keys():
+            image = byte_to_image(request.data['image'])
+            temp_url = save_image_s3(image, 'clothes-sets')
+            image_url = move_image_to_saved(temp_url, 'clothes-sets')
+            
+            request.data['image_url'] = image_url
             
         return super().update(request, *args, **kwargs)
     
