@@ -1,6 +1,6 @@
 <template>
     <b-container>
-        <b-row algin-h="end" class="mb-3 mr-1">
+        <b-row class="mb-3 mr-1 justify-content-end">
             <b-button to="/cody/add">등록하기</b-button>
         </b-row>
         <b-row>
