@@ -37,9 +37,24 @@ const CLOTHES_CATEGORIES = [
   }
 ]
 
+const CODY_CATEGORIES = [
+  {
+    upper: '스타일',
+    lower: [
+      '심플', '스트릿', '화려', '데이트', '정장'
+    ]
+  },
+  {
+    upper: '리뷰',
+    lower: [
+      '등록'
+    ]
+  }
+]
 const SERVER_BASE_URL = 'http://localhost:8000'
 
 export default {
   CLOTHES_CATEGORIES,
+  CODY_CATEGORIES,
   SERVER_BASE_URL
 }
