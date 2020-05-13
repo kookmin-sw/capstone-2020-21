@@ -618,8 +618,6 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         # Get Location.
         city_name = request.query_params.get('city_name')
         forecast_date = request.query_params.get('date')
-        # city_name = request.data['city_name']
-        # forecast_date = request.data['date']
         weather_data = get_global_weather_city_name(forecast_date, city_name)
         temperature = float(weather_data['TEMP'])
         max_temp = float(weather_data['MAX'])
