@@ -116,9 +116,9 @@ def get_global_weather_city_name(forecast_date, city_name):
     t_min = float(t_min)
 
     wci_high = getWCI(t_high, v)
-    wci_high = round(wci, 2)
+    wci_high = round(wci_high, 2)
     wci_low = getWCI(t_min, v)
-    wci_low = round(wci, 2)
+    wci_low = round(wci_low, 2)
 
     passing_data['WCI'] = wci # current wind chill temp
     passing_data['WCIMAX'] = wci_high # maximum chill temp
