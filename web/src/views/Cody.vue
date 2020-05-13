@@ -65,7 +65,6 @@ export default {
         axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/?me=true`, config)
           .then((response) => {
             vm.clothes_set = response.data.results
-            console.log(vm.clothes)
           }).catch((ex) => {
           // TODO: error handling.
           })
@@ -96,13 +95,15 @@ export default {
               }).catch((ex) => {
               // TODO: error handling.
               })
-          } else {
-            axios.get(`${consts.SERVER_BASE_URL}/clothes-sets-review/?me=true`, config)
-              .then((response) => {
-                vm.clothes_set = response.data.results
-              }).catch((ex) => {
-              // TODO: error handling.
-              })
+          } else if (vm.currentCategories.upper === '리뷰') {
+            if (vm.currentCategories.lower === '등록') {
+              axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/?me=true&review=true`, config)
+                .then((response) => {
+                  vm.clothes_set = response.data.results
+                }).catch((ex) => {
+                  // TODO: error handling.
+                })
+            }
           }
         }
       }

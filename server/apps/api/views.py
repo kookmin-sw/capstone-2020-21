@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from statistics import mode
 
 from .exceptions import S3FileError
+from .globalweather import get_global_weather_city_name
 from .models import Clothes, ClothesSet, ClothesSetReview, User, Weather
 from .permissions import UserPermissions
 from .serializers import (
@@ -311,7 +312,25 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
                 'error' : 'token authorization failed ... please log in'
             }, status=status.HTTP_401_UNAUTHORIZED)
             
-        return super().list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+        if request.query_params.get('review'):
+            reviews = ClothesSetReview.objects.all()
+            
+            queryset_list = list(queryset)
+            for clothesSet in queryset_list:
+                included_reviews = reviews.filter(clothes_set__id=clothesSet.id)
+                if len(included_reviews) == 0:
+                    queryset = queryset.exclude(id=clothesSet.id)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+            
+        return Response(serializer.data)
+            
     
     def create(self, request, *args, **kwargs):
         if 'clothes' in request.data.keys():
@@ -606,6 +625,38 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'count': count,
                 'next': offset + limit_count,
                 'results': final_results,
+            }, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def global_weather(self, request, *args, **kwargs):
+        """
+        An endpoint that returns global weather data for 
+        location and date which wanna forecast
+        """
+        # Get Location.
+        city_name = request.query_params.get('city_name')
+        forecast_date = request.query_params.get('date')
+        weather_data = get_global_weather_city_name(forecast_date, city_name)
+        temperature = float(weather_data['TEMP'])
+        max_temp = float(weather_data['MAX'])
+        min_temp = float(weather_data['MIN'])
+        humidity = int(weather_data['REH'])
+        wind_speed = float(weather_data['WSD'])
+        precipitation = float(weather_data['PRE'])
+        sense = float(weather_data['WCI'])
+        max_sense = float(weather_data['WCIMAX'])
+        min_sense = float(weather_data['WCIMIN'])
+
+        return Response({
+        'temperature': temperature,
+        'min_temperature': min_temp,
+        'max_temperature': max_temp,
+        'chill_temp': sense,
+        'min_chill_temp': min_sense,
+        'max_chill_temp': max_sense,
+        'humidity': humidity,
+        'wind_speed': wind_speed,
+        'precipitation': precipitation,
             }, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])

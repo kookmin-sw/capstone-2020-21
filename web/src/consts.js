@@ -47,7 +47,7 @@ const CODY_CATEGORIES = [
   {
     upper: '리뷰',
     lower: [
-      '미등록', '등록'
+      '등록'
     ]
   }
 ]
