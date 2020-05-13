@@ -658,6 +658,53 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         'wind_speed': wind_speed,
         'precipitation': precipitation,
             }, status=status.HTTP_200_OK)
+        
+    @action(detail=False, methods=['get'])
+    def global_search(self, request, *args, **kwargs):
+        """
+        An endpoint that returns search result for
+        location based on query parameter
+        """
+        
+        # Get query parameters.
+        search = request.query_params.get('search')
+        search = '' if search == None else search
+        limit = request.query_params.get('limit')
+        offset = request.query_params.get('offset')
+        
+        # Open JSON file for location results.
+        with open('apps/api/locations/cities_20000.json', 'rt', encoding='UTF-8') as json_file:
+            data = json.load(json_file)
+            
+        # Get results total count & initial list containing search keyword.    
+        results = []
+        count = 0
+        for city in data:
+            if search in city['city_name']:
+                count += 1
+                results.append({
+                    'id': city['city_id'],
+                    'location' : city['city_name']
+                })
+        
+        # Filter list according to limit & offset.
+        final_results = []
+        offset = 0 if offset == None else int(offset)
+        limit = count if limit == None else int(limit)
+        limit_count = 0
+        
+        for result in results[offset:]:
+            limit_count += 1
+            final_results.append(result)
+            if limit_count == limit:
+                break
+        
+        # Return response.
+        return Response({
+                'count': count,
+                'next': offset + limit_count,
+                'results': final_results,
+            }, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
     def current_weather(self, request, *args, **kwargs):
