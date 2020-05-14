@@ -63,7 +63,15 @@ export default {
       }
       axios.post(`${consts.SERVER_BASE_URL}/clothes/`, data, config)
         .then(response => {
-          this.$router.push('/closet')
+          this.$router.push({
+            name: 'Bridge',
+            params: {
+              errorMessage: '옷이 성공적으로 등록되었습니다',
+              destination: 'Closet',
+              delay: 3,
+              variant: 'success'
+            }
+          })
         }).catch((ex) => {
           this.alertMessage = '옷 등록에 실패했습니다. 오류가 계속 될 경우, 관리자에게 연락해주세요.'
           this.showAlert = true
@@ -78,7 +86,6 @@ export default {
       var config = {
         headers: { Authorization: `Bearer ${token}` }
       }
-
       axios.post(`${consts.SERVER_BASE_URL}/clothes/inference/`, { image: imageStr }, config)
         .then(response => {
           this.image = response.data.image_url
@@ -92,9 +99,15 @@ export default {
   },
   created: function () {
     if (!localStorage.getItem('token')) {
-      this.$router.push('/login')
-      // TODO: 에러메세지 더 좋은걸로 바꾸기.
-      alert('로그인해주세요!')
+      this.$router.push({
+        name: 'Bridge',
+        params: {
+          errorMessage: '로그인이 필요한 서비스입니다.',
+          destination: 'login',
+          delay: 3,
+          variant: 'danger'
+        }
+      })
     }
   }
 }
