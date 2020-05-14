@@ -58,12 +58,9 @@ export default {
       }
       axios.post(`${consts.SERVER_BASE_URL}/clothes/`, data, config)
         .then(response => {
-          // TODO: delete console.log .
-          console.log(response)
           this.$router.push('/closet')
         }).catch((ex) => {
-          // TODO: handle error.
-          console.log(ex)
+          
         })
     },
     handleModify: function () {
@@ -78,8 +75,6 @@ export default {
 
       axios.post(`${consts.SERVER_BASE_URL}/clothes/inference/`, { image: imageStr }, config)
         .then(response => {
-          // TODO: delete console.log .
-          console.log(response)
           this.image = response.data.image_url
           this.analysis_props.upper = response.data.upper_category
           this.analysis_props.lower = response.data.lower_category
