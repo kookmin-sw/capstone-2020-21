@@ -1,5 +1,8 @@
 <template>
   <b-container>
+    <b-alert id="alert" v-model="showAlert" variant="danger" dismissible >
+      {{ alertMessage }}
+    </b-alert>
     <b-row cols="1" cols-md="2">
       <b-col class="mb-5 mb-md-0 pl-4 pr-4" cols="12" md="6">
         <ImageUploadComponent :image="image" @update:image="handleImageUpdate" />
@@ -41,7 +44,9 @@ export default {
         lower: '',
         alias: ''
       },
-      disableAnalysis: true
+      disableAnalysis: true,
+      alertMessage: '',
+      showAlert: false
     }
   },
   methods: {
@@ -60,7 +65,8 @@ export default {
         .then(response => {
           this.$router.push('/closet')
         }).catch((ex) => {
-          
+          this.alertMessage = '옷 등록에 실패했습니다. 오류가 계속 될 경우, 관리자에게 연락해주세요.'
+          this.showAlert = true
         })
     },
     handleModify: function () {
@@ -79,7 +85,8 @@ export default {
           this.analysis_props.upper = response.data.upper_category
           this.analysis_props.lower = response.data.lower_category
         }).catch((ex) => {
-          // TODO: handle errors.
+          this.alertMessage = '옷 분석에 실패했습니다. 오류가 계속 될 경우, 관리자에게 연락해주세요.'
+          this.showAlert = true
         })
     }
   },
