@@ -1,13 +1,13 @@
 <template>
     <b-container>
         <b-row>
-          <b-col md="4" cols="12" style="text-align:left">
+          <b-col md="4" cols="4" style="text-align:left">
             <b-button to="/cody">뒤로가기</b-button>
           </b-col>
-          <b-col md="4" cols="12" style="text-align:center">
+          <b-col md="4" cols="4" style="text-align:center">
             <b-button to="/review">리뷰등록하기</b-button>
           </b-col>
-          <b-col md="4" cols="12" style="text-align:right">
+          <b-col md="4" cols="4" style="text-align:right">
             <b-button @click="deleteCody">삭제하기</b-button>
           </b-col>
         </b-row>
@@ -54,13 +54,11 @@
                     </b-col>
                 </b-row>
             </b-col>
-
         </b-row>
-        <!-- review 보여주기 -->
         <b-row>
-          <!-- <b-col md="4" cols="12" class="mb-3" v-for="review in clothes_set_review" :key="review.id">
-            <ClothesSetReviewCard :clothes_set_review="review"/>
-          </b-col> -->
+          <b-col md="4" cols="12" class="mb-3" v-for="cody_review in review" :key="cody_review.id">
+            <ClothesSetReviewCard :review="cody_review"/>
+          </b-col>
         </b-row>
     </b-container>
 </template>
@@ -89,11 +87,10 @@ export default {
         name: ''
       },
       disableAnalysis: true,
-      clothes_set_review: []
+      review: []
     }
   },
   props: [
-    'review',
     'clothes_set_id'
   ],
   computed: {
@@ -120,11 +117,16 @@ export default {
         var clothesId = vm.clothes_set_id
         axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/`)
           .then((response) => {
-            console.log(response.data)
             vm.clothes_set = response.data
 
             vm.analysis_props.style = vm.clothes_set.style
             vm.analysis_props.name = vm.clothes_set.name
+          }).catch((ex) => {
+          // TODO: error handling.
+          })
+        axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/clothes-set-reviews`)
+          .then((response) => {
+            vm.review = response.data.results
           }).catch((ex) => {
           // TODO: error handling.
           })
