@@ -7,6 +7,7 @@
       <b-form-file placeholder="이미지파일 업로드"
                     drop-placeholder="여기 놓아주세요!"
                     browse-text="찾아보기"
+                    accept="image/jpeg, image/png, image/gif"
                     @change="onFileChange" />
     </b-row>
   </div>
