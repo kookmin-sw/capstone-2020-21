@@ -1,13 +1,13 @@
 <template>
     <b-container>
         <b-row>
-          <b-col md="4" cols="4" style="text-align:left">
+          <b-col cols="4" class="text-left">
             <b-button to="/cody">뒤로가기</b-button>
           </b-col>
-          <b-col md="4" cols="4" style="text-align:center">
+          <b-col cols="4" class="text-center">
             <b-button to="/review">리뷰등록하기</b-button>
           </b-col>
-          <b-col md="4" cols="4" style="text-align:right">
+          <b-col cols="4" class="text-right">
             <b-button @click="deleteCody">삭제하기</b-button>
           </b-col>
         </b-row>
@@ -45,7 +45,7 @@
                     </b-row>
                   </b-col>
                 </b-row>
-                <b-row>
+                <b-row class="mb-3">
                     <b-col cols="6">
                         <b-button pill class="w-75" @click="handleModify">수정하기</b-button>
                     </b-col>

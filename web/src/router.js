@@ -73,7 +73,8 @@ export default new Router({
     {
       path: '/cody/detail',
       name: 'CodyDetail',
-      component: CodyDetail
+      component: CodyDetail,
+      props: true
     },
     {
       path: '/bridge',
