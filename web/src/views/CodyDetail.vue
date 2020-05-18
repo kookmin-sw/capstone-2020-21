@@ -1,79 +1,186 @@
 <template>
-  <div class="cody_detail">
-    <MainNavigation></MainNavigation>
-    <div class="btn_back">
-        <router-link to="/cody"><b-button class="back">뒤로가기</b-button></router-link>
-    </div>
-     <b-container>
-      <b-row>
-        <b-col class="text-center" md="7">
-          <CodyDetailComponent></CodyDetailComponent>
-        </b-col>
-        <b-col class="text-center" md="4" offset-md="1">
-          <form action="" @submit.prevent="sendPost">
-            <ClosetDeletedComponent></ClosetDeletedComponent>
-            <CodyDetailInfoComponent title="상세정보" v-bind:list="list"></CodyDetailInfoComponent>
-          </form>
-        </b-col>
-      </b-row>
+    <b-container>
+        <b-row>
+          <b-col cols="4" class="text-left">
+            <b-button to="/cody">뒤로가기</b-button>
+          </b-col>
+          <b-col cols="4" class="text-center">
+            <b-button to="/review">리뷰등록하기</b-button>
+          </b-col>
+          <b-col cols="4" class="text-right">
+            <b-button @click="deleteCody">삭제하기</b-button>
+          </b-col>
+        </b-row>
+        <b-row>
+            <b-col md="6" cols="12">
+                <b-img fluid :src="clothes_set.image_url"/>
+            </b-col>
+            <b-col md="6" cols="12">
+                <b-row>
+                  <b-col>
+                    <b-row class="justify-content-center mb-3">
+                      <h2>코디 정보</h2>
+                    </b-row>
+                    <b-row no-gutters class="mb-2">
+                      <b-col align-self="center" cols="4">
+                        <label class="mb-0" for="form-style">스타일</label>
+                      </b-col>
+                      <b-col cols="8">
+                        <b-form-select id="form-style"
+                                 :disabled="disableAnalysis"
+                                 :options="style_categories"
+                                 v-model="analysis_props.style"/>
+                      </b-col>
+                    </b-row>
+                    <b-row no-gutters class="mb-2">
+                      <b-col align-self="center" cols="4">
+                        <label class="mb-0" for="form-name">별칭</label>
+                      </b-col>
+                      <b-col cols="8">
+                        <b-form-input type="text"
+                                        id="form-name"
+                                        :disabled="disableAnalysis"
+                                        v-model="analysis_props.name"/>
+                      </b-col>
+                    </b-row>
+                  </b-col>
+                </b-row>
+                <b-row class="mb-3">
+                    <b-col cols="6">
+                        <b-button pill class="w-75" @click="handleModify">수정하기</b-button>
+                    </b-col>
+                    <b-col cols="6">
+                        <b-button pill class="w-75" @click="handleUpdate">확인하기</b-button>
+                    </b-col>
+                </b-row>
+            </b-col>
+        </b-row>
+        <b-row>
+          <b-col md="4" cols="12" class="mb-3" v-for="cody_review in reviews" :key="cody_review.id">
+            <ClothesSetReviewCard :review="cody_review"/>
+          </b-col>
+        </b-row>
     </b-container>
-  </div>
 </template>
 
 <script>
-import { bus } from '../main'
-import CodyDetailComponent from '@/components/CodyDetailComponent.vue'
-import ClosetDeletedComponent from '@/components/ClosetDeletedComponent.vue'
-import MainNavigation from '@/components/MainNavigation.vue'
-import CodyDetailInfoComponent from '@/components/CodyDetailInfoComponent.vue'
+import axios from 'axios'
+import consts from '@/consts.js'
+import ClothesSetReviewCard from '@/components/cards/ClothesSetReviewCard.vue'
 export default {
-  name: 'CodyDetail',
   components: {
-    CodyDetailComponent,
-    ClosetDeletedComponent,
-    MainNavigation,
-    CodyDetailInfoComponent
+    ClothesSetReviewCard
   },
   data: function () {
     return {
-      list: ['심플', '스트릿', '화려', '데이트', '정장']
+      categories: consts.CODY_CATEGORIES,
+      clothes_set: {
+        name: '',
+        style: '',
+        id: 0,
+        owner: '',
+        image_url: '',
+        clothes: []
+      },
+      analysis_props: {
+        style: '',
+        name: ''
+      },
+      disableAnalysis: true,
+      reviews: []
     }
   },
-  created () {
-    bus.$on('contextChanged', (data) => {
-      console.log(data)
-      this.context = data
-    })
+  props: [
+    'clothes_set_id'
+  ],
+  computed: {
+    style_categories: function () {
+      for (var category of this.categories) {
+        return category.lower
+      }
+      return []
+    }
+
+  },
+  created: function () {
+    this.style = this.style_category
+    var vm = this
+    if (vm.clothes_set_id === undefined) {
+      alert('잘못된 접근입니다!')
+      vm.$router.push('/cody')
+    } else {
+      if (!localStorage.getItem('token')) {
+        vm.$router.push('/login')
+        // TODO: 에러메세지 더 좋은걸로 바꾸기.
+        alert('로그인해주세요!')
+      } else {
+        var clothesId = vm.clothes_set_id
+        axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/`)
+          .then((response) => {
+            vm.clothes_set = response.data
+
+            vm.analysis_props.style = vm.clothes_set.style
+            vm.analysis_props.name = vm.clothes_set.name
+          }).catch((ex) => {
+          // TODO: error handling.
+          })
+        axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/clothes-set-reviews`)
+          .then((response) => {
+            vm.reviews = response.data.results
+          }).catch((ex) => {
+          // TODO: error handling.
+          })
+      }
+    }
   },
   methods: {
-    done: function (event) {
-      alert('등록되었습니다')
+    handleModify: function () {
+      this.disableAnalysis = false
+    },
+    handleUpdate: function () {
+      var vm = this
+      var clothesId = vm.clothes_set_id
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      var data = {
+        image_url: vm.image,
+        name: vm.analysis_props.name,
+        style: vm.analysis_props.style
+      }
+      axios.patch(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/`, data, config)
+        .then(response => {
+          alert('수정되었습니다!')
+          vm.analysis_props.name = response.data.name
+          vm.analysis_props.style = response.data.style
+          vm.disableAnalysis = true
+        }).catch((ex) => {
+          // TODO: handle error.
+          console.log(ex)
+        })
+    },
+    deleteCody: function () {
+      var vm = this
+      var clothesId = vm.clothes_set_id
+      var token = window.localStorage.getItem('token')
+      var config = {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+      axios.delete(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/`, config)
+        .then(response => {
+          alert('삭제되었습니다!')
+          vm.$router.push('/cody')
+        }).catch((ex) => {
+          // TODO: handle error.
+          console.log(ex)
+        })
     }
   }
+
 }
 </script>
 
-<style scoped>
-.cody_detail{
-    width: 100%;
-    margin-right: auto;
-    margin-left: auto;
-}
-.information{
-    text-align: center;
-    display: inline-block;
-    position: absolute;
-    top: 50%;
-     margin-top: -200px;
-     width: 500px;
-     height: 300px;
+<style>
 
-}
-.btn_back{
-    text-align: left;
-}
-.back{
-    margin-left: 150px;
-    margin-bottom: 20px;
-}
 </style>
