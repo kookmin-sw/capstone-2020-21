@@ -57,9 +57,12 @@ export default {
     }
   },
   created: function () {
-    var vm = this
-    // TODO : localStorage에 token이 없을 때 어떻게 처리할 지
-    if (window.localStorage.getItem('token')) {
+    if (!localStorage.getItem('token')) {
+      this.$router.push('/login')
+      // TODO: 에러메세지 더 좋은걸로 바꾸기.
+      alert('로그인해주세요!')
+    } else {
+      var vm = this
       var token = window.localStorage.getItem('token')
       var config = {
         headers: { Authorization: `Bearer ${token}` }
