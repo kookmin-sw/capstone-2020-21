@@ -56,7 +56,7 @@
             </b-col>
         </b-row>
         <b-row>
-          <b-col md="4" cols="12" class="mb-3" v-for="cody_review in review" :key="cody_review.id">
+          <b-col md="4" cols="12" class="mb-3" v-for="cody_review in reviews" :key="cody_review.id">
             <ClothesSetReviewCard :review="cody_review"/>
           </b-col>
         </b-row>
@@ -87,7 +87,7 @@ export default {
         name: ''
       },
       disableAnalysis: true,
-      review: []
+      reviews: []
     }
   },
   props: [
@@ -126,7 +126,7 @@ export default {
           })
         axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/clothes-set-reviews`)
           .then((response) => {
-            vm.review = response.data.results
+            vm.reviews = response.data.results
           }).catch((ex) => {
           // TODO: error handling.
           })
