@@ -512,7 +512,6 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             end_time = int(end.split('T')[1].split(':')[0])
             
             # API 요청하기
-            # TODO: 날씨 데이터 없을때 오류처리.
             all_weather_data = Weather.objects.all()
             weather_data_set = all_weather_data.filter(location_code=location)
             weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_time)
@@ -579,11 +578,36 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             end_time = int(end.split('T')[1].split(':')[0])
             
             # API 요청하기
-            # TODO: 날씨 데이터 없을때 오류처리.
             all_weather_data = Weather.objects.all()
             weather_data_set = all_weather_data.filter(location_code=location)
             weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_time)
             weather_data_on_end = weather_data_on_start.filter(date__lte=end_date, time__lte=end_time)
+
+            if weather_data_on_end.count()==0:
+                with open('apps/api/locations/data.json') as json_file:
+                    json_data = json.load(json_file)
+                
+                new_x = int((json_data[str(location)]['x']))
+                new_y = int((json_data[str(location)]['y']))    
+
+                date_list = [start, end]
+
+                for date_time in date_list:
+                    date = date_time.strftime('%Y-%m-%d %H:%M:%S')
+                    year_month_day = date[0].split('-')
+                    year = year_month_day[0]
+                    month = year_month_day[1]
+                    day = year_month_day[2]
+                    conv_time = date[1].split(':')
+                    conv_time = conv_time[0] + conv_time[1]
+                    conv_time, conv_date = convert_time(conv_time, year, month, day)
+        
+                    response = get_weather_date(date, str(location))
+                    weather_data_on_end.objects.create(location_code=location, date=date[0:10], time=conv_time[0:2], x=new_x, y=new_y,
+                                                        temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'], 
+                                                        wind_speed=response['WSD'], precipitation=response['R06'])
+
+                                                        
             
             request.data['max_temp'] = weather_data_on_end.aggregate(Max('temp'))['temp__max']
             request.data['min_temp'] = weather_data_on_end.aggregate(Min('temp'))['temp__min']
