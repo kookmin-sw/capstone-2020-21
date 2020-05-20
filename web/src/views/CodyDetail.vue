@@ -5,7 +5,7 @@
             <b-button to="/cody">뒤로가기</b-button>
           </b-col>
           <b-col cols="4" class="text-center">
-            <b-button to="/review">리뷰등록하기</b-button>
+            <b-button @click="handleReviewClick">리뷰등록하기</b-button>
           </b-col>
           <b-col cols="4" class="text-right">
             <b-button @click="deleteCody">삭제하기</b-button>
@@ -159,6 +159,9 @@ export default {
           // TODO: handle error.
           console.log(ex)
         })
+    },
+    handleReviewClick: function () {
+      this.$router.push({ name: 'Review', params: { clothes_set_id: this.clothes_set_id } })
     },
     deleteCody: function () {
       var vm = this
