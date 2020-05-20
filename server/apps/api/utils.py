@@ -30,7 +30,7 @@ def remove_background(image):
     # Paramters.
     BLUR = 21
     CANNY_THRESH_1 = 10
-    CANNY_THRESH_2 = 200
+    CANNY_THRESH_2 = 30
     MASK_DILATE_ITER = 10
     MASK_ERODE_ITER = 10
     MASK_COLOR = (0.0,0.0,1.0)
