@@ -1,5 +1,8 @@
 <template>
     <b-container>
+      <b-alert id="alert" v-model="showAlert" variant="danger" dismissible >
+        {{ alertMessage }}
+      </b-alert>
         <b-row align-h="end" class="mb-3 mr-1">
             <b-button to="/closet/add">등록하기</b-button>
         </b-row>
@@ -33,16 +36,14 @@ export default {
   data: function () {
     return {
       currentCategories: { lower: '', upper: '' },
-      clothes: []
+      clothes: [],
+      alertMessage: '',
+      showAlert: false
     }
   },
   computed: {
     categories: function () {
       const CLOTHES_CATEGORIES = consts.CLOTHES_CATEGORIES
-      /*
-        Workaround for deep copying nested objects
-        ref: https://bit.ly/2y4vJLI
-      */
       var categoryList = JSON.parse(JSON.stringify(CLOTHES_CATEGORIES))
       for (var i in categoryList) {
         categoryList[i].lower.unshift('전체')
@@ -58,9 +59,15 @@ export default {
   },
   created: function () {
     if (!localStorage.getItem('token')) {
-      this.$router.push('/login')
-      // TODO: 에러메세지 더 좋은걸로 바꾸기.
-      alert('로그인해주세요!')
+      this.$router.push({
+        name: 'Bridge',
+        params: {
+          errorMessage: '로그인이 필요한 서비스입니다.',
+          destination: 'login',
+          delay: 3,
+          variant: 'danger'
+        }
+      })
     } else {
       var vm = this
       var token = window.localStorage.getItem('token')
@@ -70,6 +77,10 @@ export default {
       axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true`, config)
         .then((response) => {
           vm.clothes = response.data.results
+          if (vm.clothes.length === 0) {
+            this.alertMessage = '등록된 옷이 없습니다. 옷을 등록해 주세요'
+            this.showAlert = true
+          }
         }).catch((ex) => {
           // TODO: error handling.
         })
