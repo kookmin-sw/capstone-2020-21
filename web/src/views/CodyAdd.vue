@@ -193,8 +193,16 @@ export default {
 
       axios.post(`${consts.SERVER_BASE_URL}/clothes-sets/`, data, config)
         .then((response) => {
-          alert('성공적으로 등록되었습니다!')
-          this.$router.push({ name: 'Cody' })
+          var msg = `'${response.data.name}' 코디가 성공적으로 등록되었습니다!`
+          this.$router.push({
+            name: 'Bridge',
+            params: {
+              errorMessage: msg,
+              destination: 'Cody',
+              delay: 3,
+              variant: 'success'
+            }
+          })
         }).catch((ex) => {
           this.isLoading = false
           this.alertMessage = '요청이 잘못되었습니다. 입력내용을 확인해주세요!'
@@ -218,14 +226,16 @@ export default {
               .then((response) => {
                 vm.clothes = response.data.results
               }).catch((ex) => {
-              // TODO: error handling.
+                this.alertMessage = '옷 정보를 받아오는데 실패했습니다. 오류가 계속될 경우 관리자에게 연락해주세요!'
+                this.showAlert = true
               })
           } else {
             axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&lower_category=${vm.currentCategories.lower}`, config)
               .then((response) => {
                 vm.clothes = response.data.results
               }).catch((ex) => {
-              // TODO: error handling.
+                this.alertMessage = '옷 정보를 받아오는데 실패했습니다. 오류가 계속될 경우 관리자에게 연락해주세요!'
+                this.showAlert = true
               })
           }
         }
@@ -242,7 +252,8 @@ export default {
       .then((response) => {
         vm.clothes = response.data.results
       }).catch((ex) => {
-        // TODO: error handling.
+        this.alertMessage = '옷 정보를 받아오는데 실패했습니다. 오류가 계속될 경우 관리자에게 연락해주세요!'
+        this.showAlert = true
       })
   },
   mounted: function () {
