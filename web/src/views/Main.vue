@@ -39,8 +39,8 @@ export default {
       weatherProps: {
         minTemp: 0,
         maxTemp: 0,
-        maxSenseTemp:0,
-        minSenseTemp:0,
+        maxSenseTemp: 0,
+        minSenseTemp: 0,
         location: {
           id: 0,
           name: '서울특별시'
