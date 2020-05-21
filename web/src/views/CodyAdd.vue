@@ -12,15 +12,28 @@
             </b-col>
             <b-col cols=12 md=8>
               <b-row>
-                <b-col v-for="clothe in clothes" :key="clothe.id" cols=12 lg=6 class="mb-3">
-                  <ClothesCard class="mb-1" :clothes="clothe">
-                    <template v-slot:additionalButton>
-                      <b-button class="mt-1" variant="info" @click="handleAddClothes(clothe.id, clothe.image_url)">
-                        추가하기
+                <template v-if="clothesExists">
+                  <b-col v-for="clothe in clothes" :key="clothe.id" cols=12 lg=6 class="mb-3">
+                    <ClothesCard class="mb-1" :clothes="clothe">
+                      <template v-slot:additionalButton>
+                        <b-button class="mt-1" variant="info" @click="handleAddClothes(clothe.id, clothe.image_url)">
+                          추가하기
+                        </b-button>
+                      </template>
+                    </ClothesCard>
+                  </b-col>
+                </template>
+                <template v-else>
+                  <b-col cols=12 class="mb-3 align-self-center">
+                    <b-container class="border p-3">
+                      등록된 옷이 없습니다
+                      <br>
+                      <b-button class="mt-3" variant="info" to="/closet/add">
+                        옷 등록하러가기
                       </b-button>
-                    </template>
-                  </ClothesCard>
-                </b-col>
+                    </b-container>
+                  </b-col>
+                </template>
               </b-row>
             </b-col>
           </b-row>
@@ -111,6 +124,9 @@ export default {
         '데이트',
         '화려'
       ]
+    },
+    clothesExists: function () {
+      return this.clothes.length !== 0
     }
   },
   methods: {
