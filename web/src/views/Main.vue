@@ -1,5 +1,8 @@
 <template>
   <b-container>
+    <b-alert id="alert" v-model="showAlert" variant="danger" dismissible >
+      {{ alertMessage }}
+    </b-alert>
     <b-row cols=1>
       <b-col cols=12>
         <!-- 날씨 컴포넌트 -->
@@ -50,7 +53,9 @@ export default {
         precipitation: 0
       },
       recommendedCategories: [],
-      userReviews: []
+      userReviews: [],
+      showAlert: false,
+      alertMessage: ''
     }
   },
   watch: {
@@ -72,6 +77,10 @@ export default {
           .then((response) => {
             vm.userReviews = response.data.results
           })
+          .catch((ex) => {
+            vm.showAlert = true
+            vm.alertMessage = '리뷰를 받아오는데 실패했습니다. 오류가 계속되면 관리자에게 연락해주세요.'
+          })
 
         url = consts.SERVER_BASE_URL + '/clothes/today_category/'
         url += '?max_sensible_temp=' + vm.weatherProps.maxSenseTemp
@@ -79,6 +88,10 @@ export default {
         axios.get(url, config)
           .then((response) => {
             vm.recommendedCategories = response.data
+          })
+          .catch((response) => {
+            vm.showAlert = true
+            vm.alertMessage = '추천 카테고리를 받아오는데 실패했습니다. 오류가 계속되면 관리자에게 연락해주세요.'
           })
       }
     }
