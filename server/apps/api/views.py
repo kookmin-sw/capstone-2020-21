@@ -521,7 +521,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 now = datetime.datetime.now()
                 today = now - datetime.timedelta(hours=24)
 
-                if start > today:
+                if start < today:
                     return Response({
                         'error' : 'please try again later'
                     }, status=status.HTTP_404_NOT_FOUND)
