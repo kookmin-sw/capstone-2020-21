@@ -523,8 +523,8 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
 
                 if start < today:
                     return Response({
-                        'error' : 'please try again later'
-                    }, status=status.HTTP_404_NOT_FOUND)
+                        'error' : 'internal server error'
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
                 else:
                     with open('apps/api/locations/data.json') as json_file:
@@ -596,8 +596,8 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
 
                 if start < today:
                     return Response({
-                        'error' : 'please try again later'
-                    }, status=status.HTTP_404_NOT_FOUND)
+                        'error' : 'internal server error'
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
                 else:
                     with open('apps/api/locations/data.json') as json_file:
