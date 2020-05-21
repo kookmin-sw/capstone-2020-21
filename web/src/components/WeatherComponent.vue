@@ -1,63 +1,71 @@
 <template>
   <b-container>
-    <b-row>
-      <b-col>
-        <h5 style="word-break: keep-all">
-          위치 : {{ weatherData.location.name }}
-        </h5>
-        <b-button class="mb-3" variant="info" size="sm" @click="openLocationModal">
-          <b-icon-arrow-clockwise/> 바꾸기
+    <b-alert id="alert" v-model="showAlert" variant="danger" dismissible style="word-break: keep-all">
+      {{ alertMessage }}
+    </b-alert>
+    <b-overlay :show="isLoading">
+      <b-row>
+        <b-col>
+          <h5 style="word-break: keep-all">
+            위치 : {{ weatherData.location.name }}
+          </h5>
+          <b-button class="mb-3" variant="info" size="sm" @click="openLocationModal">
+            <b-icon-arrow-clockwise/> 바꾸기
+          </b-button>
+        </b-col>
+      </b-row>
+      <b-row align-h="center">
+        <b-form-datepicker v-if="isGlobal"
+                            class="w-50 mb-3 text-center"
+                            v-model="date"
+                            locale="en-US"
+                            size="sm"
+                            placeholder="날짜 선택"
+                            :min="minDate"
+                            :max="maxDate"
+                            right
+                            :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit' }"
+                            @input="fetchGlobalWeather()">
+        </b-form-datepicker>
+      </b-row>
+      <b-row align-h="center">
+        <b-button class="ml-1 mb-3" variant="success" size="sm" @click="toggleGlobal">
+          <template v-if="isGlobal">
+            국내날씨 보기
+          </template>
+          <template v-else>
+            세계날씨 보기
+          </template>
         </b-button>
-      </b-col>
-    </b-row>
-    <b-row align-h="center">
-      <b-form-datepicker v-if="isGlobal"
-                          class="w-50 mb-3 text-center"
-                          v-model="date"
-                          locale="en-US"
-                          size="sm"
-                          placeholder="날짜 선택"
-                          :min="minDate"
-                          :max="maxDate"
-                          right
-                          :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit' }"
-                          @input="fetchGlobalWeather()">
-      </b-form-datepicker>
-    </b-row>
-    <b-row align-h="center">
-      <b-button class="ml-1 mb-3" variant="success" size="sm" @click="toggleGlobal">
-        <template v-if="isGlobal">
-          국내날씨 보기
-        </template>
-        <template v-else>
-          세계날씨 보기
-        </template>
-      </b-button>
-    </b-row>
-    <b-row cols=12 align-h="center" align-v="center" align-content="center">
-      <b-col class="h5 text-md-right" cols=12 md=6>
-        <b-img src="../assets/hot.png" width="30px"></b-img>
-        {{ weatherData.maxTemp }} / {{ weatherData.maxSenseTemp }} °C
-      </b-col>
-      <b-col class="h5 text-md-left" cols=12 md=6>
-        <b-img src="../assets/cold.png" width="30px"></b-img>
-        {{ weatherData.minTemp }} / {{ weatherData.minSenseTemp }} °C
-      </b-col>
-      <b-col class="h5" cols=12 md=3 lg=2>
-        <b-img src="../assets/humidity.png" width="30px"></b-img>
-        {{ weatherData.humidity }} %
-      </b-col>
-      <b-col class="h5" cols=12 md=3 lg=2>
-        <b-img src="../assets/wind.png" width="30px"></b-img>
-        {{ weatherData.windSpeed }} m/s
-      </b-col>
-      <b-col class="h5" cols=12 md=3 lg=2>
-        <b-img src="../assets/rain.png" width="30px"></b-img>
-        {{ weatherData.precipitation }} mm
-      </b-col>
-    </b-row>
+      </b-row>
+      <b-row cols=12 align-h="center" align-v="center" align-content="center">
+        <b-col class="h5 text-md-right" cols=12 md=6>
+          <b-img src="../assets/hot.png" width="30px"></b-img>
+          {{ weatherData.maxTemp }} / {{ weatherData.maxSenseTemp }} °C
+        </b-col>
+        <b-col class="h5 text-md-left" cols=12 md=6>
+          <b-img src="../assets/cold.png" width="30px"></b-img>
+          {{ weatherData.minTemp }} / {{ weatherData.minSenseTemp }} °C
+        </b-col>
+        <b-col class="h5" cols=12 md=3 lg=2>
+          <b-img src="../assets/humidity.png" width="30px"></b-img>
+          {{ weatherData.humidity }} %
+        </b-col>
+        <b-col class="h5" cols=12 md=3 lg=2>
+          <b-img src="../assets/wind.png" width="30px"></b-img>
+          {{ weatherData.windSpeed }} m/s
+        </b-col>
+        <b-col class="h5" cols=12 md=3 lg=2>
+          <b-img src="../assets/rain.png" width="30px"></b-img>
+          {{ weatherData.precipitation }} mm
+        </b-col>
+      </b-row>
+    </b-overlay>
     <b-modal ref="location-modal" title="위치 검색" ok-title="확인" cancel-title="취소">
       <b-container>
+        <b-alert id="locationModalAlert" v-model="showLocationModalAlert" variant="danger" dismissible style="word-break: keep-all">
+          {{ locationModalAlertMessage }}
+        </b-alert>
         <b-row class="mb-3" no-gutters>
           <b-col cols=10>
             <b-input v-model="keyword" type="search" placeholder="도/시를 입력해주세요"/>
@@ -86,6 +94,9 @@
     </b-modal>
     <b-modal ref="global-modal" title="세계 위치 검색" ok-title="확인" cancel-title="취소">
       <b-container>
+        <b-alert id="globalModalAlert" v-model="showGlobalModalAlert" variant="danger" dismissible style="word-break: keep-all">
+          {{ globalModalAlertMessage }}
+        </b-alert>
         <b-row class="mb-3" no-gutters>
           <b-col cols=10>
             <b-input v-model="keyword" type="search" placeholder="도시명을 입력해주세요"/>
@@ -133,7 +144,14 @@ export default {
       date: new Date().toISOString().split('T')[0],
       locations: [],
       keyword: '',
-      isGlobal: false
+      isGlobal: false,
+      locationModalAlertMessage: '',
+      showLocationModalAlert: false,
+      globalModalAlertMessage: '',
+      showGlobalModalAlert: false,
+      showAlert: false,
+      alertMessage: '',
+      isLoading: false
     }
   },
   computed: {
@@ -148,7 +166,6 @@ export default {
   },
   methods: {
     openLocationModal: function () {
-      // TODO(mskwon1): implement this.
       if (this.isGlobal) {
         this.$refs['global-modal'].show()
       } else {
@@ -176,6 +193,10 @@ export default {
       axios.get(url, config)
         .then((response) => {
           vm.locations = response.data.results
+        })
+        .catch((ex) => {
+          vm.showGlobalModalAlert = true
+          vm.globalModalAlertMessage = '검색결과를 받아오는데 실패했습니다. 오류가 계속 될 경우 관리자에게 알려주세요.'
         })
     },
     handleLocationClick: function (event, location) {
@@ -205,11 +226,16 @@ export default {
         .then((response) => {
           vm.locations = response.data.results
         })
+        .catch((ex) => {
+          vm.showLocationModalAlert = true
+          vm.locationModalAlertMessage = '검색결과를 받아오는데 실패했습니다. 오류가 계속 될 경우 관리자에게 알려주세요.'
+        })
     },
     fetchCurrentWeather: function (config) {
       var vm = this
       var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/current_weather/'
       url += '?location=' + this.weatherData.location.id
+      this.isLoading = true
 
       axios.get(url, config)
         .then((response) => {
@@ -230,6 +256,12 @@ export default {
           vm.weatherData.humidity = humidity
           vm.weatherData.windSpeed = wind_speed
           vm.weatherData.precipitation = precipitation
+          this.isLoading = false
+        })
+        .catch((ex) => {
+          this.showAlert = true
+          this.alertMessage = '날씨정보를 받아오는데 실패했습니다. 오류가 계속 될 경우 관리자에게 알려주세요.'
+          this.isLoading = false
         })
     },
     fetchGlobalWeather: function () {
@@ -242,6 +274,7 @@ export default {
       var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/global_weather/'
       url += '?city_name=' + this.weatherData.location.name
       url += '&date=' + this.date
+      this.isLoading = true
 
       axios.get(url, config)
         .then((response) => {
@@ -262,6 +295,12 @@ export default {
           vm.weatherData.humidity = humidity
           vm.weatherData.windSpeed = wind_speed.toFixed(1)
           vm.weatherData.precipitation = precipitation.toFixed(1)
+          this.isLoading = false
+        })
+        .catch((ex) => {
+          this.showAlert = true
+          this.alertMessage = '날씨정보를 받아오는데 실패했습니다. 오류가 계속 될 경우 관리자에게 알려주세요.'
+          this.isLoading = false
         })
     },
     toggleGlobal: function () {
