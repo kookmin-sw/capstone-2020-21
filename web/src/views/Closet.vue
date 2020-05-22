@@ -12,6 +12,13 @@
                                           @chooseCategory="handleLowerClick"/>
             </b-col>
             <b-col md="10" cols="12">
+              <b-row>
+                <b-col cols="12">
+                  <b-alert id="alert_clothe" v-model="showClotheAlert" variant="danger" dismissible >
+                    {{ noClotheMessage }}
+                  </b-alert>
+                </b-col>
+              </b-row>
                 <b-row>
                     <b-col v-for="clothe in clothes" :key="clothe.id" md="4" cols="12" class="mb-3">
                         <ClothesCard :clothes="clothe"/>
@@ -38,7 +45,9 @@ export default {
       currentCategories: { lower: '', upper: '' },
       clothes: [],
       alertMessage: '',
-      showAlert: false
+      noClotheMessage: '',
+      showAlert: false,
+      showClotheAlert: false
     }
   },
   computed: {
@@ -78,11 +87,11 @@ export default {
         .then((response) => {
           vm.clothes = response.data.results
           if (vm.clothes.length === 0) {
-            this.alertMessage = '등록된 옷이 없습니다. 옷을 등록해 주세요'
-            this.showAlert = true
+            this.noClotheMessage = '등록된 옷이 없습니다. 옷을 등록해 주세요'
+            this.showClotheAlert = true
           }
         }).catch((ex) => {
-          this.alertMessage = '로딩에 실패하였습니다. 다시 시도해주세요'
+          this.alertMessage = '옷을 불러올 수 없습니다. 다시 시도해주세요'
           this.showAlert = true
         })
     }
@@ -102,7 +111,7 @@ export default {
               .then((response) => {
                 vm.clothes = response.data.results
               }).catch((ex) => {
-                this.alertMessage = '로딩에 실패하였습니다. 다시 시도해주세요'
+                this.alertMessage = '전체 옷을 불러올 수 없습니다. 다시 시도해주세요'
                 this.showAlert = true
               })
           } else if (vm.currentCategories.lower === '전체') {
@@ -110,7 +119,7 @@ export default {
               .then((response) => {
                 vm.clothes = response.data.results
               }).catch((ex) => {
-                this.alertMessage = '로딩에 실패하였습니다. 다시 시도해주세요'
+                this.alertMessage = '해당 카테고리의 전체 옷을 불러올 수 없습니다. 다시 시도해주세요'
                 this.showAlert = true
               })
           } else {
@@ -118,7 +127,7 @@ export default {
               .then((response) => {
                 vm.clothes = response.data.results
               }).catch((ex) => {
-                this.alertMessage = '로딩에 실패하였습니다. 다시 시도해주세요'
+                this.alertMessage = '해당 소분류 카테고리를 불러올 수없습니다. 다시 시도해주세요'
                 this.showAlert = true
               })
           }
