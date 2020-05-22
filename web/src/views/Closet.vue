@@ -14,8 +14,8 @@
             <b-col md="10" cols="12">
               <b-row>
                 <b-col cols="12">
-                  <b-alert id="alert" v-model="Alert" variant="danger" dismissible >
-                    {{ noclotheMessage }}
+                  <b-alert id="alert_clothe" v-model="Alert" variant="danger" dismissible >
+                    {{ noClotheMessage }}
                   </b-alert>
                 </b-col>
               </b-row>
@@ -45,7 +45,7 @@ export default {
       currentCategories: { lower: '', upper: '' },
       clothes: [],
       alertMessage: '',
-      noclotheMessage: '',
+      noClotheMessage: '',
       showAlert: false,
       Alert: false
     }
@@ -87,7 +87,7 @@ export default {
         .then((response) => {
           vm.clothes = response.data.results
           if (vm.clothes.length === 0) {
-            this.noclotheMessage = '등록된 옷이 없습니다. 옷을 등록해 주세요'
+            this.noClotheMessage = '등록된 옷이 없습니다. 옷을 등록해 주세요'
             this.Alert = true
           }
         }).catch((ex) => {
