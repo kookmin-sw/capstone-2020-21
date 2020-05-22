@@ -1,5 +1,9 @@
 const CLOTHES_CATEGORIES = [
   {
+    upper: '전체',
+    lower: []
+  },
+  {
     upper: '상의',
     lower: [
       '반팔티셔츠', '긴팔티셔츠', '반팔셔츠', '긴팔셔츠',
@@ -38,6 +42,10 @@ const CLOTHES_CATEGORIES = [
 ]
 
 const CODY_CATEGORIES = [
+  {
+    upper: '전체',
+    lower: []
+  },
   {
     upper: '스타일',
     lower: [

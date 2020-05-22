@@ -82,7 +82,8 @@ export default {
             this.showAlert = true
           }
         }).catch((ex) => {
-          // TODO: error handling.
+          this.alertMessage = '로딩에 실패하였습니다. 다시 시도해주세요'
+          this.showAlert = true
         })
     }
   },
@@ -96,19 +97,29 @@ export default {
           var config = {
             headers: { Authorization: `Bearer ${token}` }
           }
-          if (vm.currentCategories.lower === '전체') {
+          if (vm.currentCategories.upper === '전체') {
+            axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true`, config)
+              .then((response) => {
+                vm.clothes = response.data.results
+              }).catch((ex) => {
+                this.alertMessage = '로딩에 실패하였습니다. 다시 시도해주세요'
+                this.showAlert = true
+              })
+          } else if (vm.currentCategories.lower === '전체') {
             axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&upper_category=${vm.currentCategories.upper}`, config)
               .then((response) => {
                 vm.clothes = response.data.results
               }).catch((ex) => {
-              // TODO: error handling.
+                this.alertMessage = '로딩에 실패하였습니다. 다시 시도해주세요'
+                this.showAlert = true
               })
           } else {
             axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&lower_category=${vm.currentCategories.lower}`, config)
               .then((response) => {
                 vm.clothes = response.data.results
               }).catch((ex) => {
-              // TODO: error handling.
+                this.alertMessage = '로딩에 실패하였습니다. 다시 시도해주세요'
+                this.showAlert = true
               })
           }
         }
