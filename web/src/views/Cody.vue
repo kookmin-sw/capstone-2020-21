@@ -90,7 +90,8 @@ export default {
               this.showCodyAlert = true
             }
           }).catch((ex) => {
-          // TODO: error handling.
+            this.alertMessage = '코디를 불러올 수 없습니다. 다시 시도해주세요'
+            this.showAlert = true
           })
       }
     }
@@ -110,7 +111,8 @@ export default {
               .then((response) => {
                 vm.clothes_set = response.data.results
               }).catch((ex) => {
-              // TODO: error handling.
+                this.alertMessage = '전체 코디를 불러올 수 없습니다. 다시 시도해주세요'
+                this.showAlert = true
               })
           } else if (vm.currentCategories.upper === '스타일') {
             axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/?me=true&style=${vm.currentCategories.lower}`, config)
