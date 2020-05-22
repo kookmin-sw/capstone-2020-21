@@ -13,7 +13,12 @@
     <b-row>
       <b-col>
         <h5>내 옷들</h5>
-        <ClothesListComponent imgOnly=true :clothes="clothes"/>
+        <template v-if="clothesEmpty">
+          <b-alert show class="m-2" style="word-break: keep-all" variant="warning">
+            카테고리에 맞는 옷이 없습니다
+          </b-alert>
+        </template>
+        <ClothesListComponent v-else imgOnly=true :clothes="clothes"/>
       </b-col>
     </b-row>
   </b-container>
@@ -40,10 +45,16 @@ export default {
     categoryItems: function () {
       var result = []
       for (var category of Object.keys(this.categories)) {
-        // TODO(mskwon1) : 해당되는 소분류가 없을시 오류처리.
-        result.push({ '대분류': category, '소분류': this.categories[category] })
+        if (this.categories[category] === '') {
+          result.push({ '대분류': category, '소분류': '-' })
+        } else {
+          result.push({ '대분류': category, '소분류': this.categories[category] })
+        }
       }
       return result
+    },
+    clothesEmpty: function () {
+      return this.clothes.length === 0
     }
   },
   watch: {
@@ -81,12 +92,12 @@ export default {
             url += ','
           }
         }
-      }
 
-      axios.get(url, config)
-        .then((response) => {
-          vm.clothes = response.data.results
-        })
+        axios.get(url, config)
+          .then((response) => {
+            vm.clothes = response.data.results
+          })
+      }
     }
   },
   created: function () {
