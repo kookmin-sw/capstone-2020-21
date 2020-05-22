@@ -544,8 +544,14 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                         conv_time = date[1].split(':')
                         conv_time = conv_time[0] + conv_time[1]
                         conv_time, conv_date = convert_time(conv_time, year, month, day)
-            
-                        response = get_weather_date(date, str(location))
+
+                        try:
+                            response = get_weather_date(date, str(location))
+                        except:
+                            return Response({
+                                'error' : 'internal server error'
+                            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
                         weather_data_on_end.objects.create(location_code=location, date=date[0:10], time=conv_time[0:2], x=new_x, y=new_y,
                                                             temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'], 
                                                             wind_speed=response['WSD'], precipitation=response['R06'])
@@ -618,7 +624,13 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                         conv_time = conv_time[0] + conv_time[1]
                         conv_time, conv_date = convert_time(conv_time, year, month, day)
             
-                        response = get_weather_date(date, str(location))
+                        try:
+                            response = get_weather_date(date, str(location))
+                        except:
+                            return Response({
+                                'error' : 'internal server error'
+                            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            
                         weather_data_on_end.objects.create(location_code=location, date=date[0:10], time=conv_time[0:2], x=new_x, y=new_y,
                                                             temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'], 
                                                             wind_speed=response['WSD'], precipitation=response['R06'])
