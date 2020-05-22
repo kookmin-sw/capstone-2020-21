@@ -1,5 +1,8 @@
 <template>
     <b-container>
+      <b-alert id="alert" v-model="showAlert" variant="danger" dismissible >
+        {{ alertMessage }}
+      </b-alert>
         <b-row>
           <b-col md="6" cols="12" style="text-align:left">
             <b-button to="/closet">뒤로가기</b-button>
@@ -52,7 +55,9 @@ export default {
         lower: '',
         alias: ''
       },
-      disableAnalysis: true
+      disableAnalysis: true,
+      alertMessage: '',
+      showAlert: false
     }
   },
   props: [
@@ -61,8 +66,15 @@ export default {
   created: function () {
     var vm = this
     if (vm.clothes_id === undefined) {
-      alert('잘못된 접근입니다!')
-      vm.$router.push('/closet')
+      this.$router.push({
+        name: 'Bridge',
+        params: {
+          errorMessage: '해당 옷이 없습니다.',
+          destination: 'Closet',
+          delay: 3,
+          variant: 'danger'
+        }
+      })
     } else {
       if (!localStorage.getItem('token')) {
         this.$router.push({
@@ -83,7 +95,8 @@ export default {
             vm.analysis_props.lower = vm.clothes.lower_category
             vm.analysis_props.alias = vm.clothes.alias
           }).catch((ex) => {
-          // TODO: error handling.
+            this.alertMessage = '해당 옷을 불러올 수 없습니다. 다시 시도해주세요'
+            this.showAlert = true
           })
       }
     }
