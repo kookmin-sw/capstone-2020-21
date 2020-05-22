@@ -1,6 +1,6 @@
 <template>
     <b-container>
-      <b-alert id="alert" v-model="showAlert" variant="danger" dismissible >
+      <b-alert id="alert" v-model="showAlert" variant="success" dismissible >
         {{ alertMessage }}
       </b-alert>
         <b-row>
@@ -71,7 +71,7 @@ export default {
         params: {
           errorMessage: '해당 옷이 없습니다.',
           destination: 'Closet',
-          delay: 3,
+          delay: 0,
           variant: 'danger'
         }
       })
@@ -120,13 +120,15 @@ export default {
       }
       axios.patch(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, data, config)
         .then(response => {
-          alert('수정되었습니다!')
+          this.alertMessage = '옷의 정보를 수정했습니다.'
+          this.showAlert = true
           vm.analysis_props.alias = response.data.alias
           vm.analysis_props.upper = response.data.upper_category
           vm.analysis_props.lower = response.data.lower_category
           vm.disableAnalysis = true
         }).catch((ex) => {
-          // TODO: handle error.
+          this.alertMessage = '해당 옷을 수정할 수 없습니다. 다시 시도해주세요'
+          this.showAlert = true
           console.log(ex)
         })
     },
@@ -139,10 +141,18 @@ export default {
       }
       axios.delete(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, config)
         .then(response => {
-          alert('삭제되었습니다!')
-          vm.$router.push('/closet')
+          this.$router.push({
+            name: 'Bridge',
+            params: {
+              errorMessage: '해당 옷이 삭제되었습니다.',
+              destination: 'Closet',
+              delay: 3,
+              variant: 'success'
+            }
+          })
         }).catch((ex) => {
-          // TODO: handle error.
+          this.alertMessage = '해당 옷을 삭제할 수 없습니다. 다시 시도해주세요'
+          this.showAlert = true
           console.log(ex)
         })
     }
