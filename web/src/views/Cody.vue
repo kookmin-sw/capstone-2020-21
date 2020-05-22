@@ -1,5 +1,8 @@
 <template>
     <b-container>
+      <b-alert id="alert" v-model="showAlert" variant="danger" dismissible >
+        {{ alertMessage }}
+      </b-alert>
         <b-row class="mb-3 mr-1 justify-content-end">
             <b-button to="/cody/add">등록하기</b-button>
         </b-row>
@@ -8,6 +11,13 @@
                 <ClassificationComponent :list="categories" @chooseCategory="handleLowerClick"/>
             </b-col>
             <b-col md="10" cols="12">
+                <b-row>
+                  <b-col cols="12">
+                    <b-alert id="alert_cody" v-model="showCodyAlert" variant="danger" dismissible >
+                      {{ noCodyMessage }}
+                    </b-alert>
+                  </b-col>
+                </b-row>
                 <b-row>
                     <b-col md="4" cols="12" class="mb-3"  v-for="clothe in clothes_set" :key="clothe.id">
                         <ClothesSetCard :clothes_set="clothe"/>
@@ -31,7 +41,11 @@ export default {
   data: function () {
     return {
       currentCategories: { lower: '', upper: '' },
-      clothes_set: []
+      clothes_set: [],
+      alertMessage: '',
+      noCodyMessage: '',
+      showAlert: false,
+      showCodyAlert: false
     }
   },
   computed: {
@@ -52,9 +66,15 @@ export default {
   },
   created: function () {
     if (!localStorage.getItem('token')) {
-      this.$router.push('/login')
-      // TODO: 에러메세지 더 좋은걸로 바꾸기.
-      alert('로그인해주세요!')
+      this.$router.push({
+        name: 'Bridge',
+        params: {
+          errorMessage: '로그인이 필요한 서비스입니다.',
+          destination: 'login',
+          delay: 3,
+          variant: 'danger'
+        }
+      })
     } else {
       var vm = this
       if (window.localStorage.getItem('token')) {
@@ -65,6 +85,10 @@ export default {
         axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/?me=true`, config)
           .then((response) => {
             vm.clothes_set = response.data.results
+            if (vm.clothes_set.length === 0) {
+              this.noCodyMessage = '등록된 옷이 없습니다. 옷을 등록해 주세요'
+              this.showCodyAlert = true
+            }
           }).catch((ex) => {
           // TODO: error handling.
           })
