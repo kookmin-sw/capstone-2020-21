@@ -65,9 +65,15 @@ export default {
       vm.$router.push('/closet')
     } else {
       if (!localStorage.getItem('token')) {
-        vm.$router.push('/login')
-        // TODO: 에러메세지 더 좋은걸로 바꾸기.
-        alert('로그인해주세요!')
+        this.$router.push({
+          name: 'Bridge',
+          params: {
+            errorMessage: '로그인이 필요한 서비스입니다.',
+            destination: 'login',
+            delay: 3,
+            variant: 'danger'
+          }
+        })
       } else {
         var clothesId = vm.clothes_id
         axios.get(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`)
