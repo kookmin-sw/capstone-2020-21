@@ -111,7 +111,7 @@ export default {
               .then((response) => {
                 vm.clothes_set = response.data.results
               }).catch((ex) => {
-                this.alertMessage = '전체 코디를 불러올 수 없습니다. 다시 시도해주세요'
+                this.alertMessage = '스타일의 전체 코디를 불러올 수 없습니다. 다시 시도해주세요'
                 this.showAlert = true
               })
           } else if (vm.currentCategories.upper === '스타일') {
@@ -119,7 +119,8 @@ export default {
               .then((response) => {
                 vm.clothes_set = response.data.results
               }).catch((ex) => {
-              // TODO: error handling.
+                this.alertMessage = '해당 스타일에 맞는 코디를 불러올 수 없습니다. 다시 시도해주세요'
+                this.showAlert = true
               })
           } else if (vm.currentCategories.upper === '리뷰') {
             if (vm.currentCategories.lower === '등록') {
@@ -127,7 +128,8 @@ export default {
                 .then((response) => {
                   vm.clothes_set = response.data.results
                 }).catch((ex) => {
-                  // TODO: error handling.
+                  this.alertMessage = '등록된 리뷰를 불러올 수 없습니다. 다시 시도해주세요'
+                  this.showAlert = true
                 })
             }
           }
