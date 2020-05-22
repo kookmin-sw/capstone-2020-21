@@ -2,7 +2,7 @@
   <b-container>
     <b-row cols="1">
       <b-col cols="12">
-        <ReviewComponent clothes_sets_id=60 :locationData.sync="locationProps"/>
+        <ReviewComponent :clothes_set_id="clothes_set_id" :locationData.sync="locationProps"/>
       </b-col>
     </b-row>
   </b-container>
@@ -24,7 +24,10 @@ export default {
         }
       }
     }
-  }
+  },
+  props: [
+    'clothes_set_id'
+  ]
 }
 </script>
 

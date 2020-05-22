@@ -1,11 +1,11 @@
 <template>
 <b-container>
   <b-row class="justify-content-center align-items-center">
-    <b-col cols="7">
+    <b-col cols="12" md="7">
       <form id="review-form" class="form" action="" method="post">
-        <h3 class="text-center text-top">Review</h3>
+        <h3 class="text-center text-top">Cody_Review</h3>
         <b-img fluid :src="imageURL"/>
-        <b-form-group label="활동장소 :" lable-for="input-1" class="text-left text-top">
+        <b-form-group label="활동장소 :" lable-for="input-1" class="text-left">
           <b-row id="input-1">
             <b-col md="auto" style="margin:0 auto">
               <h5 style="word-break: keep-all">
@@ -19,23 +19,23 @@
             </b-col>
           </b-row>
         </b-form-group>
-        <b-form-group label="활동기간 :" label-for="input-2" class="text-left text-top">
+        <b-form-group label="활동시작시간 :" label-for="input-2" class="text-left text-top">
           <b-row id="input-2">
             <b-col md="auto" style="margin:0 auto">
-              <b-calendar :min="min" :max="max" v-model="form.start_date" locale="en-US"></b-calendar>
+              <b-form-datepicker :min="min" :max="max" v-model="form.start_date" locale="en-US"></b-form-datepicker>
             </b-col>
             <b-col md="auto" style="margin:0 auto">
-              <b-calendar :min="min" :max="max" v-model="form.end_date" locale="en-US"></b-calendar>
+              <b-form-timepicker v-model="form.start_time" locale="en"></b-form-timepicker>
             </b-col>
           </b-row>
         </b-form-group>
-        <b-form-group label="활동시간 :" label-for="input-3" class="text-left text-top">
+        <b-form-group label="활동끝난시간 :" label-for="input-3" class="text-left text-top">
           <b-row id="input-3">
             <b-col md="auto" style="margin:0 auto">
-              <b-time v-model="form.start_time" locale="en"></b-time>
+              <b-form-datepicker :min="min" :max="max" v-model="form.end_date" locale="en-US"></b-form-datepicker>
             </b-col>
             <b-col md="auto" style="margin:0 auto">
-              <b-time v-model="form.end_time" locale="en"></b-time>
+              <b-form-timepicker v-model="form.end_time" locale="en"></b-form-timepicker>
             </b-col>
           </b-row>
         </b-form-group>
@@ -116,17 +116,18 @@ export default {
         start_time: '',
         end_time: '',
         comment: '',
-        range: ''
+        range: '3'
       },
       imageURL: '',
       'locations': [],
       'keyword': '',
       min: '',
-      max: ''
+      max: '',
+      minlimit: ''
     }
   },
   props: [
-    'clothes_sets_id',
+    'clothes_set_id',
     'locationData'
   ],
   methods: {
@@ -136,7 +137,7 @@ export default {
         headers: { Authorization: `Bearer ${token}` }
       }
       var url = consts.SERVER_BASE_URL + '/clothes-sets/'
-      url += this.clothes_sets_id + '/'
+      url += this.clothes_set_id + '/'
       axios.get(url, config)
         .then(response => {
           console.log(response)
@@ -161,8 +162,11 @@ export default {
       var config = {
         headers: { Authorization: `Bearer ${token}` }
       }
+      // if (this.start_date > this.end_date) {
+      //   alert('날짜를 다시 입력해주세요!')
+      // }
       var data = {
-        clothes_set: Number(this.clothes_sets_id),
+        clothes_set: Number(this.clothes_set_id),
         start_datetime: this.form.start_date + 'T' + this.form.start_time,
         end_datetime: this.form.end_date + 'T' + this.form.end_time,
         location: Number(this.locationData.location.id),
@@ -208,6 +212,11 @@ export default {
   created: function () {
     this.getImageId()
     this.setDate()
+    var vm = this
+    if (vm.clothes_set_id === undefined) {
+      alert('잘못된 접근입니다!')
+      vm.$router.push('/login')
+    }
   }
 }
 </script>
