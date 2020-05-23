@@ -60,6 +60,9 @@
 
         <b-modal ref="location-modal" title="위치 검색" ok-title="확인" cancel-title="취소">
           <b-container>
+            <b-alert id="locationModalAlert" v-model="showLocationModalAlert" variant="danger" dismissible style="word-break: keep-all">
+              {{ locationModalAlertMessage }}
+            </b-alert>
             <b-row class="mb-3" no-gutters>
               <b-col cols="10">
                 <b-input v-model="keyword" type="search" placeholder="도/시를 입력해주세요"/>
@@ -123,7 +126,9 @@ export default {
       'keyword': '',
       min: '',
       max: '',
-      minlimit: ''
+      minlimit: '',
+      locationModalAlertMessage: '',
+      showLocationModalAlert: false
     }
   },
   props: [
@@ -216,8 +221,8 @@ export default {
         .then((response) => {
           vm.locations = response.data.results
         }).catch((ex) => {
-          this.alertMessage = '지역 검색에 실패했습니다. 오류가 계속 될 경우, 관리자에게 연락해주세요.'
-          this.showAlert = true
+          vm.showLocationModalAlert = true
+          vm.locationModalAlertMessage = '검색결과를 받아오는데 실패했습니다. 오류가 계속 될 경우 관리자에게 알려주세요.'
         })
     }
   },
