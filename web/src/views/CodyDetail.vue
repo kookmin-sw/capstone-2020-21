@@ -136,11 +136,11 @@ export default {
         axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/`)
           .then((response) => {
             vm.clothes_set = response.data
-
             vm.analysis_props.style = vm.clothes_set.style
             vm.analysis_props.name = vm.clothes_set.name
           }).catch((ex) => {
-          // TODO: error handling.
+            this.alertMessage = '해당 코디를 불러올 수 없습니다. 다시 시도해주세요'
+            this.showAlert = true
           })
         axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/clothes-set-reviews`)
           .then((response) => {
@@ -169,12 +169,14 @@ export default {
       }
       axios.patch(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/`, data, config)
         .then(response => {
-          alert('수정되었습니다!')
+          this.alertMessage = '코디 정보를 수정했습니다.'
+          this.showAlert = true
           vm.analysis_props.name = response.data.name
           vm.analysis_props.style = response.data.style
           vm.disableAnalysis = true
         }).catch((ex) => {
-          // TODO: handle error.
+          this.alertMessage = '해당 코디를 수정할 수 없습니다. 다시 시도해주세요'
+          this.showAlert = true
           console.log(ex)
         })
     },
