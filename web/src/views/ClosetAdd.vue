@@ -62,7 +62,9 @@ export default {
         image_url: this.image,
         upper_category: this.analysis_props.upper,
         lower_category: this.analysis_props.lower,
-        alias: this.analysis_props.alias
+      }
+      if (this.analysis_props.alias !== '') {
+        data['alias'] = this.analysis_props.alias
       }
       axios.post(`${consts.SERVER_BASE_URL}/clothes/`, data, config)
         .then(response => {

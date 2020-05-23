@@ -42,7 +42,8 @@ export default new Router({
     {
       path: '/review',
       name: 'Review',
-      component: Review
+      component: Review,
+      props: true
     },
     {
       path: '/closet/detail',
