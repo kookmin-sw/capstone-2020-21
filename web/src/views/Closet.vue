@@ -1,5 +1,8 @@
 <template>
     <b-container>
+      <b-alert id="alert" v-model="showAlert" variant="danger" dismissible >
+        {{ alertMessage }}
+      </b-alert>
         <b-row align-h="end" class="mb-3 mr-1">
             <b-button to="/closet/add">등록하기</b-button>
         </b-row>
@@ -9,6 +12,13 @@
                                           @chooseCategory="handleLowerClick"/>
             </b-col>
             <b-col md="10" cols="12">
+              <b-row>
+                <b-col cols="12">
+                  <b-alert id="alert_clothe" v-model="showClotheAlert" variant="danger" dismissible >
+                    {{ noClotheMessage }}
+                  </b-alert>
+                </b-col>
+              </b-row>
                 <b-row>
                     <b-col v-for="clothe in clothes" :key="clothe.id" md="4" cols="12" class="mb-3">
                         <ClothesCard :clothes="clothe"/>
@@ -33,16 +43,16 @@ export default {
   data: function () {
     return {
       currentCategories: { lower: '', upper: '' },
-      clothes: []
+      clothes: [],
+      alertMessage: '',
+      noClotheMessage: '',
+      showAlert: false,
+      showClotheAlert: false
     }
   },
   computed: {
     categories: function () {
       const CLOTHES_CATEGORIES = consts.CLOTHES_CATEGORIES
-      /*
-        Workaround for deep copying nested objects
-        ref: https://bit.ly/2y4vJLI
-      */
       var categoryList = JSON.parse(JSON.stringify(CLOTHES_CATEGORIES))
       for (var i in categoryList) {
         categoryList[i].lower.unshift('전체')
@@ -57,9 +67,18 @@ export default {
     }
   },
   created: function () {
-    var vm = this
-    // TODO : localStorage에 token이 없을 때 어떻게 처리할 지
-    if (window.localStorage.getItem('token')) {
+    if (!localStorage.getItem('token')) {
+      this.$router.push({
+        name: 'Bridge',
+        params: {
+          errorMessage: '로그인이 필요한 서비스입니다.',
+          destination: 'login',
+          delay: 3,
+          variant: 'danger'
+        }
+      })
+    } else {
+      var vm = this
       var token = window.localStorage.getItem('token')
       var config = {
         headers: { Authorization: `Bearer ${token}` }
@@ -67,8 +86,13 @@ export default {
       axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true`, config)
         .then((response) => {
           vm.clothes = response.data.results
+          if (vm.clothes.length === 0) {
+            this.noClotheMessage = '등록된 옷이 없습니다. 옷을 등록해 주세요'
+            this.showClotheAlert = true
+          }
         }).catch((ex) => {
-          // TODO: error handling.
+          this.alertMessage = '옷을 불러올 수 없습니다. 다시 시도해주세요'
+          this.showAlert = true
         })
     }
   },
@@ -82,19 +106,29 @@ export default {
           var config = {
             headers: { Authorization: `Bearer ${token}` }
           }
-          if (vm.currentCategories.lower === '전체') {
+          if (vm.currentCategories.upper === '전체') {
+            axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true`, config)
+              .then((response) => {
+                vm.clothes = response.data.results
+              }).catch((ex) => {
+                this.alertMessage = '전체 옷을 불러올 수 없습니다. 다시 시도해주세요'
+                this.showAlert = true
+              })
+          } else if (vm.currentCategories.lower === '전체') {
             axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&upper_category=${vm.currentCategories.upper}`, config)
               .then((response) => {
                 vm.clothes = response.data.results
               }).catch((ex) => {
-              // TODO: error handling.
+                this.alertMessage = '해당 카테고리의 전체 옷을 불러올 수 없습니다. 다시 시도해주세요'
+                this.showAlert = true
               })
           } else {
             axios.get(`${consts.SERVER_BASE_URL}/clothes/?me=true&lower_category=${vm.currentCategories.lower}`, config)
               .then((response) => {
                 vm.clothes = response.data.results
               }).catch((ex) => {
-              // TODO: error handling.
+                this.alertMessage = '해당 소분류 카테고리를 불러올 수없습니다. 다시 시도해주세요'
+                this.showAlert = true
               })
           }
         }

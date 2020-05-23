@@ -16,9 +16,16 @@ def byte_to_image(inp):
     """
     converts base64 string to image
     """
+    MAX_WIDTH = 400
+    
     _bytes = base64.b64decode(inp)
     nparr = np.fromstring(_bytes, dtype=np.uint8)
     img = cv2.imdecode(nparr, 1)
+    
+    if (img.shape[1] > MAX_WIDTH):    
+        ratio = float(MAX_WIDTH) / img.shape[1]
+        dim = (MAX_WIDTH, int(img.shape[0] * ratio))
+        img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
     
     return img
 
@@ -30,7 +37,7 @@ def remove_background(image):
     # Paramters.
     BLUR = 21
     CANNY_THRESH_1 = 10
-    CANNY_THRESH_2 = 200
+    CANNY_THRESH_2 = 30
     MASK_DILATE_ITER = 10
     MASK_ERODE_ITER = 10
     MASK_COLOR = (0.0,0.0,1.0)

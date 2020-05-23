@@ -1,5 +1,8 @@
 <template>
     <b-container>
+      <b-alert id="alert" v-model="showAlert" variant="success" dismissible >
+        {{ alertMessage }}
+      </b-alert>
         <b-row>
           <b-col md="6" cols="12" style="text-align:left">
             <b-button to="/closet">뒤로가기</b-button>
@@ -52,7 +55,9 @@ export default {
         lower: '',
         alias: ''
       },
-      disableAnalysis: true
+      disableAnalysis: true,
+      alertMessage: '',
+      showAlert: false
     }
   },
   props: [
@@ -61,13 +66,26 @@ export default {
   created: function () {
     var vm = this
     if (vm.clothes_id === undefined) {
-      alert('잘못된 접근입니다!')
-      vm.$router.push('/closet')
+      this.$router.push({
+        name: 'Bridge',
+        params: {
+          errorMessage: '해당 옷이 없습니다.',
+          destination: 'Closet',
+          delay: 0,
+          variant: 'danger'
+        }
+      })
     } else {
       if (!localStorage.getItem('token')) {
-        vm.$router.push('/login')
-        // TODO: 에러메세지 더 좋은걸로 바꾸기.
-        alert('로그인해주세요!')
+        this.$router.push({
+          name: 'Bridge',
+          params: {
+            errorMessage: '로그인이 필요한 서비스입니다.',
+            destination: 'login',
+            delay: 3,
+            variant: 'danger'
+          }
+        })
       } else {
         var clothesId = vm.clothes_id
         axios.get(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`)
@@ -77,7 +95,8 @@ export default {
             vm.analysis_props.lower = vm.clothes.lower_category
             vm.analysis_props.alias = vm.clothes.alias
           }).catch((ex) => {
-          // TODO: error handling.
+            this.alertMessage = '해당 옷을 불러올 수 없습니다. 다시 시도해주세요'
+            this.showAlert = true
           })
       }
     }
@@ -101,13 +120,15 @@ export default {
       }
       axios.patch(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, data, config)
         .then(response => {
-          alert('수정되었습니다!')
+          this.alertMessage = '옷의 정보를 수정했습니다.'
+          this.showAlert = true
           vm.analysis_props.alias = response.data.alias
           vm.analysis_props.upper = response.data.upper_category
           vm.analysis_props.lower = response.data.lower_category
           vm.disableAnalysis = true
         }).catch((ex) => {
-          // TODO: handle error.
+          this.alertMessage = '해당 옷을 수정할 수 없습니다. 다시 시도해주세요'
+          this.showAlert = true
           console.log(ex)
         })
     },
@@ -120,10 +141,18 @@ export default {
       }
       axios.delete(`${consts.SERVER_BASE_URL}/clothes/${clothesId}/`, config)
         .then(response => {
-          alert('삭제되었습니다!')
-          vm.$router.push('/closet')
+          this.$router.push({
+            name: 'Bridge',
+            params: {
+              errorMessage: '해당 옷이 삭제되었습니다.',
+              destination: 'Closet',
+              delay: 3,
+              variant: 'success'
+            }
+          })
         }).catch((ex) => {
-          // TODO: handle error.
+          this.alertMessage = '해당 옷을 삭제할 수 없습니다. 다시 시도해주세요'
+          this.showAlert = true
           console.log(ex)
         })
     }
