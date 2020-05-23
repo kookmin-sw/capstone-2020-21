@@ -3,7 +3,7 @@
   <b-row class="justify-content-center align-items-center">
     <b-col cols="12" md="7">
       <form id="review-form" class="form" action="" method="post">
-        <h3 class="text-center text-top">Cody_Review</h3>
+        <h3 class="text-center text-top">리뷰   작성</h3>
         <b-img fluid :src="imageURL"/>
         <b-form-group label="활동장소 :" lable-for="input-1" class="text-left">
           <b-row id="input-1">
@@ -142,6 +142,9 @@ export default {
         .then(response => {
           console.log(response)
           this.imageURL = response.data.image_url
+        }).catch((ex) => {
+          this.alertMessage = '코디 이미지를 불러오지 못하였습니다. 오류가 계속 될 경우, 관리자에게 연락해주세요.'
+          this.showAlert = true
         })
     },
     setDate: function () {
@@ -162,9 +165,6 @@ export default {
       var config = {
         headers: { Authorization: `Bearer ${token}` }
       }
-      // if (this.start_date > this.end_date) {
-      //   alert('날짜를 다시 입력해주세요!')
-      // }
       var data = {
         clothes_set: Number(this.clothes_set_id),
         start_datetime: this.form.start_date + 'T' + this.form.start_time,
@@ -176,12 +176,21 @@ export default {
       console.log(data)
       axios.post(`${consts.SERVER_BASE_URL}/clothes-set-reviews/`, data, config)
         .then(response => {
-          console.log(response)
-          this.$router.push('/cody/')
+          this.$router.push({
+            name: 'Bridge',
+            params: {
+              errorMessage: '리뷰가 성공적으로 등록되었습니다',
+              destination: 'Cody',
+              delay: 3,
+              variant: 'success'
+            }
+          })
+        }).catch((ex) => {
+          this.alertMessage = '리뷰 등록에 실패했습니다. 오류가 계속 될 경우, 관리자에게 연락해주세요.'
+          this.showAlert = true
         })
     },
     openLocationModal: function () {
-      // TODO(mskwon1): implement this.
       this.$refs['location-modal'].show()
     },
     handleLocationClick: function (event, location) {
@@ -206,6 +215,9 @@ export default {
       axios.get(url, config)
         .then((response) => {
           vm.locations = response.data.results
+        }).catch((ex) => {
+          this.alertMessage = '지역 검색에 실패했습니다. 오류가 계속 될 경우, 관리자에게 연락해주세요.'
+          this.showAlert = true
         })
     }
   },
