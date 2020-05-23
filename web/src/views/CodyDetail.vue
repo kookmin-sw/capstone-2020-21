@@ -1,5 +1,8 @@
 <template>
     <b-container>
+      <b-alert id="alert" v-model="showAlert" variant="success" dismissible >
+        {{ alertMessage }}
+      </b-alert>
         <b-row>
           <b-col cols="4" class="text-left">
             <b-button to="/cody">뒤로가기</b-button>
@@ -87,7 +90,9 @@ export default {
         name: ''
       },
       disableAnalysis: true,
-      reviews: []
+      reviews: [],
+      alertMessage: '',
+      showAlert: false
     }
   },
   props: [
@@ -105,14 +110,27 @@ export default {
   created: function () {
     this.style = this.style_category
     var vm = this
-    if (vm.clothes_set_id === undefined) {
-      alert('잘못된 접근입니다!')
-      vm.$router.push('/cody')
+    if (!localStorage.getItem('token')) {
+      this.$router.push({
+        name: 'Bridge',
+        params: {
+          errorMessage: '로그인이 필요한 서비스입니다.',
+          destination: 'login',
+          delay: 3,
+          variant: 'danger'
+        }
+      })
     } else {
-      if (!localStorage.getItem('token')) {
-        vm.$router.push('/login')
-        // TODO: 에러메세지 더 좋은걸로 바꾸기.
-        alert('로그인해주세요!')
+      if (vm.clothes_set_id === undefined) {
+        this.$router.push({
+          name: 'Bridge',
+          params: {
+            errorMessage: '해당 코디가 없습니다.',
+            destination: 'Cody',
+            delay: 3,
+            variant: 'danger'
+          }
+        })
       } else {
         var clothesId = vm.clothes_set_id
         axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/`)
