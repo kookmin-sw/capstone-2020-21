@@ -192,10 +192,18 @@ export default {
       }
       axios.delete(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/`, config)
         .then(response => {
-          alert('삭제되었습니다!')
-          vm.$router.push('/cody')
+          this.$router.push({
+            name: 'Bridge',
+            params: {
+              errorMessage: '해당 코디가 삭제되었습니다.',
+              destination: 'Cody',
+              delay: 3,
+              variant: 'success'
+            }
+          })
         }).catch((ex) => {
-          // TODO: handle error.
+          this.alertMessage = '해당 코디를 삭제할 수 없습니다. 다시 시도해주세요'
+          this.showAlert = true
           console.log(ex)
         })
     }
