@@ -59,6 +59,13 @@
             </b-col>
         </b-row>
         <b-row>
+          <b-col cols="12">
+            <b-alert id="alert_review" v-model="showReviewAlert" variant="danger" dismissible >
+              {{ noReviewMessage }}
+            </b-alert>
+          </b-col>
+        </b-row>
+        <b-row>
           <b-col md="4" cols="12" class="mb-3" v-for="cody_review in reviews" :key="cody_review.id">
             <ClothesSetReviewCard :review="cody_review"/>
           </b-col>
@@ -92,7 +99,9 @@ export default {
       disableAnalysis: true,
       reviews: [],
       alertMessage: '',
-      showAlert: false
+      noReviewMessage: '',
+      showAlert: false,
+      showReviewAlert: false
     }
   },
   props: [
@@ -145,8 +154,13 @@ export default {
         axios.get(`${consts.SERVER_BASE_URL}/clothes-sets/${clothesId}/clothes-set-reviews`)
           .then((response) => {
             vm.reviews = response.data.results
+            if (vm.reviews.length === 0) {
+              this.noReviewMessage = '등록된 리뷰가 없습니다. 리뷰를 등록해 주세요'
+              this.showReviewAlert = true
+            }
           }).catch((ex) => {
-          // TODO: error handling.
+            this.alertMessage = '리뷰를 불러올 수 없습니다. 다시 시도해주세요'
+            this.showAlert = true
           })
       }
     }
