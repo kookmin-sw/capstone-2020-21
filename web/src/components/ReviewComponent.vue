@@ -127,6 +127,8 @@ export default {
       min: '',
       max: '',
       minlimit: '',
+      showAlert: false,
+      alertMessage: '',
       locationModalAlertMessage: '',
       showLocationModalAlert: false
     }
