@@ -65,23 +65,23 @@ export default {
   ],
   created: function () {
     var vm = this
-    if (vm.clothes_id === undefined) {
+    if (!localStorage.getItem('token')) {
       this.$router.push({
         name: 'Bridge',
         params: {
-          errorMessage: '해당 옷이 없습니다.',
-          destination: 'Closet',
-          delay: 0,
+          errorMessage: '로그인이 필요한 서비스입니다.',
+          destination: 'login',
+          delay: 3,
           variant: 'danger'
         }
       })
     } else {
-      if (!localStorage.getItem('token')) {
+      if (vm.clothes_id === undefined) {
         this.$router.push({
           name: 'Bridge',
           params: {
-            errorMessage: '로그인이 필요한 서비스입니다.',
-            destination: 'login',
+            errorMessage: '해당 옷이 없습니다.',
+            destination: 'Closet',
             delay: 3,
             variant: 'danger'
           }

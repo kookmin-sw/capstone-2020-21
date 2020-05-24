@@ -43,10 +43,6 @@ const CLOTHES_CATEGORIES = [
 
 const CODY_CATEGORIES = [
   {
-    upper: '전체',
-    lower: []
-  },
-  {
     upper: '스타일',
     lower: [
       '심플', '스트릿', '화려', '데이트', '정장'
