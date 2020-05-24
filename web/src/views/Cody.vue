@@ -86,7 +86,7 @@ export default {
           .then((response) => {
             vm.clothes_set = response.data.results
             if (vm.clothes_set.length === 0) {
-              this.noCodyMessage = '등록된 옷이 없습니다. 옷을 등록해 주세요'
+              this.noCodyMessage = '등록된 코디가 없습니다. 코디를 등록해 주세요'
               this.showCodyAlert = true
             }
           }).catch((ex) => {
