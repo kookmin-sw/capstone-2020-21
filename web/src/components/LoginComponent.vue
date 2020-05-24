@@ -6,16 +6,16 @@
             <h3 class="text-center">Login</h3>
             <div>
               <b-form-group id="input-group-1" label="ID :" label-for="input-1">
-                  <b-form-input id="input-1" v-model="form.id" type="id"></b-form-input>
+                  <b-form-input id="input-1" v-model="form.id"></b-form-input>
               </b-form-group>
               <b-form-group id="input-group-1" label="PASSWORD :" label-for="input-2">
-                  <b-form-input id="input-2" v-model="form.password" type="password"></b-form-input>
+                  <b-form-input id="input-2" v-model="form.password"></b-form-input>
               </b-form-group>
             </div>
             <div>
               <b-row>
                   <b-col class="col-6" style="margin:0 auto">
-                      <b-button pill class="w-75" type="new_submit" @click.prevent="handleLogin">확인</b-button>
+                      <b-button pill class="w-75" @click.prevent="handleLogin">확인</b-button>
                   </b-col>
               </b-row>
             </div>
@@ -37,7 +37,9 @@ export default {
       form: {
         id: '',
         password: ''
-      }
+      },
+      alertMessage: '',
+      showAlert: false
     }
   },
   methods: {
@@ -45,15 +47,14 @@ export default {
       var token = ''
       axios.post(`${consts.SERVER_BASE_URL}/api/token/`, { username: this.form.id, password: this.form.password })
         .then(response => {
-          // TODO: delete console.log .
-          console.log(response)
           token = response.data.access
           window.localStorage.setItem('token', token)
           EventBus.$emit('login-success')
-          this.$router.go(-1)
+          this.$router.push('/mainpage')
         })
-        .then(ex => {
-          // TODO: handle errors.
+        .catch(ex => {
+          this.alertMessage = '로그인에 실패했습니다. 오류가 계속 될 경우, 관리자에게 연락해주세요.'
+          this.showAlert = true
         })
     }
   }
