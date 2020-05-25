@@ -3,22 +3,21 @@
 <div id="login-row" class="row justify-content-center align-items-center">
     <div id="login-column" class="col-md-4" style="margin-top:44px">
         <form id="login-form" class="form" action="" method="post">
+            <b-alert id="LoginAlert" v-model="showAlert" variant="danger" dismissible style="word-break: keep-all">
+              {{ alertMessage }}
+            </b-alert>
             <h3 class="text-center">Login</h3>
-            <div>
               <b-form-group id="input-group-1" label="ID :" label-for="input-1">
                   <b-form-input id="input-1" v-model="form.id"></b-form-input>
               </b-form-group>
               <b-form-group id="input-group-1" label="PASSWORD :" label-for="input-2">
                   <b-form-input id="input-2" v-model="form.password"></b-form-input>
               </b-form-group>
-            </div>
-            <div>
               <b-row>
                   <b-col class="col-6" style="margin:0 auto">
                       <b-button pill class="w-75" @click.prevent="handleLogin">확인</b-button>
                   </b-col>
               </b-row>
-            </div>
         </form>
     </div>
 </div>

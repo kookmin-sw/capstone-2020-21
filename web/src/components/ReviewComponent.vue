@@ -3,6 +3,9 @@
   <b-row class="justify-content-center align-items-center">
     <b-col cols="12" md="7">
       <form id="review-form" class="form" action="" method="post">
+        <b-alert id="SignupAlert" v-model="showAlert" variant="danger" dismissible style="word-break: keep-all">
+          {{ alertMessage }}
+        </b-alert>
         <h3 class="text-center text-top">리뷰   작성</h3>
         <b-img fluid :src="imageURL"/>
         <b-form-group label="활동장소 :" lable-for="input-1" class="text-left">
