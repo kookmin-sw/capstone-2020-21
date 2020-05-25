@@ -11,7 +11,7 @@
                   <b-form-input id="input-1" v-model="form.id"></b-form-input>
               </b-form-group>
               <b-form-group id="input-group-1" label="PASSWORD :" label-for="input-2">
-                  <b-form-input id="input-2" v-model="form.password"></b-form-input>
+                  <b-form-input id="input-2" v-model="form.password" type="password"></b-form-input>
               </b-form-group>
               <b-row>
                   <b-col class="col-6" style="margin:0 auto">
