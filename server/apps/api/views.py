@@ -602,21 +602,37 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             end = request.data['end_datetime']
             location = int(request.data['location'])
             start_date = start.split('T')[0]
-            start_time = int(start.split('T')[1].split(':')[0])
+            start_time = start.split('T')[1].split(':')
             end_date = end.split('T')[0]
-            end_time = int(end.split('T')[1].split(':')[0])
+            end_time = end.split('T')[1].split(':')
+
+            start_year_month_day = start_date.split('-')
+            start_year = start_year_month_day[0]
+            start_month = start_year_month_day[1]
+            start_day = start_year_month_day[2]
+            start_conv_time = start_time[0] + start_time[1]
+            start_conv_time, start_conv_date = convert_time(start_conv_time, start_year, start_month, start_day)
+            start_conv_time = int(start_conv_time[0] + start_conv_time[1])
+
+            end_year_month_day = end_date.split('-')
+            end_year = end_year_month_day[0]
+            end_month = end_year_month_day[1]
+            end_day = end_year_month_day[2]
+            end_conv_time = end_time[0] + end_time[1]
+            end_conv_time, end_conv_date = convert_time(end_conv_time, end_year, end_month, end_day)
+            end_conv_time = int(end_conv_time[0] + end_conv_time[1])
             
             # API 요청하기
             all_weather_data = Weather.objects.all()
             weather_data_set = all_weather_data.filter(location_code=location)
-            weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_time)
-            weather_data_on_end = weather_data_on_start.filter(date__lte=end_date, time__lte=end_time)
+            weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_conv_time)
+            weather_data_on_end = weather_data_on_start.filter(date__lte=end_date, time__lte=end_conv_time)
 
             if weather_data_on_end.count()==0:
                 now = datetime.datetime.now()
                 today = now - datetime.timedelta(hours=24)
 
-                if start < today:
+                if parse(start) < today:
                     return Response({
                         'error' : 'internal server error'
                     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
