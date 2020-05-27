@@ -1,6 +1,6 @@
 <template>
   <b-navbar sticky class="shadow" toggleable="md" type="dark" style="background-color:#17A2B8">
-    <b-navbar-brand class="font-weight-bold" to="/" style="font-size: large">
+    <b-navbar-brand class="font-weight-bold" :to="mainDest" style="font-size: large">
       <!-- 로고, OTTE 타이틀 -->
       <img src="../assets/logo.png" class="d-inline-block align-middle mb-0 mr-1"
             style="width: 2rem; height: 2.1rem;" alt="logo">
@@ -51,6 +51,12 @@ export default {
     return {
       isLoggedIn: false,
       username: ''
+    }
+  },
+  computed: {
+    mainDest: function () {
+      if (this.isLoggedIn) return '/mainpage'
+      return '/'
     }
   },
   methods: {
