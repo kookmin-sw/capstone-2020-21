@@ -106,3 +106,5 @@
    - Show Clothes Set Reviews written by the user that had the similar weather with today's weather.
    - Relying on 'positive' Clothes Set Reviews written by other users that had the similar weather with today's weather, find which small category of each big categories were the most popular, and show the user's clothes on those categories.
 
+5. Provide **foreign weather service**
+   - Users can use OTTE on foreign trips/business trips through foreign weather service
