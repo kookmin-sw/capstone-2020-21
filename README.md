@@ -1,7 +1,9 @@
 # 옷때?(OTTE?)
 #### 팀페이지 주소 : https://kookmin-sw.github.io/capstone-2020-21/
 #### 계획서평가 발표영상 링크 : https://youtu.be/9LO2N7AenVQ
-#### 중간평가 발표영상 링크 : https://youtu.be/ursh3OyH09s
+#### 1차 중간평가 발표영상 링크 : https://youtu.be/ursh3OyH09s
+#### 2차 중간평가 발표영상 링크 : https://youtu.be/2W2d1jzT0iw
+
 ## 1. 프로젝트 개요
 
 <center><img src="index.assets/image-20200314162533015.png" alt="image-20200314162533015" height="33%" width="33%" /></center>
@@ -20,6 +22,8 @@
    - 과거 유사한 날씨에 본인이 작성한 코디 리뷰 조회
    - 과거 유사한 날씨에 다른 사용자들이 작성한 긍정적인 리뷰들 중, 
      각 대분류 별 가장 높은 비율을 차지한 소분류 카테고리에 따라 해당 카테고리와 일치하는 사용자의 옷 추천
+5. **해외날씨 서비스** 제공
+   - 해외 여행 또는 해외 출장 시에도 해당 서비스를 이용할 수 있도록 해외날씨 서비스 제공 
 
 ## 2. 팀 소개
 
