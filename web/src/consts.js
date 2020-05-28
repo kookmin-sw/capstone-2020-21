@@ -34,7 +34,7 @@ const CLOTHES_CATEGORIES = [
     ]
   },
   {
-    upper: '한벌옷',
+    upper: '원피스',
     lower: [
       '원피스'
     ]
