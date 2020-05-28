@@ -25,23 +25,23 @@
       </p>
       <p class="text-light">
         <b-img src="@/assets/hot.png" width="30px" />
-        {{ review.max_temp }} / {{ review.max_sensible_temp }} °C
+        {{ review.max_temp }} / {{ round(review.max_sensible_temp, 1) }} °C
       </p>
       <p class="text-light">
         <b-img src="@/assets/cold.png" width="30px" />
-        {{ review.min_temp }} / {{ review.min_sensible_temp }} °C
+        {{ review.min_temp }} / {{ round(review.min_sensible_temp, 1) }} °C
       </p>
       <p class="text-light">
         <b-img src="@/assets/humidity.png" width="30px" />
-        {{ review.humidity }} %
+        {{ round(review.humidity, 1) }} %
       </p>
       <p class="text-light">
         <b-img src="@/assets/wind.png" width="30px" />
-        {{ review.wind_speed }} m/s
+        {{ round(review.wind_speed, 1) }} m/s
       </p>
       <p class="text-light">
         <b-img src="@/assets/rain.png" width="30px" />
-        {{ review.precipitation }} mm
+        {{ round(review.precipitation, 1) }} mm
       </p>
     </template>
   </b-overlay>
@@ -71,6 +71,9 @@ export default {
     },
     convertDate: function (targetDate) {
       return new Date(targetDate).toLocaleDateString()
+    },
+    round: function (num, to) {
+      return num.toFixed(to)
     }
   }
 }
