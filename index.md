@@ -18,6 +18,8 @@
    - 과거 유사한 날씨에 본인이 작성한 코디 리뷰 조회
    - 과거 유사한 날씨에 다른 사용자들이 작성한 긍정적인 리뷰들 중, 
      각 대분류 별 가장 높은 비율을 차지한 소분류 카테고리에 따라 해당 카테고리와 일치하는 사용자의 옷 추천
+5. **해외날씨 서비스** 제공
+   - 해외 여행 또는 해외 출장 시에도 해당 서비스를 이용할 수 있도록 해외날씨 서비스 제공 
 
 ## 2. 팀 소개
 
@@ -104,6 +106,10 @@
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/9LO2N7AenVQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-## 5. 중간평가 영상
+## 5. 1차 중간평가 영상
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ursh3OyH09s" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## 6. 2차 중간평가 영상
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/2W2d1jzT0iw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
