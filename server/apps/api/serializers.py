@@ -38,7 +38,7 @@ class ClothesSetReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'clothes_set', 'start_datetime', 'end_datetime', 
                   'location', 'review', 'max_temp', 'min_temp', 
                   'max_sensible_temp', 'min_sensible_temp', 'humidity', 
-                  'wind_speed', 'precipitation', 'comment', 'owner')
+                  'wind_speed', 'precipitation', 'comment', 'weather_type', 'owner')
         read_only_fields = ('owner', )
 
 class ClothesSetReviewReadSerializer(serializers.ModelSerializer):
