@@ -3,6 +3,7 @@ import boto3
 import cv2.cv2 as cv2
 from django.conf import settings
 import json
+import math
 import numpy as np
 import os
 import sagemaker
@@ -213,4 +214,36 @@ def get_upper_category(lower_index):
         return '아우터'
     else:
         return '원피스'
+    
+def get_weather_class(weather):
+    """
+    returns weather_type of the weather vector
+    weather: maxTemp/minTemp/windSpeed/humidity
+    ex) [20,10,2.5,52.5]
+    """
+    weather_types = [
+        [29.7, 22.1, 1.7, 67.3],
+        [23.8, 13.3, 1.9, 61.1],
+        [26.1, 17.7, 2.5, 73.9],
+        [24.4, 12.0, 1.7, 45.9],
+        [25.1, 20.2, 2.5, 92.5],
+        [11.8, 1.2, 1.2, 60.6],
+        [8.7, 0.0, 1.4, 75.8],
+        [20.2, 10.2, 0.5, 76.4],
+        [28.4, 21.3, 1.1, 82.5],
+        [9.3, -1.4, 1.7, 42.6]
+    ]
+    
+    distances = []
+    for weather_type in weather_types:
+        tempSum = 0
+        for i in range(len(weather_type)):
+            dist = weather[i] - weather_type[i]
+            if i == 4:
+                dist = 0.1 * dist
+            tempSum += dist * dist
+        distances.append(math.sqrt(tempSum))
+        
+    typeIndex = distances.index(min(distances))
+    return typeIndex + 1
     

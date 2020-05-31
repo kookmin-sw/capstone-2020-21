@@ -409,8 +409,12 @@ def convert_time(time, year, month, day):
     
     if int(month) // 10 == 0:
         str_month = "0" + str(month)
+    else:
+        str_month = str(month)
     if int(day) // 10 == 0:
         str_day = "0" + str(day)
+    else:
+        str_day = str(day)
 
     date = str(year) + str_month + str_day
 

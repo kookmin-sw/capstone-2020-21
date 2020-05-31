@@ -518,6 +518,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             start_conv_time = start_time[0] + start_time[1]
             start_conv_time, start_conv_date = convert_time(start_conv_time, start_year, start_month, start_day)
             start_conv_time = int(start_conv_time[0] + start_conv_time[1])
+            start_conv_date = start_conv_date[:4] + '-' + start_conv_date[4:6] + '-' + start_conv_date[6:]
 
             end_year_month_day = end_date.split('-')
             end_year = end_year_month_day[0]
@@ -526,13 +527,16 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             end_conv_time = end_time[0] + end_time[1]
             end_conv_time, end_conv_date = convert_time(end_conv_time, end_year, end_month, end_day)
             end_conv_time = int(end_conv_time[0] + end_conv_time[1])
+            end_conv_date = end_conv_date[:4] + '-' + end_conv_date[4:6] + '-' + end_conv_date[6:]
             
             # API 요청하기
             all_weather_data = Weather.objects.all()
             weather_data_set = all_weather_data.filter(location_code=location)
-            weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_conv_time)
-            weather_data_on_end = weather_data_on_start.filter(date__lte=end_date, time__lte=end_conv_time)
-
+            weather_data_set = weather_data_set.exclude(date__lt=start_conv_date)
+            weather_data_set = weather_data_set.exclude(date__gt=end_conv_date)
+            weather_data_on_start = weather_data_set.exclude(date=start_conv_date, time__lt=start_conv_time)
+            weather_data_on_end = weather_data_on_start.exclude(date=end_conv_date, time__gt=end_conv_time)
+            
             if weather_data_on_end.count()==0:
                 now = datetime.datetime.now()
                 today = now - datetime.timedelta(hours=24)
@@ -579,6 +583,13 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             request.data['humidity'] = weather_data_on_end.aggregate(Avg('humidity'))['humidity__avg']
             request.data['wind_speed'] = weather_data_on_end.aggregate(Avg('wind_speed'))['wind_speed__avg']
             request.data['precipitation'] = weather_data_on_end.aggregate(Avg('precipitation'))['precipitation__avg']
+            
+            request.data['weather_type'] = get_weather_class([
+                request.data['max_temp'],
+                request.data['min_temp'],
+                request.data['wind_speed'],
+                request.data['humidity'],
+            ])
         
         return super(ClothesSetReviewView, self).create(request, *args, **kwargs)
     
@@ -613,6 +624,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             start_conv_time = start_time[0] + start_time[1]
             start_conv_time, start_conv_date = convert_time(start_conv_time, start_year, start_month, start_day)
             start_conv_time = int(start_conv_time[0] + start_conv_time[1])
+            start_conv_date = start_conv_date[:4] + '-' + start_conv_date[4:6] + '-' + start_conv_date[6:]
 
             end_year_month_day = end_date.split('-')
             end_year = end_year_month_day[0]
@@ -621,12 +633,15 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             end_conv_time = end_time[0] + end_time[1]
             end_conv_time, end_conv_date = convert_time(end_conv_time, end_year, end_month, end_day)
             end_conv_time = int(end_conv_time[0] + end_conv_time[1])
+            end_conv_date = end_conv_date[:4] + '-' + end_conv_date[4:6] + '-' + end_conv_date[6:]
             
             # API 요청하기
             all_weather_data = Weather.objects.all()
             weather_data_set = all_weather_data.filter(location_code=location)
-            weather_data_on_start = weather_data_set.filter(date__gte=start_date, time__gte=start_conv_time)
-            weather_data_on_end = weather_data_on_start.filter(date__lte=end_date, time__lte=end_conv_time)
+            weather_data_set = weather_data_set.exclude(date__lt=start_conv_date)
+            weather_data_set = weather_data_set.exclude(date__gt=end_conv_date)
+            weather_data_on_start = weather_data_set.exclude(date=start_conv_date, time__lt=start_conv_time)
+            weather_data_on_end = weather_data_on_start.exclude(date=end_conv_date, time__gt=end_conv_time)
 
             if weather_data_on_end.count()==0:
                 now = datetime.datetime.now()
@@ -674,6 +689,13 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             request.data['humidity'] = weather_data_on_end.aggregate(Avg('humidity'))['humidity__avg']
             request.data['wind_speed'] = weather_data_on_end.aggregate(Avg('wind_speed'))['wind_speed__avg']
             request.data['precipitation'] = weather_data_on_end.aggregate(Avg('precipitation'))['precipitation__avg']
+            
+            request.data['weather_type'] = get_weather_class([
+                request.data['max_temp'],
+                request.data['min_temp'],
+                request.data['wind_speed'],
+                request.data['humidity'],
+            ])
         
         return super(ClothesSetReviewView, self).update(request, *args, **kwargs)
     

@@ -63,6 +63,7 @@ class ClothesSetReview(models.Model):
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
     comment = models.CharField(max_length=100, default='한줄평을 입력해주세요.')
     created_at = models.DateTimeField(default=timezone.now)
+    weather_type = models.IntegerField(choices=WEATHER_TYPE_CHOICES, default=0)
     
 
 class Weather(models.Model):
