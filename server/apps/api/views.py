@@ -5,7 +5,6 @@ from django.db.models import Avg, Max, Min
 from django.utils import timezone
 from filters.mixins import FiltersMixin
 import json
-import random
 from random import sample
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
@@ -282,12 +281,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         div_tag = html.find('div', class_='list-box box')
 
         # 0~9 랜덤 숫자 3개 뽑기
-        num_list = []
-        ran_num = random.randint(0, 9)
-        for count in range(3):
-            while ran_num in num_list:
-                ran_num = random.randint(0, 9)
-            num_list.append(ran_num)
+        num_list = sample([0,1,2,3,4,5,6,7,8,9], 3)
 
         li_tag = div_tag.find_all('li', class_='listItem')
         
