@@ -1,4 +1,7 @@
+from copy import deepcopy
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.utils.translation import gettext_lazy as _
@@ -77,3 +80,11 @@ class Weather(models.Model):
     humidity = models.IntegerField()
     wind_speed = models.FloatField()
     precipitation = models.FloatField()
+
+@receiver(pre_delete, sender=Clothes)
+def cascade_delete_pre_delete(sender, instance, **kwargs):
+    print(instance)
+    clothes_sets = ClothesSet.objects.filter(clothes__id=instance.id)
+    
+    for clothes_set in clothes_sets:
+        clothes_set.delete()
