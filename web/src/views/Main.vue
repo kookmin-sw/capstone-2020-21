@@ -11,13 +11,39 @@
     </b-row>
     <b-row cols=1 cols-md=2>
       <b-col cols=12 lg=4>
-        <!-- 추천 카테고리 컴포넌트 -->
-        <RecommendedCombinationsComponent class="border" :combinations="recommendedCombinations" />
+        <b-row>
+          <b-col cols=12>
+            <!-- 추천 카테고리 컴포넌트 -->
+            <RecommendedCombinationsComponent class="border" :combinations="recommendedCombinations" />
+          </b-col>
+          <b-col cols=12 class="mt-3">
+            <b-row>
+              <b-col cols=12>
+                <h4>최신 스타일</h4>
+              </b-col>
+              <b-col cols=12>
+                <b-carousel controls indicators>
+                  <b-carousel-slide
+                    v-for="lookbook in lookbooks"
+                    :key="lookbook.image"
+                    :img-src="lookbook.image"
+                    :caption-html="lookbook.brand + '<br><h5>' + lookbook.name + '</h5>'"
+                    style="text-shadow: 0px 0px 4px #000">
+                  </b-carousel-slide>
+                </b-carousel>
+              </b-col>
+            </b-row>
+          </b-col>
+        </b-row>
       </b-col>
       <b-col class="mt-3 mt-lg-0" cols=12 lg=8>
-        <!-- 리뷰 컴포넌트 -->
-        <h4 class="mt-3 pb-0">유사한 날씨에 작성한 리뷰</h4>
-        <ReviewListComponent :reviews="userReviews" />
+        <b-row>
+          <b-col cols=12>
+            <!-- 리뷰 컴포넌트 -->
+            <h4 class="mt-3 pb-0">유사한 날씨에 작성한 리뷰</h4>
+            <ReviewListComponent :reviews="userReviews" />
+          </b-col>
+        </b-row>
       </b-col>
     </b-row>
   </b-container>
@@ -55,7 +81,8 @@ export default {
       recommendedCombinations: [],
       userReviews: [],
       showAlert: false,
-      alertMessage: ''
+      alertMessage: '',
+      lookbooks: []
     }
   },
   watch: {
@@ -99,6 +126,23 @@ export default {
           })
       }
     }
+  },
+  created: function () {
+    var token = window.localStorage.getItem('token')
+    var config = {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+    var vm = this
+    var url = consts.SERVER_BASE_URL + '/clothes/lookbook/'
+
+    axios.get(url, config)
+      .then((response) => {
+        vm.lookbooks = response.data
+      })
+      .catch((ex) => {
+        vm.showAlert = true
+        vm.alertMessage = '룩북 데이터를 받아오는데 실패했습니다. 오류가 계속되면 관리자에게 연락해주세요.'
+      })
   }
 }
 </script>
