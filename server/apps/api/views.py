@@ -6,6 +6,7 @@ from django.utils import timezone
 from filters.mixins import FiltersMixin
 import json
 import random
+from random import sample
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -211,48 +212,54 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         """
         An endpoint where the today_category is returned
         """
+        
+        MAX_ITEM_NUM = 3
+        MAX_IMAGE_NUM = 3
 
-        min_sensible = float(request.query_params.get('min_sensible_temp'))
-        max_sensible = float(request.query_params.get('max_sensible_temp'))
+        min_temp = float(request.query_params.get('minTemp'))
+        max_temp = float(request.query_params.get('maxTemp'))
+        wind_speed = float(request.query_params.get('windSpeed'))
+        humidity = float(request.query_params.get('humidity'))
         
+        weather_type = get_weather_class([max_temp, min_temp, wind_speed, humidity])
         cody_review_set = ClothesSetReview.objects.all()
-        filtered_cody_review_set = cody_review_set.filter(review=3, 
-                                                        min_sensible_temp__gte=min_sensible-2,
-                                                        min_sensible_temp__lte=min_sensible+2, 
-                                                        max_sensible_temp__gte=max_sensible-2,
-                                                        max_sensible_temp__lte=max_sensible+2
-                                                        )
-        
-        # TODO : 효빈이 serializer 공부용 -효빈-
-        # serializer = ClothesSetReviewReadSerializer(filtered_cody_review_set, many=True)
-        # return Response(serializer.data)    
+        filtered_cody_review_set = cody_review_set.filter(review=3, weather_type=weather_type)
 
         filtered_clothes_set_id = []
         for filtered_cody_review in filtered_cody_review_set:
             filtered_clothes_set_id.append(filtered_cody_review.clothes_set.id)
         
         filtered_clothes_set = ClothesSet.objects.filter(pk__in=filtered_clothes_set_id)
-
-        analysis_upper_category_dict = {
-            '하의' : [],
-            '원피스' : [],
-            '아우터' : [],
-            '치마' : [],
-            '상의' : []        
-        }
-
+        
+        combination_dict = {}
         for clothes_set in filtered_clothes_set:
+            clothes_combination = set()
             for clothes in clothes_set.clothes.all():
-                analysis_upper_category_dict[clothes.upper_category].append(clothes.lower_category)
+                clothes_combination.add(clothes.lower_category)
+                
+            comb = tuple(clothes_combination)
+            if comb in combination_dict.keys():
+                combination_dict[comb][0] += 1
+                combination_dict[comb][1].add(clothes_set.image_url)
+            else:
+                combination_dict[comb] = [1,set([clothes_set.image_url])]
+        
+        result = sorted(combination_dict.items(), key=(lambda x:x[1][0]), reverse=True)[:MAX_ITEM_NUM]
 
-        for key in analysis_upper_category_dict.keys():
-            if len(analysis_upper_category_dict[key]) == 0:
-                analysis_upper_category_dict[key] = ""
-                continue
+        result_list = []
+        for item in result:
+            item = list(item)
+            result_dict = {}
+            result_dict['combination'] = '-'.join(list(item[0]))
+            images_list = list(item[1][1])
 
-            analysis_upper_category_dict[key] = mode(analysis_upper_category_dict[key])
+            if len(images_list) > MAX_IMAGE_NUM:
+                images_list = sample(images_list, MAX_IMAGE_NUM)
 
-        return Response(analysis_upper_category_dict)    
+            result_dict['images'] = images_list
+            result_list.append(result_dict)
+
+        return Response(result_list)
 
     
     @action(detail=False, methods=['get'])
@@ -519,16 +526,13 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             
         queryset = self.filter_queryset(self.get_queryset())
 
-        max_temp = request.query_params.get('max_sensible_temp')
-        min_temp = request.query_params.get('min_sensible_temp')
+        max_temp = float(request.query_params.get('maxTemp'))
+        min_temp = float(request.query_params.get('minTemp'))
+        wind_speed = float(request.query_params.get('windSpeed'))
+        humidity = float(request.query_params.get('humidity'))
         
-        if max_temp is not None:
-            max_temp = float(max_temp)
-            queryset = queryset.filter(max_sensible_temp__lte=(max_temp+2), max_sensible_temp__gte=(max_temp-2))
-
-        if min_temp is not None:
-            min_temp = float(min_temp)
-            queryset = queryset.filter(min_sensible_temp__lte=(min_temp+2), min_sensible_temp__gte=(min_temp-2))
+        weather_type = get_weather_class([max_temp, min_temp, wind_speed, humidity])
+        queryset = queryset.filter(weather_type=weather_type)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
