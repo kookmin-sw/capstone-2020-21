@@ -220,7 +220,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         
         weather_type = get_weather_class([max_temp, min_temp, wind_speed, humidity])
         cody_review_set = ClothesSetReview.objects.all()
-        filtered_cody_review_set = cody_review_set.filter(weather_type=weather_type)
+        filtered_cody_review_set = cody_review_set.filter(review=3, weather_type=weather_type)
 
         filtered_clothes_set_id = []
         for filtered_cody_review in filtered_cody_review_set:
