@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 import datetime
 from dateutil.parser import parse
 from django.db.models import Avg, Max, Min
@@ -10,6 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+import requests
 from statistics import mode
 
 from .exceptions import S3FileError
@@ -257,6 +259,51 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             result_list.append(result_dict)
 
         return Response(result_list)
+
+    
+    @action(detail=False, methods=['get'])
+    def lookbook(self, request, *args, **kwargs):
+        """
+        An endpoint where the lookbook is returned
+        """
+        now = datetime.datetime.now()
+        year = str(now.year)
+        user_gender = request.user.gender
+        if user_gender=='남자':
+            user_gender = 'm'
+        else:
+            user_gender = 'f'
+
+        url = 'https://www.musinsa.com/index.php?m=shopstaff&_y=' + year + '&ordw=d_regis&gender=' + user_gender
+        
+        req = requests.get(url)
+        html = BeautifulSoup(req.text, 'html.parser')
+        div_tag = html.find('div', class_='list-box box')
+
+        # 0~9 랜덤 숫자 3개 뽑기
+        num_list = sample([0,1,2,3,4,5,6,7,8,9], 3)
+
+        li_tag = div_tag.find_all('li', class_='listItem')
+        
+        lookbook_list = []
+        for count in range(3):
+            ran_img = int(num_list[count])
+            ran_li = li_tag[ran_img]
+
+            # 이미지 url 받아오기
+            img_url = ran_li.find('img').get('src')
+            img_url = img_url.replace('//','http://')
+
+            # 브랜드명 받아오기
+            brand = ran_li.find('p', class_='brackets brand').text
+
+            # 모델 이름 받아오기
+            name = ran_li.find('span').text
+
+            lookbook = {'image' : img_url, 'brand' : brand, 'name' : name}
+            lookbook_list.append(lookbook)
+
+        return Response(lookbook_list)
 
 
 class ClothesNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
