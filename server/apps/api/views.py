@@ -280,13 +280,13 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         html = BeautifulSoup(req.text, 'html.parser')
         div_tag = html.find('div', class_='list-box box')
 
-        # 0~9 랜덤 숫자 3개 뽑기
-        num_list = sample([0,1,2,3,4,5,6,7,8,9], 3)
+        # 0~9 랜덤 숫자 5개 뽑기
+        num_list = sample([0,1,2,3,4,5,6,7,8,9], 5)
 
         li_tag = div_tag.find_all('li', class_='listItem')
         
         lookbook_list = []
-        for count in range(3):
+        for count in range(5):
             ran_img = int(num_list[count])
             ran_li = li_tag[ran_img]
 
