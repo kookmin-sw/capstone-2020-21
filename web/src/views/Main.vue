@@ -12,7 +12,7 @@
     <b-row cols=1 cols-md=2>
       <b-col cols=12 lg=4>
         <!-- 추천 카테고리 컴포넌트 -->
-        <RecommendedCategoriesComponent class="border" :categories="recommendedCategories" />
+        <RecommendedCombinationsComponent class="border" :combinations="recommendedCombinations" />
       </b-col>
       <b-col class="mt-3 mt-lg-0" cols=12 lg=8>
         <!-- 리뷰 컴포넌트 -->
@@ -27,14 +27,14 @@
 import axios from 'axios'
 import consts from '@/consts.js'
 import WeatherComponent from '@/components/WeatherComponent'
-import RecommendedCategoriesComponent from '@/components/RecommendedCategoriesComponent'
+import RecommendedCombinationsComponent from '@/components/RecommendedCombinationsComponent'
 import ReviewListComponent from '@/components/ReviewListComponent'
 
 export default {
   name: 'mainPage',
   components: {
     WeatherComponent,
-    RecommendedCategoriesComponent,
+    RecommendedCombinationsComponent,
     ReviewListComponent
   },
   data: function () {
@@ -52,7 +52,7 @@ export default {
         windSpeed: 0,
         precipitation: 0
       },
-      recommendedCategories: [],
+      recommendedCombinations: [],
       userReviews: [],
       showAlert: false,
       alertMessage: ''
@@ -68,9 +68,8 @@ export default {
         }
         var vm = this
         var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/'
-        url += '?limit=10&max_sensible_temp=' + vm.weatherProps.maxSenseTemp
+        url += '?max_sensible_temp=' + vm.weatherProps.maxSenseTemp
         url += '&min_sensible_temp=' + vm.weatherProps.minSenseTemp
-        url += '&review=3'
         url += '&me=true'
 
         axios.get(url, config)
@@ -83,11 +82,14 @@ export default {
           })
 
         url = consts.SERVER_BASE_URL + '/clothes/today_category/'
-        url += '?max_sensible_temp=' + vm.weatherProps.maxSenseTemp
-        url += '&min_sensible_temp=' + vm.weatherProps.minSenseTemp
+        url += '?maxTemp=' + vm.weatherProps.maxTemp
+        url += '&minTemp=' + vm.weatherProps.minTemp
+        url += '&windSpeed=' + vm.weatherProps.windSpeed
+        url += '&humidity=' + vm.weatherProps.humidity
+
         axios.get(url, config)
           .then((response) => {
-            vm.recommendedCategories = response.data
+            vm.recommendedCombinations = response.data
           })
           .catch((response) => {
             vm.showAlert = true
