@@ -239,6 +239,8 @@ def get_weather_class(weather):
         tempSum = 0
         for i in range(len(weather_type)):
             dist = weather[i] - weather_type[i]
+            if i == 4:
+                dist = 0.1 * dist
             tempSum += dist * dist
         distances.append(math.sqrt(tempSum))
         
