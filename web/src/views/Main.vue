@@ -68,8 +68,10 @@ export default {
         }
         var vm = this
         var url = consts.SERVER_BASE_URL + '/clothes-set-reviews/'
-        url += '?max_sensible_temp=' + vm.weatherProps.maxSenseTemp
-        url += '&min_sensible_temp=' + vm.weatherProps.minSenseTemp
+        url += '?maxTemp=' + vm.weatherProps.maxTemp
+        url += '&minTemp=' + vm.weatherProps.minTemp
+        url += '&windSpeed=' + vm.weatherProps.windSpeed
+        url += '&humidity=' + vm.weatherProps.humidity
         url += '&me=true'
 
         axios.get(url, config)
