@@ -220,7 +220,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         
         weather_type = get_weather_class([max_temp, min_temp, wind_speed, humidity])
         cody_review_set = ClothesSetReview.objects.all()
-        filtered_cody_review_set = cody_review_set.filter(weather_type=weather_type)
+        filtered_cody_review_set = cody_review_set.filter(review=3, weather_type=weather_type)
 
         filtered_clothes_set_id = []
         for filtered_cody_review in filtered_cody_review_set:
@@ -473,16 +473,13 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             
         queryset = self.filter_queryset(self.get_queryset())
 
-        max_temp = request.query_params.get('max_sensible_temp')
-        min_temp = request.query_params.get('min_sensible_temp')
+        max_temp = float(request.query_params.get('maxTemp'))
+        min_temp = float(request.query_params.get('minTemp'))
+        wind_speed = float(request.query_params.get('windSpeed'))
+        humidity = float(request.query_params.get('humidity'))
         
-        if max_temp is not None:
-            max_temp = float(max_temp)
-            queryset = queryset.filter(max_sensible_temp__lte=(max_temp+2), max_sensible_temp__gte=(max_temp-2))
-
-        if min_temp is not None:
-            min_temp = float(min_temp)
-            queryset = queryset.filter(min_sensible_temp__lte=(min_temp+2), min_sensible_temp__gte=(min_temp-2))
+        weather_type = get_weather_class([max_temp, min_temp, wind_speed, humidity])
+        queryset = queryset.filter(weather_type=weather_type)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
