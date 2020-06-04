@@ -58,6 +58,9 @@ export default {
     upper_categories: function () {
       var result = []
       for (var category of this.categories) {
+        if (category.upper === '전체') {
+          continue
+        }
         result.push(category.upper)
       }
       return result
