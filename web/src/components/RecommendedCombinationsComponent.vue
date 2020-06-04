@@ -4,7 +4,7 @@
       <b-col>
         <b-card class="border-0">
           <b-card-title>
-            추천 옷 조합
+            인기있는 옷 조합
           </b-card-title>
           <b-alert id="categoryAlert" :show="categoryEmpty" variant="danger" style="word-break: keep-all">
             현재 날씨에 맞는 코디 정보가 없습니다
