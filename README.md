@@ -1,10 +1,5 @@
 # 옷때?(OTTE?)
 #### 팀페이지 주소 : https://kookmin-sw.github.io/capstone-2020-21/
-#### 홍보영상 링크 : https://youtu.be/tdWAHNXE_jo
-#### 계획서평가 발표영상 링크 : https://youtu.be/9LO2N7AenVQ
-#### 1차 중간평가 발표영상 링크 : https://youtu.be/ursh3OyH09s
-#### 2차 중간평가 발표영상 링크 : https://youtu.be/2W2d1jzT0iw
-#### 최종평가 발표영상 링크 : https://youtu.be/Q411RhkTjcw
 
 ## 1. 프로젝트 개요
 
@@ -27,7 +22,47 @@
 5. **해외날씨 서비스** 제공
    - 해외 여행 또는 해외 출장 시에도 해당 서비스를 이용할 수 있도록 해외날씨 서비스 제공 
 
-## 2. 팀 소개
+## 2. Abstract
+
+​	Many people search for what to wear before going out in order to find appropriate clothes set for the weather. But even if they go through this process of searching, there are cases where they feel colder or hotter than what they have thought after getting out. Because every people feels different on how hot or cold about the same weather and also has different clothes to choose from, we are trying to help them resolve the problem "What to wear today" by focusing on individual information.
+
+​	'**OTTE?**' stands for **O**utfit **T**oday wea**T**h**E**r, and it is a web service that helps the user to find appropriate clothes set for the weather they are about to face. The main features are as follows.
+
+1. Save the user's **Clothes** information.
+   - Classify the uploaded clothes picture.
+     - Big categories : Outer, Top, Pants, Skirts, Dress.
+     - Small categories : detailed multiple categories inside inside big categories
+2. Save the user's **Clothes Set**(what combination of clothes the user wore) information.
+3. Save the user's **Clothes Set "Review"**(when & where they wore, whether it was too cold or hot).
+4. **Recommend** the clothing set for weather today.
+   - Show Clothes Set Reviews written by the user that had the similar weather with today's weather.
+   - Relying on 'positive' Clothes Set Reviews written by other users that had the similar weather with today's weather, find which small category of each big categories were the most popular, and show the user's clothes on those categories.
+
+5. Provide **foreign weather service**
+   - Users can use OTTE on foreign trips/business trips through foreign weather service
+   
+
+## 3. 소개 영상
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/9LO2N7AenVQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## 4. 1차 중간평가 영상
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ursh3OyH09s" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## 5. 2차 중간평가 영상
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/2W2d1jzT0iw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## 6. 최종평가 영상
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Q411RhkTjcw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## 7. 홍보 영상
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/tdWAHNXE_jo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## 8. 팀 소개
 
 #### 이경용 교수님
 
@@ -92,21 +127,3 @@
 📌 role: 유닛 테스팅, 로고 제작
 ~~~
 
-## 3. Abstract
-
-​	Many people search for what to wear before going out in order to find appropriate clothes set for the weather. But even if they go through this process of searching, there are cases where they feel colder or hotter than what they have thought after getting out. Because every people feels different on how hot or cold about the same weather and also has different clothes to choose from, we are trying to help them resolve the problem "What to wear today" by focusing on individual information.
-
-​	'**OTTE?**' stands for **O**utfit **T**oday wea**T**h**E**r, and it is a web service that helps the user to find appropriate clothes set for the weather they are about to face. The main features are as follows.
-
-1. Save the user's **Clothes** information.
-   - Classify the uploaded clothes picture.
-     - Big categories : Outer, Top, Pants, Skirts, Dress.
-     - Small categories : detailed multiple categories inside inside big categories
-2. Save the user's **Clothes Set**(what combination of clothes the user wore) information.
-3. Save the user's **Clothes Set "Review"**(when & where they wore, whether it was too cold or hot).
-4. **Recommend** the clothing set for weather today.
-   - Show Clothes Set Reviews written by the user that had the similar weather with today's weather.
-   - Relying on 'positive' Clothes Set Reviews written by other users that had the similar weather with today's weather, find which small category of each big categories were the most popular, and show the user's clothes on those categories.
-
-5. Provide **foreign weather service**
-   - Users can use OTTE on foreign trips/business trips through foreign weather service
