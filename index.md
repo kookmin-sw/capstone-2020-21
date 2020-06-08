@@ -57,7 +57,7 @@
 
 ## 7. 시연 영상
 
-<iframe width="560" height="315" src="https://youtu.be/ZAAijUxpF6Q" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src=" https://youtu.be/ZAAijUxpF6Q" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## 8. 홍보 영상
 
