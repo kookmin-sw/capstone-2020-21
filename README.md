@@ -46,28 +46,16 @@
 
 [![계획서발표](https://user-images.githubusercontent.com/28581497/84007456-6b204480-a9ab-11ea-8143-55a09c310bf7.JPG)](https://www.youtube.com/embed/9LO2N7AenVQ)
 
-## 4. 1차 중간평가 영상
-
-[[!1차발표](https://user-images.githubusercontent.com/28581497/84007477-74a9ac80-a9ab-11ea-846d-849c5d3619a9.JPG)](https://www.youtube.com/embed/ursh3OyH09s)
-
-## 5. 2차 중간평가 영상
-
-[![2차발표](https://user-images.githubusercontent.com/28581497/84007482-75dad980-a9ab-11ea-8c15-4e38ac8c9802.JPG)](https://www.youtube.com/embed/2W2d1jzT0iw)
-
-## 6. 최종평가 영상
+## 4. 최종평가 영상
 
 [![최종발표](https://user-images.githubusercontent.com/28581497/84007523-868b4f80-a9ab-11ea-9e13-c78cb0a29b21.JPG)](https://www.youtube.com/embed/Q411RhkTjcw)
 
-## 7. 시연 영상
+#### 1차 중간평가 발표영상 링크 : https://youtu.be/ursh3OyH09s
+#### 2차 중간평가 발표영상 링크 : https://youtu.be/2W2d1jzT0iw
+#### 시연 영상 링크 : https://youtu.be/ZAAijUxpF6Q
+#### 홍보 영상 링크 : https://youtu.be/tdWAHNXE_jo
 
-[![시연영상](https://user-images.githubusercontent.com/28581497/84007546-8db25d80-a9ab-11ea-9186-6d0cdc3158f3.JPG)](https://youtu.be/ZAAijUxpF6Q)
-
-## 8. 홍보 영상
-
-[![홍보영상](https://user-images.githubusercontent.com/28581497/84007570-986cf280-a9ab-11ea-8ada-0a750679ac6a.JPG)](https://www.youtube.com/embed/tdWAHNXE_jo)
-
-
-## 9. 팀 소개
+## 5. 팀 소개
 
 #### 이경용 교수님
 
