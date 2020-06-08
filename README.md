@@ -1,8 +1,10 @@
 # 옷때?(OTTE?)
 #### 팀페이지 주소 : https://kookmin-sw.github.io/capstone-2020-21/
+#### 홍보영상 링크 : https://youtu.be/tdWAHNXE_jo
 #### 계획서평가 발표영상 링크 : https://youtu.be/9LO2N7AenVQ
 #### 1차 중간평가 발표영상 링크 : https://youtu.be/ursh3OyH09s
 #### 2차 중간평가 발표영상 링크 : https://youtu.be/2W2d1jzT0iw
+#### 최종평가 발표영상 링크 : https://youtu.be/Q411RhkTjcw
 
 ## 1. 프로젝트 개요
 
