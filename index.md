@@ -115,3 +115,13 @@
 ## 6. 2차 중간평가 영상
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/2W2d1jzT0iw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## 7. 최종평가 영상
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Q411RhkTjcw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## 8. 홍보 영상
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/tdWAHNXE_jo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
