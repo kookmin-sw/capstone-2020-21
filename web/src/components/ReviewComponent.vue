@@ -162,7 +162,7 @@ export default {
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 
       const minDate = new Date(today)
-      minDate.setDate(minDate.getDate() - 7)
+      minDate.setDate(minDate.getDate() - 6)
 
       const maxDate = new Date(today)
       maxDate.setDate(maxDate.getDate())
