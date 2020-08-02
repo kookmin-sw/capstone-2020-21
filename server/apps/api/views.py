@@ -932,28 +932,29 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         date = request.data['date']
         time = request.data['time']
         level = request.data['level']
-        x = request.data['x']
-        y = request.data['y']
 
-        with open('apps/api/locations/data.json') as json_file:
-            json_data = json.load(json_file)
+        # TODO(hyobin) : gps 사용 여부 확인
+        # x = request.data['x']
+        # y = request.data['y']
 
-        location_code = 0
-        for index in json_data:
-            if json_data[index]['x'] == x:
-                if json_data[index]['y'] == y:
-                    location = int(index)
-                    location_code = location
-                    break
+        # with open('apps/api/locations/data.json') as json_file:
+        #     json_data = json.load(json_file)
+
+        # location_code = 0
+        # for index in json_data:
+        #     if json_data[index]['x'] == x:
+        #         if json_data[index]['y'] == y:
+        #             location = int(index)
+        #             location_code = location
+        #             break
         
-        ReviewSensor.objects.create(owner_id=owner, date=date, time=time, level=level, location_code=location_code)
+        ReviewSensor.objects.create(owner_id=owner, date=date, time=time, level=level)
 
         return Response({
                         'owner_id' : owner,
                         'date' : date,
                         'time' : time, 
                         'level' : level,
-                        'location_code' : location_code,
                         })
 
 
