@@ -87,7 +87,6 @@ class ReviewSensor(models.Model):
     
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
     level = models.IntegerField(choices=LEVEL_CHOICES)
-    location_code = models.IntegerField()
     date = models.DateField()
     time = models.TimeField()
 
