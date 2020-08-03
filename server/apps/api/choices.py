@@ -9,6 +9,11 @@ GENDER_CHOICES = [
 
 with open('apps/api/locations/data.json') as json_file:
     data = json.load(json_file)
+
+LEVEL_CHOICES = [
+    (-1, -1),
+    (1, 1),
+]
     
 LOCATION_CHOICES = []
 for row in data:

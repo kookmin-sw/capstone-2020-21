@@ -16,7 +16,7 @@ from statistics import mode
 
 from .exceptions import S3FileError
 from .globalweather import get_global_weather_city_name
-from .models import Clothes, ClothesSet, ClothesSetReview, User, Weather
+from .models import Clothes, ClothesSet, ClothesSetReview, ReviewSensor, User, Weather
 from .permissions import UserPermissions
 from .serializers import (
     ClothesSerializer,
@@ -919,6 +919,44 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'wind_speed': wind_speed,
                 'precipitation': precipitation,
             }, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def review_sensor(self, request, *args, **kwargs):
+        """
+        An endpoint where the review_sensor is returned
+        """
+
+        # owner = request.user.id
+        owner = User.objects.filter(username=request.data['username'])
+        owner = owner[0].id
+        date = request.data['date']
+        time = request.data['time']
+        level = request.data['level']
+
+        # TODO(hyobin) : gps 사용 여부 확인
+        # x = request.data['x']
+        # y = request.data['y']
+
+        # with open('apps/api/locations/data.json') as json_file:
+        #     json_data = json.load(json_file)
+
+        # location_code = 0
+        # for index in json_data:
+        #     if json_data[index]['x'] == x:
+        #         if json_data[index]['y'] == y:
+        #             location = int(index)
+        #             location_code = location
+        #             break
+        
+        ReviewSensor.objects.create(owner_id=owner, date=date, time=time, level=level)
+
+        return Response({
+                        'owner_id' : owner,
+                        'date' : date,
+                        'time' : time, 
+                        'level' : level,
+                        })
+
 
 class ClothesSetReviewNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSetReview.objects.all()

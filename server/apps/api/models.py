@@ -70,6 +70,7 @@ class ClothesSetReview(models.Model):
     
 
 class Weather(models.Model):
+
     location_code = models.IntegerField()
     x = models.IntegerField(default=0)
     y = models.IntegerField(default=0)
@@ -81,6 +82,15 @@ class Weather(models.Model):
     wind_speed = models.FloatField()
     precipitation = models.FloatField()
 
+
+class ReviewSensor(models.Model):
+    
+    owner = models.ForeignKey('User', on_delete=models.CASCADE)
+    level = models.IntegerField(choices=LEVEL_CHOICES)
+    date = models.DateField()
+    time = models.TimeField()
+
+
 @receiver(pre_delete, sender=Clothes)
 def cascade_delete_pre_delete(sender, instance, **kwargs):
     print(instance)
@@ -88,3 +98,4 @@ def cascade_delete_pre_delete(sender, instance, **kwargs):
     
     for clothes_set in clothes_sets:
         clothes_set.delete()
+
