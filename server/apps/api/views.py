@@ -669,8 +669,11 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     r = 2
                 else: # 끝-시작 = 시간대 3개
                     r = 3
-
+                
+                change_date_idx=0
                 for i in range(0, r):
+                    change_date_idx = change_date_idx + 1
+
                     if(r==1): # 끝-시작 = 시간대 1개
                         start_conv_time = start_time[0] + start_time[1] # 시+분 ex_12:30 -> 1230
                         end_conv_time = end_time[0] + end_time[1]
@@ -811,6 +814,10 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                         request.data['wind_speed'],
                         request.data['humidity'],
                     ])
+                    if(start_time[0] == '00' and start_time[1] == '00' and start_time[2] == '00'):
+                        if(change_date_idx == 1):
+                            new_date = str(int(start_conv_date[9]) + 1)
+                            start_conv_date = start_conv_date[:9] + new_date
 
                     request.data['start_datetime'] = start_conv_date + " " + real_start_time
                     request.data['end_datetime'] = end_conv_date + " " + real_end_time
@@ -822,7 +829,11 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     review_sensor_set = review_sensor_set.exclude(date=start_conv_date, time__lt=real_start_time)
                     review_sensor_set = review_sensor_set.exclude(date=end_conv_date, time__gt=real_end_time)
 
-                    calc_review = review_sensor_set.aggregate(Sum('level'))['level__sum']
+                    if(review_sensor_set.count() == 0):
+                        calc_review = 0
+                    else:
+                        calc_review = review_sensor_set.aggregate(Sum('level'))['level__sum']
+                    
                     if(calc_review <= -4):
                         request.data['review'] = 1
                     elif(calc_review <= -2):
@@ -834,7 +845,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     else:
                         request.data['review'] = 5   
 
-                    super(ClothesSetReviewView, self).update(request, *args, **kwargs)
+                    super(ClothesSetReviewView, self).create(request, *args, **kwargs)
     
         
         return Response({
