@@ -834,7 +834,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     else:
                         request.data['review'] = 5   
 
-                    super(ClothesSetReviewView, self).create(request, *args, **kwargs)
+                    super(ClothesSetReviewView, self).update(request, *args, **kwargs)
     
         
         return Response({
@@ -849,102 +849,36 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     def update(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
-        target_clothes_review_set = ClothesSetReview.objects.filter(id=key)
+        target_clothes_review_set = ClothesSetReview.objects.filter(owner_id=key)
         
         if user.id != int(target_clothes_review_set[0].owner.id):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
         
-        if set(['clothes_set', 'start_datetime', 'end_datetime', 'location', 'review']).issubset(request.data.keys()):
+        if set(['clothes_set', 'start_datetime', 'end_datetime', 'location']).issubset(request.data.keys()):
             start = request.data['start_datetime']
             end = request.data['end_datetime']
             location = int(request.data['location'])
-            start_date = start.split('T')[0]
-            start_time = start.split('T')[1].split(':')
-            end_date = end.split('T')[0]
-            end_time = end.split('T')[1].split(':')
+            fix_start_date = start.split('T')[0]
+            fix_start_time = start.split('T')[1].split(':')
+            fix_end_date = end.split('T')[0]
+            fix_end_time = end.split('T')[1].split(':')
 
-            start_year_month_day = start_date.split('-')
-            start_year = start_year_month_day[0]
-            start_month = start_year_month_day[1]
-            start_day = start_year_month_day[2]
-            start_conv_time = start_time[0] + start_time[1]
-            start_conv_time, start_conv_date = convert_time(start_conv_time, start_year, start_month, start_day)
-            start_conv_time = int(start_conv_time[0] + start_conv_time[1])
-            start_conv_date = start_conv_date[:4] + '-' + start_conv_date[4:6] + '-' + start_conv_date[6:]
+            start_year_month_day = fix_start_date.split('-')
+            fix_start_year = start_year_month_day[0] # 년
+            fix_start_month = start_year_month_day[1] # 월
+            fix_start_day = start_year_month_day[2] # 일
 
-            end_year_month_day = end_date.split('-')
-            end_year = end_year_month_day[0]
-            end_month = end_year_month_day[1]
-            end_day = end_year_month_day[2]
-            end_conv_time = end_time[0] + end_time[1]
-            end_conv_time, end_conv_date = convert_time(end_conv_time, end_year, end_month, end_day)
-            end_conv_time = int(end_conv_time[0] + end_conv_time[1])
-            end_conv_date = end_conv_date[:4] + '-' + end_conv_date[4:6] + '-' + end_conv_date[6:]
+            end_year_month_day = fix_end_date.split('-')
+            fix_end_year = end_year_month_day[0]
+            fix_end_month = end_year_month_day[1]
+            fix_end_day = end_year_month_day[2]
+
+            cody_set = ClothesSetReview.objects.filter(owner_id=request.data['owner_id'], clothes_set_id=request.data['clothes_set'],
+                                                        start_datetime__gte=start, end_datetime__lte=end)
+            cody_set.update(comment=request.data['comment'])
             
-            # API 요청하기
-            all_weather_data = Weather.objects.all()
-            weather_data_set = all_weather_data.filter(location_code=location)
-            weather_data_set = weather_data_set.exclude(date__lt=start_conv_date)
-            weather_data_set = weather_data_set.exclude(date__gt=end_conv_date)
-            weather_data_on_start = weather_data_set.exclude(date=start_conv_date, time__lt=start_conv_time)
-            weather_data_on_end = weather_data_on_start.exclude(date=end_conv_date, time__gt=end_conv_time)
-
-            if weather_data_on_end.count()==0:
-                now = datetime.datetime.now()
-                today = now - datetime.timedelta(hours=24)
-
-                if parse(start) < today:
-                    return Response({
-                        'error' : 'internal server error'
-                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-                else:
-                    with open('apps/api/locations/data.json') as json_file:
-                        json_data = json.load(json_file)
-                    
-                    new_x = int((json_data[str(location)]['x']))
-                    new_y = int((json_data[str(location)]['y']))    
-
-                    date_list = [start, end]
-
-                    for date_time in date_list:
-                        date = date_time.strftime('%Y-%m-%d %H:%M:%S')
-                        year_month_day = date[0].split('-')
-                        year = year_month_day[0]
-                        month = year_month_day[1]
-                        day = year_month_day[2]
-                        conv_time = date[1].split(':')
-                        conv_time = conv_time[0] + conv_time[1]
-                        conv_time, conv_date = convert_time(conv_time, year, month, day)
-            
-                        try:
-                            response = get_weather_date(date, str(location))
-                        except:
-                            return Response({
-                                'error' : 'internal server error'
-                            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                            
-                        weather_data_on_end.objects.create(location_code=location, date=date[0:10], time=conv_time[0:2], x=new_x, y=new_y,
-                                                            temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'], 
-                                                            wind_speed=response['WSD'], precipitation=response['R06'])
-          
-            request.data['max_temp'] = weather_data_on_end.aggregate(Max('temp'))['temp__max']
-            request.data['min_temp'] = weather_data_on_end.aggregate(Min('temp'))['temp__min']
-            request.data['max_sensible_temp'] = weather_data_on_end.aggregate(Max('sensible_temp'))['sensible_temp__max']
-            request.data['min_sensible_temp'] = weather_data_on_end.aggregate(Min('sensible_temp'))['sensible_temp__min']
-            request.data['humidity'] = weather_data_on_end.aggregate(Avg('humidity'))['humidity__avg']
-            request.data['wind_speed'] = weather_data_on_end.aggregate(Avg('wind_speed'))['wind_speed__avg']
-            request.data['precipitation'] = weather_data_on_end.aggregate(Avg('precipitation'))['precipitation__avg']
-            
-            request.data['weather_type'] = get_weather_class([
-                request.data['max_temp'],
-                request.data['min_temp'],
-                request.data['wind_speed'],
-                request.data['humidity'],
-            ])
-        
         return super(ClothesSetReviewView, self).update(request, *args, **kwargs)
     
     def destroy(self, request, *args, **kwargs):
