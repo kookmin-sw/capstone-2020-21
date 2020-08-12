@@ -890,7 +890,9 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                                                         start_datetime__gte=start, end_datetime__lte=end)
             cody_set.update(comment=request.data['comment'])
             
-        return super(ClothesSetReviewView, self).update(request, *args, **kwargs)
+        return Response({
+            "owner_id" : request.data['owner_id']
+            }, status=status.HTTP_200_OK)
     
     def destroy(self, request, *args, **kwargs):
         user = request.user
