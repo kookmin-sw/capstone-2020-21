@@ -822,7 +822,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     request.data['end_datetime'] = end_conv_date + " " + real_end_time
 
                     all_review_sensor = ReviewSensor.objects.all()
-                    review_sensor_set = all_review_sensor.filter(owner_id=request.data['owner_id']) # owner_id=request.user.id
+                    review_sensor_set = all_review_sensor.filter(owner_id=request.user.id) 
                     review_sensor_set = review_sensor_set.exclude(date__lt=start_conv_date)
                     review_sensor_set = review_sensor_set.exclude(date__gt=end_conv_date)
                     review_sensor_set = review_sensor_set.exclude(date=start_conv_date, time__lt=real_start_time)
@@ -848,7 +848,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     
         
         return Response({
-                'owner_id': request.data['owner_id'],
+                'owner_id': request.user.id,
             }, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
@@ -885,12 +885,12 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             fix_end_month = end_year_month_day[1]
             fix_end_day = end_year_month_day[2]
 
-            cody_set = ClothesSetReview.objects.filter(owner_id=request.data['owner_id'], clothes_set_id=request.data['clothes_set'],
+            cody_set = ClothesSetReview.objects.filter(owner_id=request.user.id, clothes_set_id=request.data['clothes_set'],
                                                         start_datetime__gte=start, end_datetime__lte=end)
             cody_set.update(comment=request.data['comment'])
             
         return Response({
-            "owner_id" : request.data['owner_id']
+            "owner_id" : request.user.id
             }, status=status.HTTP_200_OK)
     
     def destroy(self, request, *args, **kwargs):
