@@ -1063,7 +1063,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 'precipitation': precipitation,
             }, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['post'])
     def review_sensor(self, request, *args, **kwargs):
         """
         An endpoint where the review_sensor is returned
