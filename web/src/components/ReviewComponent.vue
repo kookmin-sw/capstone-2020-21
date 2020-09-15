@@ -42,21 +42,7 @@
             </b-col>
           </b-row>
         </b-form-group>
-        <b-form-group label="만족도 :" label-for="input-4" class="text-left text-top">
-          <b-form-input id="input-4" v-model="form.range" type="range" min="1" max="5"></b-form-input>
-          <b-row>
-            <b-col class="col-2 text-left">1</b-col>
-            <b-col class="col-3 text-center">2</b-col>
-            <b-col class="col-2 text-center">3</b-col>
-            <b-col class="col-3 text-center">4</b-col>
-            <b-col class="col-2 text-right">5</b-col>
-          </b-row>
-          <b-row>
-            <b-col class="col-4 text-left">추웠다</b-col>
-            <b-col class="col-4 text-center">적당했다</b-col>
-            <b-col class="col-4 text-right">더웠다</b-col>
-          </b-row>
-        </b-form-group>
+        
         <b-form-group label="한줄평 :" label-for="input-5" class="text-left text-top">
           <b-form-input id="input-5" v-model="form.comment"></b-form-input>
         </b-form-group>
@@ -121,8 +107,7 @@ export default {
         end_date: '',
         start_time: '',
         end_time: '',
-        comment: '',
-        range: '3'
+        comment: ''
       },
       imageURL: '',
       'locations': [],
