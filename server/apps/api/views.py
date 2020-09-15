@@ -194,13 +194,13 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         """
         An endpoint where the analysis of a clothes is returned
         """
+        
         image = byte_to_image(request.data['image'])
         image_tensor = image_to_tensor(image)
         inference_result = execute_inference(image_tensor)
         upper, lower = get_categories_from_predictions(inference_result)
-        
-        image = remove_background(image)
-        image_url = save_image_s3(image, 'clothes')
+        image_name = save_image_s3_temp_original(image)
+        image_url = remove_background(image_name)
         
         return Response({'image_url': image_url, 
                          'upper_category':upper, 

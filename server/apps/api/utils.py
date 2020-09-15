@@ -6,6 +6,7 @@ import json
 import math
 import numpy as np
 import os
+import requests 
 import sagemaker
 from sagemaker.predictor import RealTimePredictor
 import time
@@ -31,59 +32,20 @@ def byte_to_image(inp):
     return img
 
 
-def remove_background(image):
+def remove_background(image_name):
     """
     Removes background from image
     """
-    # Paramters.
-    BLUR = 21
-    CANNY_THRESH_1 = 10
-    CANNY_THRESH_2 = 30
-    MASK_DILATE_ITER = 10
-    MASK_ERODE_ITER = 10
-    MASK_COLOR = (0.0,0.0,1.0)
-    
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
-    # Edge detection.
-    edges = cv2.Canny(gray, CANNY_THRESH_1, CANNY_THRESH_2)
-    edges = cv2.dilate(edges, None)
-    edges = cv2.erode(edges, None)
-    
-    # Find contours in edges, sort by area
-    contour_info = []
-    contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-
-    for c in contours:
-        contour_info.append((
-            c,
-            cv2.isContourConvex(c),
-            cv2.contourArea(c),
-        ))
-    contour_info = sorted(contour_info, key=lambda c: c[2], reverse=True)
-    max_contour = contour_info[0]
-    
-    # Create empty mask.
-    mask = np.zeros(edges.shape)
-    cv2.fillConvexPoly(mask, max_contour[0], (255))
-    
-    # Smooth mask and blur it.
-    mask = cv2.dilate(mask, None, iterations=MASK_DILATE_ITER)
-    mask = cv2.erode(mask, None, iterations=MASK_ERODE_ITER)
-    mask = cv2.GaussianBlur(mask, (BLUR, BLUR), 0)
-    mask_stack = np.dstack([mask]*3)
-    
-    # Blend masked img into MASK_COLOR background
-    mask_stack = mask_stack.astype('float32') / 255.0
-    image = image.astype('float32') / 255.0
-
-    masked = (mask_stack * image) + ((1-mask_stack) * MASK_COLOR)
-    masked = (masked * 255).astype('uint8')
-    
-    c_red, c_green, c_blue = cv2.split(image)
-    img_a = cv2.merge((c_red, c_green, c_blue, mask.astype('float32') / 255.0))
-
-    return img_a*255
+    BUCKET_NAME = "otte-bucket"
+    KEY = "clothes/temp_original/" + image_name
+    URL = 'https://bbr3bgydp4.execute-api.ap-northeast-2.amazonaws.com/remove_background' 
+    data = {"bucket":BUCKET_NAME, "key": KEY}
+    print(BUCKET_NAME, KEY)
+    response = requests.post(URL, data=json.dumps(data))
+    print(response)
+    image_url = response.json()['body'].replace("\"", "")
+    print(image_url)
+    return image_url
     
     
 def image_to_tensor(image):
@@ -127,6 +89,27 @@ def execute_inference(image):
 
     return result    
 
+
+def save_image_s3_temp_original(image):
+    """
+    Receives image and saves it to s3 bucket (temp_original),
+    returns the url of an uplodaed image.
+    """
+    prefix = 'clothes'
+    image_name = prefix + '_' + str(int(round(time.time()*1000))) + '.png'
+    BUCKET_NAME = 'otte-bucket'
+    REGION_NAME = 'ap-northeast-2'
+    
+    cv2.imwrite("/temp/"+ image_name, image)
+    
+    s3 = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                      aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+    
+    s3.upload_file("/temp/"+ image_name, BUCKET_NAME, prefix + "/temp_original/"+ image_name, ExtraArgs={'ACL':'public-read'})
+
+    os.remove("/temp/"+ image_name)
+
+    return image_name
 
 def save_image_s3(image, prefix):
     """
