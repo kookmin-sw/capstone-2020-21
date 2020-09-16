@@ -40,11 +40,10 @@ def remove_background(image_name):
     KEY = "clothes/temp_original/" + image_name
     URL = 'https://bbr3bgydp4.execute-api.ap-northeast-2.amazonaws.com/remove_background' 
     data = {"bucket":BUCKET_NAME, "key": KEY}
-    print(BUCKET_NAME, KEY)
     response = requests.post(URL, data=json.dumps(data))
-    print(response)
+    if response.status_code == 504 :
+        response = requests.post(URL, data=json.dumps(data))
     image_url = response.json()['body'].replace("\"", "")
-    print(image_url)
     return image_url
     
     
