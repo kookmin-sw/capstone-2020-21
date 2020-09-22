@@ -36,13 +36,11 @@ def remove_background(image_name):
     """
     Removes background from image
     """
-    BUCKET_NAME = "otte-bucket"
+    BUCKET_NAME = "crc-otte-bucket"
     KEY = "clothes/temp_original/" + image_name
-    URL = 'https://bbr3bgydp4.execute-api.ap-northeast-2.amazonaws.com/remove_background' 
+    URL = 'https://pye21473th.execute-api.ap-northeast-2.amazonaws.com/remove_background' 
     data = {"bucket":BUCKET_NAME, "key": KEY}
     response = requests.post(URL, data=json.dumps(data))
-    if response.status_code == 504 :
-        response = requests.post(URL, data=json.dumps(data))
     image_url = response.json()['body'].replace("\"", "")
     return image_url
     
@@ -96,7 +94,7 @@ def save_image_s3_temp_original(image):
     """
     prefix = 'clothes'
     image_name = prefix + '_' + str(int(round(time.time()*1000))) + '.png'
-    BUCKET_NAME = 'otte-bucket'
+    BUCKET_NAME = 'crc-otte-bucket'
     REGION_NAME = 'ap-northeast-2'
     
     cv2.imwrite("/temp/"+ image_name, image)
