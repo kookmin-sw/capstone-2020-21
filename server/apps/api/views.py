@@ -539,6 +539,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     def create(self, request, *args, **kwargs):
         if 'clothes_set' in request.data:
             user = request.user
+            
             all_clothes_set = ClothesSet.objects.all()
             filtered_clothes_set = all_clothes_set.filter(owner_id=user.id)
             filtered_clothes_set_id = []
@@ -550,301 +551,239 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 return Response({
                     "error" : "this is not your clothes set : " + request.data['clothes_set']
                 }, status=status.HTTP_200_OK)
-
-        # 하루 시간대 (0-8, 8-16, 16-24)
-        day = [0, 8, 16, 24] 
         
+        # 하루 시간대 (0-8, 8-16, 16-24)
+        day = [0, 8, 16, 24]
+
         if set(['clothes_set', 'start_datetime', 'end_datetime', 'location']).issubset(request.data.keys()):
             start = request.data['start_datetime']
             end = request.data['end_datetime']
             location = int(request.data['location'])
-            fix_start_date = start.split('T')[0]
-            fix_start_time = start.split('T')[1].split(':')
-            fix_end_date = end.split('T')[0]
-            fix_end_time = end.split('T')[1].split(':')
+            start_date = start.split('T')[0]
+            start_time = start.split('T')[1].split(':')
+            end_date = end.split('T')[0]
+            end_time = end.split('T')[1].split(':')
 
-            start_year_month_day = fix_start_date.split('-')
-            fix_start_year = start_year_month_day[0] # 년
-            fix_start_month = start_year_month_day[1] # 월
-            fix_start_day = start_year_month_day[2] # 일
+            start_year_month_day = start_date.split('-')
+            start_year = start_year_month_day[0]
+            start_month = start_year_month_day[1]
+            start_day = start_year_month_day[2]
+            start_conv_time = start_time[0] + start_time[1]
+            start_conv_time, start_conv_date = convert_time(start_conv_time, start_year, start_month, start_day)
+            start_conv_time = int(start_conv_time[0] + start_conv_time[1])
+            start_conv_date = start_conv_date[:4] + '-' + start_conv_date[4:6] + '-' + start_conv_date[6:]
 
-            end_year_month_day = fix_end_date.split('-')
-            fix_end_year = end_year_month_day[0]
-            fix_end_month = end_year_month_day[1]
-            fix_end_day = end_year_month_day[2]
-
-            # 리뷰가 여러 날짜에 걸치는 경우를 위해 날짜 차이 계산
-            d1 = start.split('T')[0].split('-')
-            d2 = end.split('T')[0].split('-')
-            t1 = datetime.datetime(int(d1[0]), int(d1[1]), int(d1[2]), 0, 0, 0)
-            t2 = datetime.datetime(int(d2[0]), int(d2[1]), int(d2[2]), 0, 0, 0)
+            end_year_month_day = end_date.split('-')
+            end_year = end_year_month_day[0]
+            end_month = end_year_month_day[1]
+            end_day = end_year_month_day[2]
+            end_conv_time = end_time[0] + end_time[1]
+            end_conv_time, end_conv_date = convert_time(end_conv_time, end_year, end_month, end_day)
+            end_conv_time = int(end_conv_time[0] + end_conv_time[1])
+            end_conv_date = end_conv_date[:4] + '-' + end_conv_date[4:6] + '-' + end_conv_date[6:]
             
-            diff_date = (t2 - t1).days
+            # 시작 시간대 구분
+            if(int(start_time[0]) < 8): # 시작시간 : 아침
+                st = 1
+            elif(int(start_time[0]) < 16): # 시작시간 : 오후
+                st = 2
+            else: # 시작시간 : 밤
+                st = 3
 
-            start_time =  [fix_start_time[0], fix_start_time[1], fix_start_time[2]]
-            end_time = [fix_end_time[0], fix_end_time[1], fix_end_time[2]]
-            start_year = fix_start_year
-            start_month = fix_start_month
-            start_day = fix_start_day
-            end_year = fix_end_year
-            end_month = fix_end_month
-            end_day = fix_end_day
+            # 끝 시간대 구분
+            if(int(end_time[0]) < 8): # 끝시간 : 아침
+                et = 0
+            elif(int(end_time[0]) < 16): # 끝시간 : 오후
+                et = 1
+            else: # 끝시간 : 밤
+                et = 2              
 
-            # 날짜 만큼 반복
-            for d in range(0, diff_date+1):
-                if(diff_date != 0): # start_date != end_date
-                    if(d == 0): # start_date != end_date & 첫 날
-                        end_time[0] = "23"
-                        end_time[1] = "59"
-                        end_time[2] = "59"
-                        end_year = fix_start_year
-                        end_month = fix_start_month
-                        end_day = fix_start_day
-                    elif(d == diff_date): # start_date != end_date & 마지막 날
-                        start_time[0] = "00"
-                        start_time[1] = "00"
-                        start_time[2] = "00"
-                        start_year = fix_end_year
-                        start_month = fix_end_month
-                        start_day = fix_end_day
-                        end_time = fix_end_time
-                        end_year = fix_end_year
-                        end_month = fix_end_month
-                        end_day = fix_end_day
-                    else: # start_date != end_date & 중간 날
-                        start_time = fix_start_time
-                        start_time[0] = "00"
-                        start_time[1] = "00"
-                        start_time[2] = "00"
-                        if((start_month == "12") & (start_day + 1 > 31)): # 년 단위 변화
-                            start_year = int(start_year) + 1
-                            start_month = "01"
-                            start_day = "01"
-                        elif(start_day + 1 > 28): # 달 단위 변화
-                            if(fix_start_month == 2):
-                                start_month = int(start_month) + 1
-                                start_day = "01"
-                            elif(start_month % 2 == 0): # 짝수 달
-                                if(start_day + 1 > 30):
-                                    start_month = int(start_month) + 1
-                                    start_day = int(start_day) + 1
-                                else:
-                                    start_day = int(start_day) + 1
-                            else: # 홀수 달
-                                if(start_day + 1 > 31):
-                                    start_month = int(start_month) + 1
-                                    start_day = int(start_day) + 1
-                                else:
-                                    start_day = int(start_day) + 1
-                        else: # 일 단위 변화
-                            start_day = int(start_day) + 1
+            # 시작 ~ 끝 시간대 계산
+            i = 0
+            r = 0
+            if(st-et == 1): # 끝-시작 = 시간대 1개
+                r = 1
+            elif(st-et == 0): # 끝-시작 = 시간대 2개
+                r = 2
+            else: # 끝-시작 = 시간대 3개
+                r = 3    
 
-                        end_year = start_year
-                        end_month = start_month
-                        end_day = start_day
+            for i in range(0, r):
+                if(r==1): # 끝-시작 = 시간대 1개
+                    start_conv_time = start_time[0] + start_time[1] # 시+분 ex_12:30 -> 1230
+                    end_conv_time = end_time[0] + end_time[1]
 
-                # 시작 시간대 구분
-                if(int(start_time[0]) < 8): # 시작시간 : 아침
-                    st = 1
-                elif(int(start_time[0]) < 16): # 시작시간 : 오후
-                    st = 2
-                else: # 시작시간 : 밤
-                    st = 3
+                    real_start_time = start_time
+                    real_start_time = str(real_start_time[0]) + ":" + str(real_start_time[1]) + ":" + str(real_start_time[2])
+                    real_end_time = end_time
+                    real_end_time = str(real_end_time[0]) + ":" + str(real_end_time[1]) + ":" + str(real_end_time[2])
 
-                # 끝 시간대 구분
-                if(int(end_time[0]) < 8): # 끝시간 : 아침
-                    et = 0
-                elif(int(end_time[0]) < 16): # 끝시간 : 오후
-                    et = 1
-                else: # 끝시간 : 밤
-                    et = 2              
-
-                # 시작 ~ 끝 시간대 계산
-                i = 0
-                r = 0
-                if(st-et == 1): # 끝-시작 = 시간대 1개
-                    r = 1
-                elif(st-et == 0): # 끝-시작 = 시간대 2개
-                    r = 2
-                else: # 끝-시작 = 시간대 3개
-                    r = 3
-                
-                change_date_idx=0
-                for i in range(0, r):
-                    change_date_idx = change_date_idx + 1
-
-                    if(r==1): # 끝-시작 = 시간대 1개
-                        start_conv_time = start_time[0] + start_time[1] # 시+분 ex_12:30 -> 1230
-                        end_conv_time = end_time[0] + end_time[1]
-
+                elif(r==2): # 끝-시작 = 시간대 2개
+                    if(i==0): # 앞 시간대
+                        start_conv_time = start_time[0] + start_time[1] 
+                        end_conv_time = day[st]*100
+                            
                         real_start_time = start_time
                         real_start_time = str(real_start_time[0]) + ":" + str(real_start_time[1]) + ":" + str(real_start_time[2])
                         real_end_time = end_time
+                        if(day[st] < 10):
+                            real_end_time = "0" + str(day[st]) + ":" + '00' + ":" + '00'
+                        else:
+                            real_end_time = str(day[st]) + ":" + '00' + ":" + '00'
+                            
+                            
+                            
+                    else: # 뒷 시간대
+                        start_conv_time = day[et]*100
+                        end_conv_time = end_time[0] + end_time[1]
+
+                        real_start_time = start_time
+                        if(day[et] < 10):
+                            real_start_time = "0" + str(day[et]) + ":" + '00' + ":" + '00'
+                        else:
+                            real_start_time = str(day[et]) + ":" + '00' + ":" + '00'
+                        real_end_time = end_time
                         real_end_time = str(real_end_time[0]) + ":" + str(real_end_time[1]) + ":" + str(real_end_time[2])
-
-                    elif(r==2): # 끝-시작 = 시간대 2개
-                        if(i==0): # 앞 시간대
-                            start_conv_time = start_time[0] + start_time[1] 
-                            end_conv_time = day[st]*100
-                            
-                            real_start_time = start_time
-                            real_start_time = str(real_start_time[0]) + ":" + str(real_start_time[1]) + ":" + str(real_start_time[2])
-                            real_end_time = end_time
-                            if(day[st] < 10):
-                                real_end_time = "0" + str(day[st]) + ":" + '00' + ":" + '00'
-                            else:
-                                real_end_time = str(day[st]) + ":" + '00' + ":" + '00'
-                            
-                            
-                            
-                        else: # 뒷 시간대
-                            start_conv_time = day[et]*100
-                            end_conv_time = end_time[0] + end_time[1]
-
-                            real_start_time = start_time
-                            if(day[et] < 10):
-                                real_start_time = "0" + str(day[et]) + ":" + '00' + ":" + '00'
-                            else:
-                                real_start_time = str(day[et]) + ":" + '00' + ":" + '00'
-                            real_end_time = end_time
-                            real_end_time = str(real_end_time[0]) + ":" + str(real_end_time[1]) + ":" + str(real_end_time[2])
                                                     
 
-                    else: # 끝-시작 = 시간대 3개
-                        if(i==0): # 앞 시간대
-                            start_conv_time = start_time[0] + start_time[1] 
-                            end_conv_time = day[st]*100
+                else: # 끝-시작 = 시간대 3개
+                    if(i==0): # 앞 시간대
+                        start_conv_time = start_time[0] + start_time[1] 
+                        end_conv_time = day[st]*100
                             
-                            real_start_time = start_time
-                            real_start_time = str(real_start_time[0]) + ":" + str(real_start_time[1]) + ":" + str(real_start_time[2])
-                            real_end_time = end_time
-                            if(day[st] < 10):
-                                real_end_time = "0" + str(day[st]) + ":" + '00' + ":" + '00'
-                            else:
-                                real_end_time = str(day[st]) + ":" + '00' + ":" + '00'
-                            
-                            
-                        elif(i==1): # 중간 시간대
-                            start_conv_time = day[st]*100
-                            end_conv_time = day[et]*100
-
-                            real_start_time = start_time
-                            real_start_time = "0" + str(day[st]) + ":" + '00' + ":" + '00'
-                            real_end_time = end_time
-                            real_end_time = str(day[et]) + ":" + '00' + ":" + '00'
-
-                        else: # 끝 시간대
-                            start_conv_time = day[et]*100
-                            end_conv_time = end_time[0] + end_time[1]
-
-                            real_start_time = start_time
-                            real_start_time = str(day[et]) + ":" + '00' + ":" + '00'
-                            real_end_time = end_time
-                            real_end_time = str(end_time[0]) + ":" + str(real_end_time[1]) + ":" + str(real_end_time[2])
-                            
-
-            
-                    start_conv_time, start_conv_date = convert_time(start_conv_time, start_year, start_month, start_day)
-                    start_conv_time = int(start_conv_time[0] + start_conv_time[1])
-                    start_conv_date = start_conv_date[:4] + '-' + start_conv_date[4:6] + '-' + start_conv_date[6:]
-
-                    end_conv_time, end_conv_date = convert_time(end_conv_time, end_year, end_month, end_day)
-                    end_conv_time = int(end_conv_time[0] + end_conv_time[1])
-                    end_conv_date = end_conv_date[:4] + '-' + end_conv_date[4:6] + '-' + end_conv_date[6:]
-                    
-                    # API 요청하기
-                    all_weather_data = Weather.objects.all()
-                    weather_data_set = all_weather_data.filter(location_code=location)
-                    weather_data_set = weather_data_set.exclude(date__lt=start_conv_date)
-                    weather_data_set = weather_data_set.exclude(date__gt=end_conv_date)
-                    weather_data_on_start = weather_data_set.exclude(date=start_conv_date, time__lt=start_conv_time)
-                    weather_data_on_end = weather_data_on_start.exclude(date=end_conv_date, time__gt=end_conv_time)
-                    
-                    if weather_data_on_end.count()==0:
-                        now = datetime.datetime.now()
-                        today = now - datetime.timedelta(hours=24)
-
-                        if parse(start) < today:
-                            return Response({
-                                'error' : 'internal server error'
-                            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+                        real_start_time = start_time
+                        real_start_time = str(real_start_time[0]) + ":" + str(real_start_time[1]) + ":" + str(real_start_time[2])
+                        real_end_time = end_time
+                        if(day[st] < 10):
+                            real_end_time = "0" + str(day[st]) + ":" + '00' + ":" + '00'
                         else:
-                            with open('apps/api/locations/data.json') as json_file:
-                                json_data = json.load(json_file)
+                            real_end_time = str(day[st]) + ":" + '00' + ":" + '00'
                             
-                            new_x = int((json_data[str(location)]['x']))
-                            new_y = int((json_data[str(location)]['y']))    
+                            
+                    elif(i==1): # 중간 시간대
+                        start_conv_time = day[st]*100
+                        end_conv_time = day[et]*100
 
-                            date_list = [start, end]
+                        real_start_time = start_time
+                        real_start_time = "0" + str(day[st]) + ":" + '00' + ":" + '00'
+                        real_end_time = end_time
+                        real_end_time = str(day[et]) + ":" + '00' + ":" + '00'
 
-                            for date_time in date_list:
-                                date = date_time.strftime('%Y-%m-%d %H:%M:%S')
-                                year_month_day = date[0].split('-')
-                                year = year_month_day[0]
-                                month = year_month_day[1]
-                                day = year_month_day[2]
-                                conv_time = date[1].split(':')
-                                conv_time = conv_time[0] + conv_time[1]
-                                conv_time, conv_date = convert_time(conv_time, year, month, day)
+                    else: # 끝 시간대
+                        start_conv_time = day[et]*100
+                        end_conv_time = end_time[0] + end_time[1]
 
-                                try:
-                                    response = get_weather_date(date, str(location))
-                                except:
-                                    return Response({
-                                        'error' : 'internal server error'
-                                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        real_start_time = start_time
+                        real_start_time = str(day[et]) + ":" + '00' + ":" + '00'
+                        real_end_time = end_time
+                        real_end_time = str(end_time[0]) + ":" + str(real_end_time[1]) + ":" + str(real_end_time[2])
 
-                                weather_data_on_end.objects.create(location_code=location, date=date[0:10], time=conv_time[0:2], x=new_x, y=new_y,
-                                                                    temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'], 
-                                                                    wind_speed=response['WSD'], precipitation=response['R06'])
-                                                                        
-                    request.data['max_temp'] = weather_data_on_end.aggregate(Max('temp'))['temp__max']
-                    request.data['min_temp'] = weather_data_on_end.aggregate(Min('temp'))['temp__min']
-                    request.data['max_sensible_temp'] = weather_data_on_end.aggregate(Max('sensible_temp'))['sensible_temp__max']
-                    request.data['min_sensible_temp'] = weather_data_on_end.aggregate(Min('sensible_temp'))['sensible_temp__min']
-                    request.data['humidity'] = weather_data_on_end.aggregate(Avg('humidity'))['humidity__avg']
-                    request.data['wind_speed'] = weather_data_on_end.aggregate(Avg('wind_speed'))['wind_speed__avg']
-                    request.data['precipitation'] = weather_data_on_end.aggregate(Avg('precipitation'))['precipitation__avg']
-                    
-                    request.data['weather_type'] = get_weather_class([
-                        request.data['max_temp'],
-                        request.data['min_temp'],
-                        request.data['wind_speed'],
-                        request.data['humidity'],
-                    ])
-                    if(start_time[0] == '00' and start_time[1] == '00' and start_time[2] == '00'):
-                        if(change_date_idx == 1):
-                            new_date = str(int(start_conv_date[9]) + 1)
-                            start_conv_date = start_conv_date[:9] + new_date
+                start_conv_time, start_conv_date = convert_time(start_conv_time, start_year, start_month, start_day)
+                start_conv_time = int(start_conv_time[0] + start_conv_time[1])
+                start_conv_date = start_conv_date[:4] + '-' + start_conv_date[4:6] + '-' + start_conv_date[6:]
 
-                    request.data['start_datetime'] = start_conv_date + " " + real_start_time
-                    request.data['end_datetime'] = end_conv_date + " " + real_end_time
+                end_conv_time, end_conv_date = convert_time(end_conv_time, end_year, end_month, end_day)
+                end_conv_time = int(end_conv_time[0] + end_conv_time[1])
+                end_conv_date = end_conv_date[:4] + '-' + end_conv_date[4:6] + '-' + end_conv_date[6:]
+                
+            
+                # API 요청하기
+                all_weather_data = Weather.objects.all()
+                weather_data_set = all_weather_data.filter(location_code=location)
+                weather_data_set = weather_data_set.exclude(date__lt=start_conv_date)
+                weather_data_set = weather_data_set.exclude(date__gt=end_conv_date)
+                weather_data_on_start = weather_data_set.exclude(date=start_conv_date, time__lt=start_conv_time)
+                weather_data_on_end = weather_data_on_start.exclude(date=end_conv_date, time__gt=end_conv_time)
+                
+                if weather_data_on_end.count()==0:
+                    now = datetime.datetime.now()
+                    today = now - datetime.timedelta(hours=24)
 
-                    all_review_sensor = ReviewSensor.objects.all()
-                    review_sensor_set = all_review_sensor.filter(owner_id=request.user.id) 
-                    review_sensor_set = review_sensor_set.exclude(date__lt=start_conv_date)
-                    review_sensor_set = review_sensor_set.exclude(date__gt=end_conv_date)
-                    review_sensor_set = review_sensor_set.exclude(date=start_conv_date, time__lt=real_start_time)
-                    review_sensor_set = review_sensor_set.exclude(date=end_conv_date, time__gt=real_end_time)
+                    if parse(start) < today:
+                        return Response({
+                            'error' : 'internal server error'
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-                    if(review_sensor_set.count() == 0):
-                        calc_review = 0
                     else:
-                        calc_review = review_sensor_set.aggregate(Sum('level'))['level__sum']
-                    
-                    if(calc_review <= -4):
-                        request.data['review'] = 1
-                    elif(calc_review <= -2):
-                        request.data['review'] = 2
-                    elif(calc_review <= 1):
-                        request.data['review'] = 3
-                    elif(calc_review <= 3):
-                        request.data['review'] = 4
-                    else:
-                        request.data['review'] = 5   
+                        with open('apps/api/locations/data.json') as json_file:
+                            json_data = json.load(json_file)
+                        
+                        new_x = int((json_data[str(location)]['x']))
+                        new_y = int((json_data[str(location)]['y']))    
 
-                    super(ClothesSetReviewView, self).create(request, *args, **kwargs)
+                        date_list = [start, end]
+
+                        for date_time in date_list:
+                            date = date_time.strftime('%Y-%m-%d %H:%M:%S')
+                            year_month_day = date[0].split('-')
+                            year = year_month_day[0]
+                            month = year_month_day[1]
+                            day = year_month_day[2]
+                            conv_time = date[1].split(':')
+                            conv_time = conv_time[0] + conv_time[1]
+                            conv_time, conv_date = convert_time(conv_time, year, month, day)
+
+                            try:
+                                response = get_weather_date(date, str(location))
+                            except:
+                                return Response({
+                                    'error' : 'internal server error'
+                                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                            weather_data_on_end.objects.create(location_code=location, date=date[0:10], time=conv_time[0:2], x=new_x, y=new_y,
+                                                                temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'], 
+                                                                wind_speed=response['WSD'], precipitation=response['R06'])
+                                                                    
+                request.data['max_temp'] = weather_data_on_end.aggregate(Max('temp'))['temp__max']
+                request.data['min_temp'] = weather_data_on_end.aggregate(Min('temp'))['temp__min']
+                request.data['max_sensible_temp'] = weather_data_on_end.aggregate(Max('sensible_temp'))['sensible_temp__max']
+                request.data['min_sensible_temp'] = weather_data_on_end.aggregate(Min('sensible_temp'))['sensible_temp__min']
+                request.data['humidity'] = weather_data_on_end.aggregate(Avg('humidity'))['humidity__avg']
+                request.data['wind_speed'] = weather_data_on_end.aggregate(Avg('wind_speed'))['wind_speed__avg']
+                request.data['precipitation'] = weather_data_on_end.aggregate(Avg('precipitation'))['precipitation__avg']
+                
+                request.data['weather_type'] = get_weather_class([
+                    request.data['max_temp'],
+                    request.data['min_temp'],
+                    request.data['wind_speed'],
+                    request.data['humidity'],
+                ]) 
+
+                if(start_time[0] == '00' and start_time[1] == '00' and start_time[2] == '00'):
+                    if(change_date_idx == 1):
+                        new_date = str(int(start_conv_date[9]) + 1)
+                        start_conv_date = start_conv_date[:9] + new_date
+
+                request.data['start_datetime'] = start_conv_date + " " + real_start_time
+                request.data['end_datetime'] = end_conv_date + " " + real_end_time
+
+                all_review_sensor = ReviewSensor.objects.all()
+                review_sensor_set = all_review_sensor.filter(owner_id=request.user.id) 
+                review_sensor_set = review_sensor_set.exclude(date__lt=start_conv_date)
+                review_sensor_set = review_sensor_set.exclude(date__gt=end_conv_date)
+                review_sensor_set = review_sensor_set.exclude(date=start_conv_date, time__lt=real_start_time)
+                review_sensor_set = review_sensor_set.exclude(date=end_conv_date, time__gt=real_end_time)
+
+                if(review_sensor_set.count() == 0):
+                    calc_review = 0
+                else:
+                    calc_review = review_sensor_set.aggregate(Sum('level'))['level__sum']
+                    
+                if(calc_review <= -4):
+                    request.data['review'] = 1
+                elif(calc_review <= -2):
+                    request.data['review'] = 2
+                elif(calc_review <= 1):
+                    request.data['review'] = 3
+                elif(calc_review <= 3):
+                    request.data['review'] = 4
+                else:
+                    request.data['review'] = 5   
+
+
+                super(ClothesSetReviewView, self).create(request, *args, **kwargs)
+
+                
     
         
         return Response({
