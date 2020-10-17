@@ -68,7 +68,7 @@ def execute_inference(image):
                              aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
     sess = sagemaker.Session(boto_session=boto_session)
     
-    ENDPOINT_MODEL = 'otte-model-endpoint'
+    ENDPOINT_MODEL = 'otte-model'
 
     predictor = RealTimePredictor(endpoint=ENDPOINT_MODEL,
                                   sagemaker_session=sess,
