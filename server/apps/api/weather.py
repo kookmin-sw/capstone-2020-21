@@ -9,7 +9,7 @@ from urllib.request import urlopen
 ServiceKey = settings.WEATHER_API_KEY
 
 
-def get_weather_date(input_date, location): 
+def get_weather_date(input_date, location):
     """
      날씨와 장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
      예시 input_date : 2020-03-31 15:26:23, location : "1" location index
@@ -60,7 +60,7 @@ def get_weather_date(input_date, location):
     v = passing_data['WSD']
     t = float(t)
     v = float(v)
-    
+
     # 체감 온도 계산
     wci = getWCI(t, v)
     wci = round(wci, 2)
@@ -115,15 +115,15 @@ def get_weather_time_date(date, time, location):
 
     for parsed in parsed_json:
         passing_data[parsed['category']] = parsed['fcstValue']
-    
+
     passing_data['T3H'] = float(passing_data['T3H'])
-    
+
     t = passing_data['T3H'] # current 3hour temp
     v = passing_data['WSD'] # current wind speed
 
     t = float(t)
     v = float(v)
-    
+
     t_high = passing_data['TMX']
     t_min = passing_data['TMN']
 
@@ -170,7 +170,7 @@ def get_weather_between(start_input_date, end_input_date, location):
     start_time = start_date[1].split(':')
     start_api_time =start_time[0] + start_time[1]
     convert_start_api_time, convert_start_api_date = convert_time(start_api_time, start_year, start_month, start_day)
-    
+
     end_api_date = end_year_month_day[0] + end_year_month_day[1] + end_year_month_day[2]
     end_time = end_date[1].split(':')
     end_api_time =end_time[0] + end_time[1]
@@ -245,21 +245,21 @@ def get_weather_between(start_input_date, end_input_date, location):
             if temp_int // 1000 == 0:
                 temp_time = "0" + temp_time
             temp_weather = get_weather_time_date(start_api_date, temp_time, location)
-            
+
             weather_data['MIN'] = min(start_T3H, end_T3H, float(temp_weather['T3H']))
             weather_data['MAX'] = max(start_T3H, end_T3H, float(temp_weather['T3H']))
             weather_data['WCIMAX'] = max(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
             weather_data['WCIMIN'] = min(float(start_weather['WCI']), float(end_weather['WCI']), float(temp_weather['WCI']))
 
-    else: 
+    else:
         weather_data['MIN'] = min(float(start_weather['TMN']), float(end_weather['TMN']))
         weather_data['MAX'] = max(float(start_weather['TMX']), float(end_weather['TMX']))
         weather_data['WCIMAX'] = max(float(start_weather['WCIMAX']), float(end_weather['WCIMAX']))
         weather_data['WCIMIN'] = min(float(start_weather['WCIMIN']), float(end_weather['WCIMIN']))
-        
+
     return weather_data
 
-def get_current_weather(location): 
+def get_current_weather(location):
     """
     장소를 인자로 받아서 날씨 데이터 딕셔너리를 반환한다.
     location : "1" location index
@@ -279,7 +279,7 @@ def get_current_weather(location):
 
     if int(month) // 10 == 0:
         month = "0" + str(month)
-    
+
     if int(day) // 10 == 0:
         day = "0" + str(day)
 
@@ -335,7 +335,7 @@ def get_current_weather(location):
         if float(passing_data_set[i]['T1H']) < float(min):
             min = passing_data_set[i]['T1H']
             min_WSD = passing_data_set[i]['WSD']
-        
+
     passing_data = passing_data_set[0]
     t = passing_data['T1H']
     v = passing_data['WSD']
@@ -361,7 +361,7 @@ def get_current_weather(location):
     return passing_data
 
 def convert_time(time, year, month, day):
-    """ 
+    """
      입력 받은 시간을 API 요청가능 시간으로 변환한다.
      예시 : 1230, 2020, 04, 07 (시간, 년도, 달, 날짜)
      날씨 API에서 확정적으로 호출 가능한 시간(Basetime)은 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회 3시간 간격)
@@ -391,7 +391,7 @@ def convert_time(time, year, month, day):
 
     elif int(time) < 1111: # 11:11 이전 일 때 08:00 날씨를 받아옴
         time = "0800"
-    
+
     elif int(time) < 1411: # 14:11 이전 일 때 14:00 날씨를 받아옴
         time = "1100"
 
@@ -404,9 +404,9 @@ def convert_time(time, year, month, day):
     elif int(time) < 2311: # 23: 11 이전 일 때 20:00 날씨를 받아옴
         time = "2000"
 
-    elif int(time) < 2400: # 24: 00 이전 일 때 20:00 날씨를 받아옴. 
+    elif int(time) < 2400: # 24: 00 이전 일 때 20:00 날씨를 받아옴.
         time = "2300"
-    
+
     if int(month) // 10 == 0:
         str_month = "0" + str(month)
     else:
@@ -421,7 +421,7 @@ def convert_time(time, year, month, day):
     return time, date
 
 def convert_fcst_time(time, year, month, day):
-    """ 
+    """
      입력 받은 시간을 API 요청가능 시간으로 변환한다.
      예시 : 1230, 2020, 04, 07 (시간, 년도, 달, 날짜)
      날씨 API에서 확정적으로 호출 가능한 시간(Basetime)은 0030 부터 1시간 간격 basetime 호출 가능 시간은 45분부터이다.
@@ -444,12 +444,12 @@ def convert_fcst_time(time, year, month, day):
     elif int(time) < 146:
         time = "0030"
 
-    elif int(time) < 246: 
+    elif int(time) < 246:
         time = "0130"
 
     elif int(time) < 346:
         time = "0230"
-    
+
     elif int(time) < 446:
         time = "0330"
 
@@ -459,12 +459,12 @@ def convert_fcst_time(time, year, month, day):
     elif int(time) < 646:
         time = "0530"
 
-    elif int(time) < 746: 
+    elif int(time) < 746:
         time = "0630"
 
     elif int(time) < 846:
         time = "0730"
-    
+
     elif int(time) < 946:
         time = "0830"
 
@@ -473,7 +473,7 @@ def convert_fcst_time(time, year, month, day):
 
     elif int(time) < 1146:
         time = "1030"
-    
+
     elif int(time) < 1246:
         time = "1130"
 
@@ -483,12 +483,12 @@ def convert_fcst_time(time, year, month, day):
     elif int(time) < 1446:
         time = "1330"
 
-    elif int(time) < 1546: 
+    elif int(time) < 1546:
         time = "1430"
 
     elif int(time) < 1646:
         time = "1530"
-    
+
     elif int(time) < 1746:
         time = "1630"
 
@@ -501,18 +501,18 @@ def convert_fcst_time(time, year, month, day):
     elif int(time) < 2046:
         time = "1930"
 
-    elif int(time) < 2146: 
+    elif int(time) < 2146:
         time = "2030"
 
     elif int(time) < 2246:
         time = "2130"
-    
+
     elif int(time) < 2346:
         time = "2230"
 
     elif int(time) < 2401:
         time = "2330"
-    
+
     if int(month) // 10 == 0:
         str_month = "0" + str(month)
     if int(day) // 10 == 0:
@@ -523,11 +523,115 @@ def convert_fcst_time(time, year, month, day):
     return time, date
 
 # 체감 온도 구하기
-def getWCI(temperature, wind_velocity): 
+def getWCI(temperature, wind_velocity):
     """
      기온과 풍속을 입력 받아 체감온도를 반환한다.
      예시 : 12, 9.5
     """
     WCI = 13.12 + 0.6215 * temperature - 11.37 * math.pow(wind_velocity, 0.16) + 0.3965 * temperature * math.pow(wind_velocity, 0.16)
- 
+
     return WCI
+
+
+def get_weather_forcast(location, ismorning):
+    """
+    장소를 인자로 받아서 날씨예보 데이터 딕셔너리를 반환한다.
+    location : "1" location index
+    오전 오후에 따라서 다른 시간대의 날씨 예보 데이터를 반환한다.
+    """
+    with open('apps/api/locations/data.json') as json_file:
+        json_data = json.load(json_file)
+
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    today = datetime.datetime.now()
+    if datetime.datetime.now().hour>=23 :
+        yesterday = datetime.date.today()
+        today = datetime.date.today() + datetime.timedelta(days=1)
+
+    year = str(yesterday.year)
+    month = str(yesterday.month)
+    day = str(yesterday.day)
+
+    if int(month) // 10 == 0:
+        month = "0" + str(month)
+
+    if int(day) // 10 == 0:
+        day = "0" + str(day)
+
+    api_time = '2300'
+    api_date = year + month + day
+
+    # 단기예보 서비스 url
+    url = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?"
+    key = "serviceKey=" + 'f1HeXUZ1XW2gzSogmy6Ethjw2G7MQnlvwv0pvk3l3YOipx7qoG2D17aiPowpSBF5oltHoZ%2FfR%2Fx9SkhKPtuhPw%3D%3D'
+    numOfRows = "&numOfRows=100"
+    typeOfData = "&dataType=JSON"
+    date = "&base_date=" + api_date
+    time = "&base_time=" + api_time
+
+    x = (json_data[str(location)]['x'])
+    y = (json_data[str(location)]['y'])
+
+    nx = "&nx=" + x
+    ny = "&ny=" + y
+
+    api_url = url + key + numOfRows + typeOfData + date + time + nx + ny
+    data = urllib.request.urlopen(api_url).read().decode('utf8')
+    data_json = json.loads(data)
+    parsed_json = data_json['response']['body']['items']['item']
+
+    passing_data = {}
+    min = 99.9
+    max = -99.9
+    temp_times = ['0300', '0600', '0900'] if int(ismorning) else ['1200', '1500', '1800', '2100']
+    temp_time = temp_times[0]
+    idx = 0
+
+    passing_data_set = [{}] # 시간대 별로 저장할 리스트
+    for i in range(0, len(parsed_json)):
+        if today.strftime('%Y%m%d') != parsed_json[i]['fcstDate'] : break
+        if parsed_json[i]['fcstTime'] in temp_times:
+            if temp_time != parsed_json[i]['fcstTime'] :
+                passing_data_set.append({})
+                idx+=1
+
+            temp_time = parsed_json[i]['fcstTime']
+            weather = parsed_json[i]
+            passing_data_set[idx][weather['category']] = weather['fcstValue']
+    max = -999
+    min = 999
+    max_WSD = 0
+    min_WSD = 100
+
+    for i in range(0, len(temp_times)):
+        if float(passing_data_set[i]['T3H']) > float(max):
+            max = passing_data_set[i]['T3H']
+            max_WSD = passing_data_set[i]['WSD']
+
+        if float(passing_data_set[i]['T3H']) < float(min):
+            min = passing_data_set[i]['T3H']
+            min_WSD = passing_data_set[i]['WSD']
+
+    passing_data = passing_data_set[1] if int(ismorning) else passing_data_set[2]
+
+    t = passing_data['T3H']
+    v = passing_data['WSD']
+    t = float(t)
+    v = float(v)
+
+    # 체감 온도 계산
+    wci = getWCI(t, v)
+    wci = round(wci, 2)
+
+    # api 단기예보 중 최저 최고온도 구하기
+    wci_max = getWCI(float(max), float(max_WSD))
+    wci_max = round(wci_max, 2)
+    wci_min = getWCI(float(min), float(min_WSD))
+    wci_min = round(wci_min, 2)
+
+    passing_data['MAX'] = max
+    passing_data['MIN'] = min
+    passing_data['WCI'] = wci # current wind chill temp
+    passing_data['WCIMIN'] = wci_min
+    passing_data['WCIMAX'] = wci_max
+    return passing_data

@@ -28,44 +28,45 @@ from .serializers import (
 )
 from .utils import *
 from .validations import (
-    user_query_schema, 
-    clothes_query_schema, 
-    clothes_set_query_schema, 
+    user_query_schema,
+    clothes_query_schema,
+    clothes_set_query_schema,
     clothes_set_review_query_schema
 )
 from .weather import (
     convert_time,
-    get_weather_date, 
-    get_weather_between, 
-    get_weather_time_date, 
-    get_current_weather
+    get_weather_date,
+    get_weather_between,
+    get_weather_time_date,
+    get_current_weather,
+    get_weather_forcast
 )
 
 class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    
+
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
     ordering_fields = ('id', 'date_joined', )
     ordering = ('id', )
-    
+
     # Apply filtering, using other query parameters.
     filter_mappings = {
         'gender': 'gender',
         'min_age': 'birthday__lte',
         'max_age': 'birthday__gte',
     }
-    
+
     # TODO(mskwon1) : change this to a more reasonable calculation.
     filter_value_transformations = {
         'min_age' : lambda val: timezone.now() - datetime.timedelta(days=int(val)*365),
         'max_age' : lambda val: timezone.now() - datetime.timedelta(days=int(val)*365),
     }
-    
+
     # Use filter validation.
     filter_validation_schema = user_query_schema
-    
+
     # Permissions.
     permission_classes = [UserPermissions]
 
@@ -75,16 +76,16 @@ class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
         return super().update(request, *args, **kwargs)
-    
+
     def destroy(self, request, *args, **kwargs):
         user = request.user
         if user.id != int(kwargs.pop('pk')):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
         return super().destroy(request, *args, **kwargs)
 
     @action(detail=False, methods=['get'])
@@ -105,15 +106,15 @@ class UserView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = Clothes.objects.all()
     serializer_class = ClothesSerializer
-    
+
     def get_queryset(self):
         queryset = Clothes.objects.all()
-        
+
         # me 파라미터가 true인 경우, 해당 유저의 옷만 반환.
         if self.request.query_params.get('me'):
             user = self.request.user
             queryset = queryset.filter(owner=user.id)
-                
+
         return queryset
 
     # Apply ordering, uses `ordering` query parameter.
@@ -126,7 +127,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         'upper_category': 'upper_category__in',
         'lower_category': 'lower_category__in',
     }
-    
+
     filter_value_transformations = {
         'upper_category': lambda val: val.split(','),
         'lower_category': lambda val: val.split(',')
@@ -134,19 +135,19 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
     # Use filter validation.
     filter_validation_schema = clothes_query_schema
-    
+
     # Permissions.
     permission_classes = [IsAuthenticatedOrReadOnly]
-    
+
     def list(self, request, *args, **kwargs):
         # If me parameter is set, check authentication.
         if request.query_params.get('me') and not request.user.is_authenticated:
             return Response({
                 'error': 'token authorization failed ... please log in'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
         return super().list(request, *args, **kwargs)
-    
+
     def create(self, request, *args, **kwargs):
         # Move image from temp to saved on s3 storage.
         # TODO(mskwon1): data 타입이 json이 아닐 경우 바꿔줘야함.
@@ -159,51 +160,51 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
                 return Response({
                     'error': 'image does not exist ... plesase try again'
                 }, status=status.HTTP_400_BAD_REQUEST)
-        
-        return super(ClothesView, self).create(request, *args, **kwargs)  
-    
+
+        return super(ClothesView, self).create(request, *args, **kwargs)
+
     def perform_create(self, serializer):
-        serializer.save(owner_id = self.request.user.id)      
+        serializer.save(owner_id = self.request.user.id)
 
     def update(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
         target_clothes = Clothes.objects.filter(id=key)
-        
+
         if user.id != int(target_clothes[0].owner.id):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
         return super().update(request, *args, **kwargs)
-    
+
     def destroy(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
         target_clothes = Clothes.objects.filter(id=key)
-        
+
         if user.id != int(target_clothes[0].owner.id):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-   
+
         return super().destroy(request, *args, **kwargs)
- 
+
     @action(detail=False, methods=['post'])
     def inference(self, request, *args, **kwargs):
         """
         An endpoint where the analysis of a clothes is returned
         """
-        
+
         image = byte_to_image(request.data['image'])
         image_tensor = image_to_tensor(image)
         inference_result = execute_inference(image_tensor)
         upper, lower = get_categories_from_predictions(inference_result)
         image_name = save_image_s3_temp_original(image)
         image_url = remove_background(image_name)
-        
-        return Response({'image_url': image_url, 
-                         'upper_category':upper, 
+
+        return Response({'image_url': image_url,
+                         'upper_category':upper,
                          'lower_category':lower}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
@@ -211,7 +212,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         """
         An endpoint where the today_category is returned
         """
-        
+
         MAX_ITEM_NUM = 3
         MAX_IMAGE_NUM = 3
 
@@ -219,7 +220,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         max_temp = float(request.query_params.get('maxTemp'))
         wind_speed = float(request.query_params.get('windSpeed'))
         humidity = float(request.query_params.get('humidity'))
-        
+
         weather_type = get_weather_class([max_temp, min_temp, wind_speed, humidity])
         cody_review_set = ClothesSetReview.objects.all()
         filtered_cody_review_set = cody_review_set.filter(review=3, weather_type=weather_type)
@@ -227,22 +228,22 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         filtered_clothes_set_id = []
         for filtered_cody_review in filtered_cody_review_set:
             filtered_clothes_set_id.append(filtered_cody_review.clothes_set.id)
-        
+
         filtered_clothes_set = ClothesSet.objects.filter(pk__in=filtered_clothes_set_id)
-        
+
         combination_dict = {}
         for clothes_set in filtered_clothes_set:
             clothes_combination = set()
             for clothes in clothes_set.clothes.all():
                 clothes_combination.add(clothes.lower_category)
-                
+
             comb = tuple(clothes_combination)
             if comb in combination_dict.keys():
                 combination_dict[comb][0] += 1
                 combination_dict[comb][1].add(clothes_set.image_url)
             else:
                 combination_dict[comb] = [1,set([clothes_set.image_url])]
-        
+
         result = sorted(combination_dict.items(), key=(lambda x:x[1][0]), reverse=True)[:MAX_ITEM_NUM]
 
         result_list = []
@@ -260,7 +261,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
         return Response(result_list)
 
-    
+
     @action(detail=False, methods=['get'])
     def lookbook(self, request, *args, **kwargs):
         """
@@ -275,7 +276,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             user_gender = 'f'
 
         url = 'https://www.musinsa.com/index.php?m=shopstaff&_y=' + year + '&ordw=d_regis&gender=' + user_gender
-        
+
         req = requests.get(url)
         html = BeautifulSoup(req.text, 'html.parser')
         div_tag = html.find('div', class_='list-box box')
@@ -284,7 +285,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         num_list = sample([0,1,2,3,4,5,6,7,8,9], 5)
 
         li_tag = div_tag.find_all('li', class_='listItem')
-        
+
         lookbook_list = []
         for count in range(5):
             ran_img = int(num_list[count])
@@ -292,7 +293,7 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
             # 이미지 url 받아오기
             img_url = ran_li.find('img').get('src')
-            
+
             # 브랜드명 받아오기
             brand = ran_li.find('p', class_='brackets brand').text
 
@@ -307,8 +308,8 @@ class ClothesView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
 class ClothesNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = Clothes.objects.all()
-    serializer_class = ClothesSerializer  
-    
+    serializer_class = ClothesSerializer
+
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
     ordering_fields = ('created_at', 'id', )
@@ -322,7 +323,7 @@ class ClothesNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet)
 
     # Use filter validation.
     filter_validation_schema = clothes_query_schema
-    
+
     # Permissions.
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -330,18 +331,18 @@ class ClothesNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet)
 class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = ClothesSet.objects.all()
-        
+
         # me 파라미터가 true인 경우, 해당 유저의 코디만 반환
         if self.request.query_params.get('me'):
             user = self.request.user
             queryset = queryset.filter(owner=user.id)
-                
+
         return queryset
-    
+
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'update':
             return ClothesSetSerializer
-        return ClothesSetReadSerializer 
+        return ClothesSetReadSerializer
 
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
@@ -355,21 +356,21 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
 
     # Use filter validation.
     filter_validation_schema = clothes_set_query_schema
-    
+
     # Permissions.
     permission_classes = [IsAuthenticatedOrReadOnly]
-    
+
     def list(self, request, *args, **kwargs):
         # If me parameter is set, check authentication.
         if request.query_params.get('me') and not request.user.is_authenticated:
             return Response({
                 'error' : 'token authorization failed ... please log in'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
         queryset = self.filter_queryset(self.get_queryset())
         if request.query_params.get('review'):
             reviews = ClothesSetReview.objects.all()
-            
+
             queryset_list = list(queryset)
             for clothesSet in queryset_list:
                 included_reviews = reviews.filter(clothes_set__id=clothesSet.id)
@@ -382,20 +383,20 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
-            
+
         return Response(serializer.data)
-            
-    
+
+
     def create(self, request, *args, **kwargs):
         if 'clothes' in request.data.keys():
             user = request.user
-            
+
             all_clothes = Clothes.objects.all()
             filtered_clothes = all_clothes.filter(owner_id=user.id)
             filtered_clothes_id = []
             for clothes in filtered_clothes:
                 filtered_clothes_id.append(int(clothes.id))
-                
+
             # 입력된 옷들이 모두 해당 유저의 것인지 확인.
             # TODO(mskwon1): content-type이 json이 아닌경우 바꿔줘야함.
             # for clothes_id in request.data.getlist('clothes'):
@@ -404,21 +405,21 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
                     return Response({
                         "error" : "this is not your clothes : " + clothes_id
                     }, status=status.HTTP_200_OK)
-        
+
         if 'image' in request.data.keys():
             image = byte_to_image(request.data['image'])
             temp_url = save_image_s3(image, 'clothes-sets')
             image_url = move_image_to_saved(temp_url, 'clothes-sets')
-            
+
             request.data['image_url'] = image_url
-        
+
         else:
             return Response({
                 "error": 'image field is required'
             }, status=status.HTTP_400_BAD_REQUEST)
-            
+
         return super().create(request, *args, **kwargs)
-    
+
     def perform_create(self, serializer):
         serializer.save(owner_id = self.request.user.id)
 
@@ -426,38 +427,38 @@ class ClothesSetView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
         user = request.user
         key = int(kwargs.pop('pk'))
         target_clothes_set = ClothesSet.objects.filter(id=key)
-        
+
         if user.id != int(target_clothes_set[0].owner.id):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
         if 'image' in request.data.keys():
             image = byte_to_image(request.data['image'])
             temp_url = save_image_s3(image, 'clothes-sets')
             image_url = move_image_to_saved(temp_url, 'clothes-sets')
-            
+
             request.data['image_url'] = image_url
-            
+
         return super().update(request, *args, **kwargs)
-    
+
     def destroy(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
         target_clothes_set = ClothesSet.objects.filter(id=key)
-        
+
         if user.id != int(target_clothes_set[0].owner.id):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
         return super().destroy(request, *args, **kwargs)
-    
-    
+
+
 class ClothesSetNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSet.objects.all()
-    serializer_class = ClothesSetReadSerializer  
-    
+    serializer_class = ClothesSetReadSerializer
+
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
     ordering_fields = ('created_at', 'id', )
@@ -470,20 +471,20 @@ class ClothesSetNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
 
     # Use filter validation.
     filter_validation_schema = clothes_set_query_schema
-    
+
     # Permissions.
     permission_classes = [IsAuthenticatedOrReadOnly]
-        
-        
-class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):    
+
+
+class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = ClothesSetReview.objects.all()
-        
+
         # me 파라미터가 true인 경우, 해당 유저의 Review만 반환
         if self.request.query_params.get('me'):
             user = self.request.user
             queryset = queryset.filter(owner=user.id)
-                
+
         return queryset
 
     def  get_serializer_class(self):
@@ -506,24 +507,24 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
 
     # Use filter validation.
     filter_validation_schema = clothes_set_review_query_schema
-    
+
     # Permissions.
-    permission_classes = [IsAuthenticatedOrReadOnly]    
-    
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
     def list(self, request, *args, **kwargs):
         # If me parameter is set, check authentication.
         if request.query_params.get('me') and not request.user.is_authenticated:
             return Response({
                 'error' : 'token authorization failed ... please log in'
             }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
         queryset = self.filter_queryset(self.get_queryset())
 
         max_temp = float(request.query_params.get('maxTemp'))
         min_temp = float(request.query_params.get('minTemp'))
         wind_speed = float(request.query_params.get('windSpeed'))
         humidity = float(request.query_params.get('humidity'))
-        
+
         weather_type = get_weather_class([max_temp, min_temp, wind_speed, humidity])
         queryset = queryset.filter(weather_type=weather_type)
 
@@ -533,25 +534,25 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
-        
+
         return Response(serializer.data)
-    
+
     def create(self, request, *args, **kwargs):
         if 'clothes_set' in request.data:
             user = request.user
-            
+
             all_clothes_set = ClothesSet.objects.all()
             filtered_clothes_set = all_clothes_set.filter(owner_id=user.id)
             filtered_clothes_set_id = []
             for clothes_set in filtered_clothes_set:
                 filtered_clothes_set_id.append(int(clothes_set.id))
-                
+
             # 입력된 코디가 해당 유저의 것인지 확인.
             if int(request.data['clothes_set']) not in filtered_clothes_set_id:
                 return Response({
                     "error" : "this is not your clothes set : " + request.data['clothes_set']
                 }, status=status.HTTP_200_OK)
-        
+
         # 하루 시간대 (0-8, 8-16, 16-24)
         day = [0, 8, 16, 24]
 
@@ -581,7 +582,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             end_conv_time, end_conv_date = convert_time(end_conv_time, end_year, end_month, end_day)
             end_conv_time = int(end_conv_time[0] + end_conv_time[1])
             end_conv_date = end_conv_date[:4] + '-' + end_conv_date[4:6] + '-' + end_conv_date[6:]
-            
+
             # 시작 시간대 구분
             if(int(start_time[0]) < 8): # 시작시간 : 아침
                 st = 1
@@ -596,7 +597,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             elif(int(end_time[0]) < 16): # 끝시간 : 오후
                 et = 1
             else: # 끝시간 : 밤
-                et = 2              
+                et = 2
 
             # 시작 ~ 끝 시간대 계산
             i = 0
@@ -606,7 +607,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             elif(st-et == 0): # 끝-시작 = 시간대 2개
                 r = 2
             else: # 끝-시작 = 시간대 3개
-                r = 3    
+                r = 3
 
             for i in range(0, r):
                 if(r==1): # 끝-시작 = 시간대 1개
@@ -620,9 +621,9 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
 
                 elif(r==2): # 끝-시작 = 시간대 2개
                     if(i==0): # 앞 시간대
-                        start_conv_time = start_time[0] + start_time[1] 
+                        start_conv_time = start_time[0] + start_time[1]
                         end_conv_time = day[st]*100
-                            
+
                         real_start_time = start_time
                         real_start_time = str(real_start_time[0]) + ":" + str(real_start_time[1]) + ":" + str(real_start_time[2])
                         real_end_time = end_time
@@ -630,9 +631,9 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                             real_end_time = "0" + str(day[st]) + ":" + '00' + ":" + '00'
                         else:
                             real_end_time = str(day[st]) + ":" + '00' + ":" + '00'
-                            
-                            
-                            
+
+
+
                     else: # 뒷 시간대
                         start_conv_time = day[et]*100
                         end_conv_time = end_time[0] + end_time[1]
@@ -644,13 +645,13 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                             real_start_time = str(day[et]) + ":" + '00' + ":" + '00'
                         real_end_time = end_time
                         real_end_time = str(real_end_time[0]) + ":" + str(real_end_time[1]) + ":" + str(real_end_time[2])
-                                                    
+
 
                 else: # 끝-시작 = 시간대 3개
                     if(i==0): # 앞 시간대
-                        start_conv_time = start_time[0] + start_time[1] 
+                        start_conv_time = start_time[0] + start_time[1]
                         end_conv_time = day[st]*100
-                            
+
                         real_start_time = start_time
                         real_start_time = str(real_start_time[0]) + ":" + str(real_start_time[1]) + ":" + str(real_start_time[2])
                         real_end_time = end_time
@@ -658,8 +659,8 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                             real_end_time = "0" + str(day[st]) + ":" + '00' + ":" + '00'
                         else:
                             real_end_time = str(day[st]) + ":" + '00' + ":" + '00'
-                            
-                            
+
+
                     elif(i==1): # 중간 시간대
                         start_conv_time = day[st]*100
                         end_conv_time = day[et]*100
@@ -685,8 +686,8 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 end_conv_time, end_conv_date = convert_time(end_conv_time, end_year, end_month, end_day)
                 end_conv_time = int(end_conv_time[0] + end_conv_time[1])
                 end_conv_date = end_conv_date[:4] + '-' + end_conv_date[4:6] + '-' + end_conv_date[6:]
-                
-            
+
+
                 # API 요청하기
                 all_weather_data = Weather.objects.all()
                 weather_data_set = all_weather_data.filter(location_code=location)
@@ -694,7 +695,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 weather_data_set = weather_data_set.exclude(date__gt=end_conv_date)
                 weather_data_on_start = weather_data_set.exclude(date=start_conv_date, time__lt=start_conv_time)
                 weather_data_on_end = weather_data_on_start.exclude(date=end_conv_date, time__gt=end_conv_time)
-                
+
                 if weather_data_on_end.count()==0:
                     now = datetime.datetime.now()
                     today = now - datetime.timedelta(hours=24)
@@ -707,9 +708,9 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     else:
                         with open('apps/api/locations/data.json') as json_file:
                             json_data = json.load(json_file)
-                        
+
                         new_x = int((json_data[str(location)]['x']))
-                        new_y = int((json_data[str(location)]['y']))    
+                        new_y = int((json_data[str(location)]['y']))
 
                         date_list = [start, end]
 
@@ -731,9 +732,9 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
                             weather_data_on_end.objects.create(location_code=location, date=date[0:10], time=conv_time[0:2], x=new_x, y=new_y,
-                                                                temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'], 
+                                                                temp=response['T3H'], sensible_temp=response['WCI'], humidity=response['REH'],
                                                                 wind_speed=response['WSD'], precipitation=response['R06'])
-                                                                    
+
                 request.data['max_temp'] = weather_data_on_end.aggregate(Max('temp'))['temp__max']
                 request.data['min_temp'] = weather_data_on_end.aggregate(Min('temp'))['temp__min']
                 request.data['max_sensible_temp'] = weather_data_on_end.aggregate(Max('sensible_temp'))['sensible_temp__max']
@@ -741,13 +742,13 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 request.data['humidity'] = weather_data_on_end.aggregate(Avg('humidity'))['humidity__avg']
                 request.data['wind_speed'] = weather_data_on_end.aggregate(Avg('wind_speed'))['wind_speed__avg']
                 request.data['precipitation'] = weather_data_on_end.aggregate(Avg('precipitation'))['precipitation__avg']
-                
+
                 request.data['weather_type'] = get_weather_class([
                     request.data['max_temp'],
                     request.data['min_temp'],
                     request.data['wind_speed'],
                     request.data['humidity'],
-                ]) 
+                ])
 
                 if(start_time[0] == '00' and start_time[1] == '00' and start_time[2] == '00'):
                     if(change_date_idx == 1):
@@ -758,7 +759,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 request.data['end_datetime'] = end_conv_date + " " + real_end_time
 
                 all_review_sensor = ReviewSensor.objects.all()
-                review_sensor_set = all_review_sensor.filter(owner_id=request.user.id) 
+                review_sensor_set = all_review_sensor.filter(owner_id=request.user.id)
                 review_sensor_set = review_sensor_set.exclude(date__lt=start_conv_date)
                 review_sensor_set = review_sensor_set.exclude(date__gt=end_conv_date)
                 review_sensor_set = review_sensor_set.exclude(date=start_conv_date, time__lt=real_start_time)
@@ -768,7 +769,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     calc_review = 0
                 else:
                     calc_review = review_sensor_set.aggregate(Sum('level'))['level__sum']
-                    
+
                 if(calc_review <= -4):
                     request.data['review'] = 1
                 elif(calc_review <= -2):
@@ -778,14 +779,14 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                 elif(calc_review <= 3):
                     request.data['review'] = 4
                 else:
-                    request.data['review'] = 5   
+                    request.data['review'] = 5
 
 
                 super(ClothesSetReviewView, self).create(request, *args, **kwargs)
 
-                
-    
-        
+
+
+
         return Response({
                 'owner_id': request.user.id,
             }, status=status.HTTP_200_OK)
@@ -799,12 +800,12 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         user = request.user
         key = int(kwargs.pop('pk'))
         target_clothes_review_set = ClothesSetReview.objects.filter(owner_id=key)
-        
+
         if user.id != int(target_clothes_review_set[0].owner.id):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
-        
+
         if set(['clothes_set', 'start_datetime', 'end_datetime', 'location']).issubset(request.data.keys()):
             start = request.data['start_datetime']
             end = request.data['end_datetime']
@@ -827,41 +828,41 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
             cody_set = ClothesSetReview.objects.filter(owner_id=request.user.id, clothes_set_id=request.data['clothes_set'],
                                                         start_datetime__gte=start, end_datetime__lte=end)
             cody_set.update(comment=request.data['comment'])
-            
+
         return Response({
             "owner_id" : request.user.id
             }, status=status.HTTP_200_OK)
-    
+
     def destroy(self, request, *args, **kwargs):
         user = request.user
         key = int(kwargs.pop('pk'))
         target_clothes_review_set = ClothesSetReview.objects.filter(id=key)
-        
+
         if user.id != int(target_clothes_review_set[0].owner.id):
             return Response({
                 'error' : 'you are not allowed to access this object'
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-        return super().destroy(request, *args, **kwargs)    
-    
+        return super().destroy(request, *args, **kwargs)
+
     @action(detail=False, methods=['get'])
     def location_search(self, request, *args, **kwargs):
         """
         An endpoint that returns search result for
         location based on query parameter
         """
-        
+
         # Get query parameters.
         search = request.query_params.get('search')
         search = '' if search == None else search
         limit = request.query_params.get('limit')
         offset = request.query_params.get('offset')
-        
+
         # Open JSON file for location results.
         with open('apps/api/locations/data.json') as json_file:
             data = json.load(json_file)
-            
-        # Get results total count & initial list containing search keyword.    
+
+        # Get results total count & initial list containing search keyword.
         results = []
         count = 0
         for index in data:
@@ -871,19 +872,19 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     'id' : index,
                     'location' : data[index]['full_address']
                 })
-        
+
         # Filter list according to limit & offset.
         final_results = []
         offset = 0 if offset == None else int(offset)
         limit = count if limit == None else int(limit)
         limit_count = 0
-        
+
         for result in results[offset:]:
             limit_count += 1
             final_results.append(result)
             if limit_count == limit:
                 break
-        
+
         # Return response.
         return Response({
                 'count': count,
@@ -894,7 +895,7 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
     @action(detail=False, methods=['get'])
     def global_weather(self, request, *args, **kwargs):
         """
-        An endpoint that returns global weather data for 
+        An endpoint that returns global weather data for
         location and date which wanna forecast
         """
         # Get Location.
@@ -922,25 +923,25 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         'wind_speed': wind_speed,
         'precipitation': precipitation,
             }, status=status.HTTP_200_OK)
-        
+
     @action(detail=False, methods=['get'])
     def global_search(self, request, *args, **kwargs):
         """
         An endpoint that returns search result for
         location based on query parameter
         """
-        
+
         # Get query parameters.
         search = request.query_params.get('search')
         search = '' if search == None else search
         limit = request.query_params.get('limit')
         offset = request.query_params.get('offset')
-        
+
         # Open JSON file for location results.
         with open('apps/api/locations/cities_20000.json', 'rt', encoding='UTF-8') as json_file:
             data = json.load(json_file)
-            
-        # Get results total count & initial list containing search keyword.    
+
+        # Get results total count & initial list containing search keyword.
         results = []
         count = 0
         for city in data:
@@ -950,19 +951,19 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
                     'id': city['city_id'],
                     'location' : city['city_name']
                 })
-        
+
         # Filter list according to limit & offset.
         final_results = []
         offset = 0 if offset == None else int(offset)
         limit = count if limit == None else int(limit)
         limit_count = 0
-        
+
         for result in results[offset:]:
             limit_count += 1
             final_results.append(result)
             if limit_count == limit:
                 break
-        
+
         # Return response.
         return Response({
                 'count': count,
@@ -985,6 +986,39 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         humidity = int(weather_data['REH'])
         wind_speed = float(weather_data['WSD'])
         precipitation = float(weather_data['RN1'])
+        sense = float(weather_data['WCI'])
+        max_sense = float(weather_data['WCIMAX'])
+        min_sense = float(weather_data['WCIMIN'])
+
+        # Return response
+        return Response({
+                'temperature': temperature,
+                'min_temperature': min_temp,
+                'max_temperature': max_temp,
+                'chill_temp': sense,
+                'min_chill_temp': min_sense,
+                'max_chill_temp': max_sense,
+                'humidity': humidity,
+                'wind_speed': wind_speed,
+                'precipitation': precipitation,
+            }, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def weather_forecast(self, request, *args, **kwargs):
+        """
+        An endpoint that returns weather forcast data for
+        location based on query parameter and morning/afternoon time
+        """
+        # Get Location.
+        location = request.query_params.get('location')
+        ismorning = request.query_params.get('ismorning')
+        weather_data = get_weather_forcast(location, ismorning)
+        temperature = float(weather_data['T3H'])
+        max_temp = float(weather_data['MAX'])
+        min_temp = float(weather_data['MIN'])
+        humidity = int(weather_data['REH'])
+        wind_speed = float(weather_data['WSD'])
+        precipitation = float(weather_data['R06'])
         sense = float(weather_data['WCI'])
         max_sense = float(weather_data['WCIMAX'])
         min_sense = float(weather_data['WCIMIN'])
@@ -1029,20 +1063,20 @@ class ClothesSetReviewView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewS
         #             location = int(index)
         #             location_code = location
         #             break
-        
+
         ReviewSensor.objects.create(owner_id=owner, date=date, time=time, level=level)
 
         return Response({
                         'owner_id' : owner,
                         'date' : date,
-                        'time' : time, 
+                        'time' : time,
                         'level' : level,
                         })
 
 
 class ClothesSetReviewNestedView(FiltersMixin, NestedViewSetMixin, viewsets.ModelViewSet):
     queryset = ClothesSetReview.objects.all()
-    serializer_class = ClothesSetReviewReadSerializer  
+    serializer_class = ClothesSetReviewReadSerializer
 
     # Apply ordering, uses `ordering` query parameter.
     filter_backends = (filters.OrderingFilter, )
@@ -1060,6 +1094,6 @@ class ClothesSetReviewNestedView(FiltersMixin, NestedViewSetMixin, viewsets.Mode
 
     # Use filter validation.
     filter_validation_schema = clothes_set_review_query_schema
-    
+
     # Permissions.
-    permission_classes = [IsAuthenticatedOrReadOnly]   
+    permission_classes = [IsAuthenticatedOrReadOnly]
